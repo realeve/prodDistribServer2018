@@ -17,6 +17,9 @@
 	{orgid:1453,orgname:'数管10号库房'},
 	{orgid:1455,orgname:'数管11号库房'},
 	{orgid:1460,orgname:'立体库'},
+	{orgid:250,orgname:'检封库房大张号票库区'},
+	{orgid:251,orgname:'检封库房小张号票库区'},
+	{orgid:252,orgname:'检封库房补票库区'}
 ]
 
 2	产品工序状态
@@ -35,7 +38,7 @@
 	{pscode:'wedg',psname:'凹二印待干品'},
 	{pscode:'weyp',psname:'凹二印品'},
 	{pscode:'dhdg',psname:'大张号票待干品'},
-	{pscode:'dzhp',psname:'大张号票'},
+	{pscode:'dzhp',psname:'大张号票'}
 ]
 
 1 批量车号在库查询

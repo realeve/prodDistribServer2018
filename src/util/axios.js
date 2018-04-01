@@ -17,7 +17,6 @@ let getToken = async shopId => {
   let fileName = `${getMainContent()}/src/util/token.json`;
   try {
     let token = fs.readFileSync(fileName, "utf-8");
-    console.log(token);
     return token;
   } catch (e) {
     let url = host + "authorize.json?user=develop&psw=111111";
