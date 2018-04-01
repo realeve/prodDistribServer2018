@@ -3,9 +3,10 @@
     "axios": "^0.18.0"
   },
   "scripts": {
-    "start": "node ./dist/app"
+    "start": "node app.js"
   },
   "dependencies": {
+    "moment": "^2.22.0",
     "qs": "^6.5.1",
     "ramda": "^0.25.0"
   }

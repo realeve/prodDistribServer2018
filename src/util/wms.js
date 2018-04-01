@@ -79,14 +79,23 @@ let getStockStatus = async carnos => {
 库管人员、拉号人员、质检人员根据你通知的锁车原因（实际就是批次）在数管系统中可以找到这一批次进行后续处理。
 比如，拉号人员可以关注这一批次的车号，然后指定车号出库进行检查。
 锁车以后必须将锁住的批次通知到后续处理的人员，这些批次的产品才能被呼出。
-被锁定的车号只能以指定车号方式呼出，否则只能等待解除锁定才能被呼出。*/
+被锁定的车号只能以指定车号方式呼出，否则只能等待解除锁定才能被呼出。
 
-let setBlackList = async carnos => {
+接口调整 20180401
+批量锁车的应用场景一般是同一原因，批量锁一批车号，将车号列表和reason_code分离比较合理，reason_code为int类型，表示id。
+建立以下原因：
+1.人工抽检
+2.异常产品转全检
+3.四新验证
+4.其它
+*/
+let setBlackList = async ({ carnos, reason_code }) => {
   let data = await axios({
     method: "post",
     url: host + "/lockH",
     data: {
-      carnos
+      carnos,
+      reason_code
     }
   }).then(res => res.data);
 
@@ -139,18 +148,27 @@ let getBlackReason = async () => {
 
 // 4 添加锁车原因
 // 状态码，锁车描述
-let addBlackReason = async ({ reason_code, reason_desc }) => {
+let addBlackReason = async ({ reason_desc }) => {
   let data = await axios({
     method: "post",
     url: host + "/lockR",
     data: {
-      reason_code,
       reason_desc
     }
   }).then(res => res.data);
 
   // 返回值：
-  let json = JSON.stringify({ status: false, errMsg: "失败原因" });
+  // let json = JSON.stringify({ status: false, errMsg: "失败原因" });
+  let json = JSON.stringify([
+    {
+      status: true,
+      reason_code: 15
+    },
+    {
+      status: false,
+      errMsg: "失败原因"
+    }
+  ]);
 
   return data;
 };
