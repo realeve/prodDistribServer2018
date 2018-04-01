@@ -59,7 +59,7 @@ let getStockStatus = async carnos => {
     }
   }).then(res => res.data);
 
-  // 返回值：车号，库房ID，数量，工序code
+  // 返回值：车号，库房ID，批次数量，工序code
   let json = JSON.stringify([
     { carno: "1880A211", orgid: "1450", quantity: 10000, pscode: "wydg" }
   ]);
@@ -117,7 +117,7 @@ let getBlackReason = async () => {
     url: host + "/lockQ"
   }).then(res => res.data);
 
-  // 返回值：未处理车号列表，已处理车号列表
+  // 返回值：
   let json = JSON.stringify([
     { reason_code: "这里的枚举是哪些", reason_desc: "对应的描述信息" }
   ]);
@@ -137,7 +137,7 @@ let addBlackReason = async ({ reason_code, reason_desc }) => {
     }
   }).then(res => res.data);
 
-  // 返回值：未处理车号列表，已处理车号列表
+  // 返回值：
   let json = JSON.stringify({ status: false, errMsg: "失败原因" });
 
   return data;
@@ -145,7 +145,7 @@ let addBlackReason = async ({ reason_code, reason_desc }) => {
 
 // 6.批量解锁
 // let [carno1,carno2,carno3] = carnos
-let setBlackList = async carnos => {
+let setWhiteList = async carnos => {
   let data = await axios({
     method: "post",
     url: host + "/unlockH",
@@ -161,4 +161,15 @@ let setBlackList = async carnos => {
   });
 
   return data;
+};
+
+module.exports = {
+  getStoreRoom,
+  getProcStatus,
+  getStockStatus,
+  setProcs,
+  getBlackReason,
+  addBlackReason,
+  setBlackList,
+  setWhiteList
 };
