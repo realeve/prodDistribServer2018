@@ -2,9 +2,9 @@ let http = require("axios");
 let qs = require("qs");
 let fs = require("fs");
 
-let DEV = true;
+let dev = true;
 
-let host = DEV ? "http://localhost:90/api/" : "http://10.8.1.25:100/api/";
+let host = dev ? "http://localhost:90/api/" : "http://10.8.1.25:100/api/";
 
 // 程序主目录
 let getMainContent = () => {
@@ -88,7 +88,5 @@ let axios = async option => {
 
 module.exports = {
   axios,
-  getToken,
-  host,
-  DEV
+  dev
 };

@@ -1,7 +1,8 @@
 const axios = require("axios");
 
 // 测试环境
-const dev = false;
+const { dev } = require("./axios");
+
 let host = dev
   ? "http://mactest.cdyc.cbpm:8080/wms/if"
   : "http://mac.cdyc.cbpm:8080/wms/if";
@@ -68,8 +69,18 @@ let getStockStatus = async carnos => {
 };
 
 // 5.批量锁车
-// let [{carno,reason_code}] = carnos
-// 问：此处 reason_code，原因状态码，啥意思
+/*let [{carno,reason_code}] = carnos
+
+问：此处 reason_code，原因状态码，啥意思
+
+答：此处 reason_code可以从接口3锁车原因列表中获得，比如人工全检锁车，我们预设的 reason_code 是 handCheck 
+你也可以通过接口4注册新的锁车原因。你在质量管理系统中发现某一特定批次的产品可能有缺陷，你想对这一批次进行锁车，并特别标注出来，
+那么你可以先注册一个锁车原因，然后将这一批次产品以新注册的原因锁车，并通知对应人员关注因xxxx锁车的这一批次。
+库管人员、拉号人员、质检人员根据你通知的锁车原因（实际就是批次）在数管系统中可以找到这一批次进行后续处理。
+比如，拉号人员可以关注这一批次的车号，然后指定车号出库进行检查。
+锁车以后必须将锁住的批次通知到后续处理的人员，这些批次的产品才能被呼出。
+被锁定的车号只能以指定车号方式呼出，否则只能等待解除锁定才能被呼出。*/
+
 let setBlackList = async carnos => {
   let data = await axios({
     method: "post",
@@ -117,7 +128,8 @@ let getBlackReason = async () => {
     url: host + "/lockQ"
   }).then(res => res.data);
 
-  // 返回值：
+  // 返回值：未处理车号列表，已处理车号列表
+  // 见接口5的回答
   let json = JSON.stringify([
     { reason_code: "这里的枚举是哪些", reason_desc: "对应的描述信息" }
   ]);

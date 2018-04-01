@@ -1,8 +1,8 @@
-let { axios, getToken } = require("./util/axios");
+let db = require("./util/db");
 
 const init = async () => {
-  let token = await getToken();
-  console.log(token);
+  let data = await db.getPrintNewprocPlan();
+  console.log(data);
 };
 
 module.exports = { init };
