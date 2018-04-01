@@ -1,8 +1,7 @@
-let db = require("./util/db");
+let handleNewProc = require("./handleNewProc");
 
-const init = async () => {
-  let data = await db.getPrintNewprocPlan();
-  console.log(data);
+const init = () => {
+  handleNewProc.init();
 };
 
 module.exports = { init };
