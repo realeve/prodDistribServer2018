@@ -1,0 +1,85 @@
+
+应用服务地址
+生产环境	http://mac.cdyc.cbpm:8080/wms
+测试环境	http://mactest.cdyc.cbpm:8080/wms
+
+常量
+1	库房编码
+[
+	{orgid:1445,orgname:'数管2号库房'},
+	{orgid:1446,orgname:'数管3号库房'},
+	{orgid:1447,orgname:'数管4号库房'},
+	{orgid:1448,orgname:'数管5号库房'},
+	{orgid:1449,orgname:'数管6号库房'},
+	{orgid:1450,orgname:'数管7号库房'},
+	{orgid:1451,orgname:'数管8号库房'},
+	{orgid:1452,orgname:'数管9号库房'},
+	{orgid:1453,orgname:'数管10号库房'},
+	{orgid:1455,orgname:'数管11号库房'},
+	{orgid:1460,orgname:'立体库'},
+]
+
+2	产品工序状态
+[
+	{pscode:'wzbz',psname:'物资白纸'},
+	{pscode:'czbz',psname:'钞纸白纸'},
+	{pscode:'bz',psname:'白纸'},
+	{pscode:'jydg',psname:'胶一印待干品'},
+	{pscode:'jyyp',psname:'胶一印品'},
+	{pscode:'jedg',psname:'胶二印待干品'},
+	{pscode:'jeyp',psname:'胶二印品'},
+	{pscode:'sydg',psname:'丝印待干品'},
+	{pscode:'syyp',psname:'丝印品'},
+	{pscode:'wydg',psname:'凹一印待干品'},
+	{pscode:'wyyp',psname:'凹一印品'},
+	{pscode:'wedg',psname:'凹二印待干品'},
+	{pscode:'weyp',psname:'凹二印品'},
+	{pscode:'dhdg',psname:'大张号票待干品'},
+	{pscode:'dzhp',psname:'大张号票'},
+]
+
+1 批量车号在库查询
+地址：/if/carnoQ
+输入carnos=[carno1,carno2,...]
+逻辑：select from tbstock t where t.strcarno in ([]) and t.intstock > 0 and t.intorgid in (1445,1446,...1454,1460)
+输出[{carno:carno,orgid:intorgid,quantity:intstock,pscode:strpscode},...]
+
+2 批量车号设定质检工艺
+地址：/if/carnoH
+输入carnos=[{carno:carno,checkType:['全检品'|'码后核查'|‘补票']},...]
+逻辑：
+	--校验
+	select strcarno from tbcare c where c.strcarno in (...)
+	set1：已知车号集合
+	set2：未知车号集合
+	以下仅处理已知车号
+	--转全检
+	update tbbase_car_technology_history t set t.status=99 where t.car_no in ([]);
+	insert tbbase_car_technology_history(car_no,technology_name,status) values([{carno,checkType,1},...])
+	--filter carno where the isManual is true，锁车
+输出{unhandledList:[],handledList:[]}
+	
+3 锁车原因列表
+地址：/if/lockQ
+输入：无
+逻辑：select * from tb_black_reason
+输出：[{reason_code,reason_desc},...]
+
+4 注册锁车原因
+地址：/if/lockR
+输入：reason_code,reason_desc
+逻辑：insert
+输出：{status:true/fasle(成功/失败),errMsg:'失败原因'}
+
+5 批量锁车
+地址：/if/lockH
+输入：carnos=[{carno,reason_code},...]
+逻辑：同2，跳过转全检部分
+	update tb_black_list t set t.intstatus=0 where t.strcarno in (carno1,carno2,...)
+	insert into tb_black_list(strcarno,intime,intstatus,reason_code) values(carno,sysdate,1,reason_code...)
+输出：同2
+
+6 批量解锁
+地址：/if/unlockH
+输入：carnos=[carno1,carno2,...]
+输出：同2

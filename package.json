@@ -4,5 +4,8 @@
   },
   "scripts": {
     "start": "node ./dist/app"
+  },
+  "dependencies": {
+    "qs": "^6.5.1"
   }
 }
