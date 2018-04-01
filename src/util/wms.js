@@ -51,7 +51,7 @@ let getProcStatus = psc =>
 // 1.批量车号在库查询
 // let [carno1,carno2,carno3] = carnos
 let getStockStatus = async carnos => {
-  let data = axios({
+  let data = await axios({
     method: "post",
     url: host + "/carnoQ",
     data: {
@@ -71,7 +71,7 @@ let getStockStatus = async carnos => {
 // let [{carno,reason_code}] = carnos
 // 问：此处 reason_code，原因状态码，啥意思
 let setBlackList = async carnos => {
-  let data = axios({
+  let data = await axios({
     method: "post",
     url: host + "/lockH",
     data: {
@@ -92,7 +92,7 @@ let setBlackList = async carnos => {
 // checkType:'全检品'||'码后核查'||'补票'
 // carnos:[carno1,carno2,carno3]
 let setProcs = async ({ checkType, carnos }) => {
-  let data = axios({
+  let data = await axios({
     method: "post",
     url: host + "/carnoH",
     data: {
@@ -112,7 +112,7 @@ let setProcs = async ({ checkType, carnos }) => {
 
 // 3 锁车原因列表
 let getBlackReason = async () => {
-  let data = axios({
+  let data = await axios({
     method: "post",
     url: host + "/lockQ"
   }).then(res => res.data);
@@ -128,7 +128,7 @@ let getBlackReason = async () => {
 // 4 添加锁车原因
 // 状态码，锁车描述
 let addBlackReason = async ({ reason_code, reason_desc }) => {
-  let data = axios({
+  let data = await axios({
     method: "post",
     url: host + "/lockR",
     data: {
@@ -146,7 +146,7 @@ let addBlackReason = async ({ reason_code, reason_desc }) => {
 // 6.批量解锁
 // let [carno1,carno2,carno3] = carnos
 let setBlackList = async carnos => {
-  let data = axios({
+  let data = await axios({
     method: "post",
     url: host + "/unlockH",
     data: {
