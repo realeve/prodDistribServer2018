@@ -4,7 +4,7 @@ let fs = require("fs");
 
 let dev = true;
 
-let host = dev ? "http://localhost:90/api/" : "http://10.8.1.25:100/api/";
+let host = dev ? "http://127.0.0.1:90/api/" : "http://10.8.1.25:100/api/";
 
 // 程序主目录
 let getMainContent = () => {
@@ -78,11 +78,9 @@ let axios = async option => {
       }
       return data;
     })
-    .catch(({ response }) => {
-      let req = response.request;
-      console.log(req);
-      let data = response.data;
-      return Promise.reject(data);
+    .catch(e => {
+      console.log(e);
+      return Promise.reject(e);
     });
 };
 

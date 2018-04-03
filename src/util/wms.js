@@ -109,17 +109,24 @@ let setBlackList = async ({ carnos, reason_code }) => {
 };
 
 // 2.批量车号设定质检工艺
-// checkType:'全检品'||'码后核查'||'补票'
-// carnos:[carno1,carno2,carno3]
+/*checkType:'全检品'||'码后核查'||'补票'
+需修改：8位清分机全检 || 人工拉号 || 系统自动分配
+[
+  { proc_stream_id: 0, proc_stream_name: "8位清分机全检" },
+  { proc_stream_id: 1, proc_stream_name: "人工拉号" },
+  { proc_stream_id: 2, proc_stream_name: "系统自动分配" }
+]
+carnos:[carno1,carno2,carno3]*/
 let setProcs = async ({ checkType, carnos }) => {
-  let data = await axios({
-    method: "post",
-    url: host + "/carnoH",
-    data: {
-      checkType,
-      carnos
-    }
-  }).then(res => res.data);
+  // let data = await axios({
+  //   method: "post",
+  //   url: host + "/carnoH",
+  //   data: {
+  //     checkType,
+  //     carnos
+  //   }
+  // }).then(res => res.data);
+  // return data;
 
   // 返回值：未处理车号列表，已处理车号列表
   let json = JSON.stringify({
@@ -127,7 +134,7 @@ let setProcs = async ({ checkType, carnos }) => {
     handledList: ["1820A211", "1820A233"]
   });
 
-  return data;
+  return json;
 };
 
 // 3 锁车原因列表
