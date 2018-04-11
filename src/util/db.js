@@ -3,70 +3,14 @@ let { axios } = require("./axios");
 /**
 *   @database: { 质量信息系统 }
 *   @desc:     { 未完成的全检任务计划列表 } 
-  
+
+  2018-04-11 更新
+  SELECT a.id,a.date_type,a.machine_name,a.proc_name,b.ProductName,a.reason,isnull(a.num1,0) num1,isnull(a.num2,0) num2,a.proc_stream1,a.proc_stream2,CONVERT (VARCHAR,a.rec_date1,112) rec_date1,CONVERT (VARCHAR,a.rec_date2,112) rec_date2,a.complete_num,a.complete_status,a.alpha_num FROM dbo.print_newproc_plan AS a INNER JOIN ProductData b on a.prod_id = b.ProductID WHERE a.complete_status = 0
 */
 const getPrintNewprocPlan = async () =>
   await axios({
     url: "/78/b36aab89f7.json"
   }).then(res => res);
-/*
-{
-  "data": [
-    {
-      "id": "1",
-      "date_type": "0",
-      "machine_name": "M81D-2号机",
-      "proc_name": "新设备",
-      "ProductName": "9604A     ",
-      "reason": "tes",
-      "num1": "24.0",
-      "num2": "0.0",
-      "proc_stream1": "0",
-      "proc_stream2": "2",
-      "rec_date1": "20180331",
-      "rec_date2": null,
-      "complete_num": "0",
-      "complete_status": "0"
-    },
-    {
-      "id": "2",
-      "date_type": "1",
-      "machine_name": "多功能-3号机",
-      "proc_name": "新设备",
-      "ProductName": "9604A     ",
-      "reason": "时间范围测试",
-      "num1": "0.0",
-      "num2": "0.0",
-      "proc_stream1": "0",
-      "proc_stream2": null,
-      "rec_date1": "20180331",
-      "rec_date2": "20180415",
-      "complete_num": "0",
-      "complete_status": "0"
-    }
-  ],
-  "title": "未完成的全检任务计划列表",
-  "rows": 2,
-  "time": "36.027ms",
-  "header": [
-    "id",
-    "date_type",
-    "machine_name",
-    "proc_name",
-    "ProductName",
-    "reason",
-    "num1",
-    "num2",
-    "proc_stream1",
-    "proc_stream2",
-    "rec_date1",
-    "rec_date2",
-    "complete_num",
-    "complete_status"
-  ]
-}
-
-*/
 
 const getCartList = async ({ machine_name, rec_date1 }) => {
   let arr = [];
@@ -84,8 +28,17 @@ const getCartListWithDate = async ({ machine_name, rec_date1, rec_date2 }) => {
   return arr;
 };
 
+const getCartListWithGZ = async ({ prod_name, gz, start_no, end_no }) => {
+  let arr = [];
+  for (let i = 100; i < 200; i++) {
+    arr.push(`1620A${i}`);
+  }
+  return arr;
+};
+
 module.exports = {
   getPrintNewprocPlan,
   getCartList,
-  getCartListWithDate
+  getCartListWithDate,
+  getCartListWithGZ
 };
