@@ -7,6 +7,8 @@ let host = dev
   ? "http://mactest.cdyc.cbpm:8080/wms/if"
   : "http://mac.cdyc.cbpm:8080/wms/if";
 
+host = "http://10.8.60.202:8080/wms/if";
+
 // 公共函数
 // 根据库房id获取库房名
 let getStoreRoom = org =>
@@ -62,7 +64,7 @@ let getStockStatus = async carnos => {
 
   // 返回值：车号，库房ID，批次数量，工序code
   let json = JSON.stringify([
-    { carno: "1880A211", orgid: "1450", quantity: 10000, pscode: "wydg" }
+    { pscode: "bz", orgid: "1449", carno: "1840K000", quantity: "350000" }
   ]);
 
   return data;
@@ -109,7 +111,7 @@ let setBlackList = async ({ carnos, reason_code }) => {
 };
 
 // 2.批量车号设定质检工艺
-/*checkType:'全检品'||'码后核查'||'补票'
+/*checkType:'全检品'||'码后核查'||'补品'
 需修改：8位清分机全检 || 人工拉号 || 系统自动分配
 [
   { proc_stream_id: 0, proc_stream_name: "8位清分机全检" },
@@ -118,23 +120,22 @@ let setBlackList = async ({ carnos, reason_code }) => {
 ]
 carnos:[carno1,carno2,carno3]*/
 let setProcs = async ({ checkType, carnos }) => {
-  // let data = await axios({
-  //   method: "post",
-  //   url: host + "/carnoH",
-  //   data: {
-  //     checkType,
-  //     carnos
-  //   }
-  // }).then(res => res.data);
-  // return data;
+  let data = await axios({
+    method: "post",
+    url: host + "/carnoH",
+    data: {
+      checkType,
+      carnos
+    }
+  }).then(res => res.data);
+  return data;
 
-  // 返回值：未处理车号列表，已处理车号列表
-  let json = JSON.stringify({
-    unhandledList: ["1880A211", "1880A232"],
-    handledList: ["1820A211", "1820A233"]
-  });
-
-  return json;
+  // // 返回值：未处理车号列表，已处理车号列表
+  // let json = JSON.stringify({
+  //   unhandledList: ["1880A211", "1880A232"],
+  //   handledList: ["1820A211", "1820A233"]
+  // });
+  // return json;
 };
 
 // 3 锁车原因列表

@@ -44,7 +44,7 @@ const getCartListWithGZ = async ({ prod_name, gz, start_no, end_no }) => {
   
     const { complete_num, complete_status, update_time, _id } = params;
 */
-export const setPrintNewprocPlan = async params =>
+const setPrintNewprocPlan = async params =>
   await axios({
     url: "/90/a6c66f8d72.json",
     params
@@ -55,7 +55,7 @@ export const setPrintNewprocPlan = async params =>
 *   @desc:     { 批量记录库管系统日志信息 } 
 	以下参数在建立过程中与系统保留字段冲突，已自动替换:
 	@desc:批量插入数据时，约定使用二维数组values参数，格式为[{remark,rec_time,return_info }]，数组的每一项表示一条数据*/
-export const addPrintWmsLog = async values =>
+const addPrintWmsLog = async values =>
   await axios({
     method: "post",
     data: {
@@ -69,6 +69,8 @@ module.exports = {
   getCartList,
   getCartListWithDate,
   getCartListWithGZ,
+  setPrintNewprocPlan,
+  addPrintWmsLog,
   setPrintNewprocPlan,
   addPrintWmsLog
 };

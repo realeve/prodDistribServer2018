@@ -25,11 +25,23 @@ const init = async () => {
 
 let getProcStream = id =>
   [
-    { proc_stream_id: 0, proc_stream_name: "8位清分机全检" },
-    { proc_stream_id: 1, proc_stream_name: "人工拉号" },
-    { proc_stream_id: 2, proc_stream_name: "系统自动分配" },
-    { proc_stream_id: 3, proc_stream_name: "正常码后核查" },
-    { proc_stream_id: 4, proc_stream_name: "码后核查工艺验证 " }
+    { proc_stream_id: 0, proc_stream_name: "全检品", remark: "8位清分机全检" },
+    { proc_stream_id: 1, remark: "人工拉号" },
+    { proc_stream_id: 2, proc_stream_name: "码后核查", remark: "正常码后核查" },
+    {
+      proc_stream_id: 3,
+      proc_stream_name: "码后核查",
+      remark: "码后核查工艺验证 "
+    },
+    {
+      proc_stream_id: 4,
+      proc_stream_name: "自动分配(人工拉号或8位全检)"
+    },
+    {
+      proc_stream_id: 5,
+      proc_stream_name: "自动分配(人工拉号或码后核查验证)"
+    },
+    { proc_stream_id: 6, proc_stream_name: "补品", remark: "补票" }
   ][id];
 
 let getLockReason = data => {
@@ -137,15 +149,19 @@ let handleProcStream = async (carnos, procStream) => {
   let result = await wms.setProcs(procs);
   consola.success(result);
   // 记录日志信息
-  await db.addPrintWmsLog([{
-    remark:JSON.stringify({carnos, procStream}),rec_time:lib.now(),return_info:JSON.stringify(result)
-  }]);
-  
+  await db.addPrintWmsLog([
+    {
+      remark: JSON.stringify({ carnos, procStream }),
+      rec_time: lib.now(),
+      return_info: JSON.stringify(result)
+    }
+  ]);
+
   return result;
 };
 
 // 更新完成状态
-let handleFinishStatus = ({ data, cartList1, cartList2, taskName }) => {
+let handleFinishStatus = async ({ data, cartList1, cartList2, taskName }) => {
   let isGZFinish = ({ ProductName, num1, num2, cartList }) => {
     let kNum = 35;
     if (ProductName.includes("9602") || ProductName.includes("9603")) {
@@ -180,7 +196,12 @@ let handleFinishStatus = ({ data, cartList1, cartList2, taskName }) => {
   }
 
   // 更新数据库状态及实时处理进度
-  await db.setPrintNewprocPlan({ complete_num, complete_status, update_time, _id:id })
+  await db.setPrintNewprocPlan({
+    complete_num,
+    complete_status,
+    update_time,
+    _id: id
+  });
   console.info(complete_num, complete_status);
 };
 
