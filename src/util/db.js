@@ -64,6 +64,22 @@ const addPrintWmsLog = async values =>
       nonce: "f0500427cb"
     }
   }).then(res => res);
+
+/**
+*   @database: { 质量信息系统 }
+*   @desc:     { 批量批量插入立体库四新计划工艺流转信息 } 
+	以下参数在建立过程中与系统保留字段冲突，已自动替换:
+	@desc:批量插入数据时，约定使用二维数组values参数，格式为[{cart_number,gz_num,proc_plan,proc_real,rec_time }]，数组的每一项表示一条数据*/
+const addPrintWmsProclist = async values =>
+  await axios({
+    method: "post",
+    data: {
+      values,
+      id: 92,
+      nonce: "db02022755"
+    }
+  }).then(res => res);
+
 module.exports = {
   getPrintNewprocPlan,
   getCartList,
@@ -72,5 +88,6 @@ module.exports = {
   setPrintNewprocPlan,
   addPrintWmsLog,
   setPrintNewprocPlan,
-  addPrintWmsLog
+  addPrintWmsLog,
+  addPrintWmsProclist
 };
