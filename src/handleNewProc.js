@@ -5,6 +5,7 @@ let lib = require("./util/lib");
 const consola = require("consola");
 
 let stepIdx = 1;
+
 const init = async () => {
   consola.start(`step${stepIdx++}: 获取四新任务列表`);
   let data = await db.getPrintNewprocPlan();
@@ -13,10 +14,12 @@ const init = async () => {
     consola.info(`step${stepIdx++}: 四新任务列表为空`);
   }
 
+  consola.success("读取到以下任务列表:" + JSON.stringify(data.data));
+
   consola.success(`step${stepIdx++}: 共获取到${data.rows}条任务`);
-  data.data.forEach((item, idx) => {
+  data.data.forEach(async (item, idx) => {
     consola.info(`       开始处理任务${idx + 1}/${data.rows}:`);
-    handlePlanList(item);
+    await handlePlanList(item);
   });
 };
 
@@ -48,16 +51,13 @@ let getLockReason = data => {
     if (date_type == "1") {
       allCount = "";
     }
-    return `${machine_name}${ProductName.trim()}品${dateName}${allCount}${proc_name}验证计划`;
+    return `${machine_name}${ProductName}品${dateName}${allCount}${proc_name}验证计划`;
   }
-  return `${ProductName.trim()}品${alpha_num}冠字${num1}至${num2} ${proc_name}验证计划`;
+  return `${ProductName}品${alpha_num}冠字${num1}至${num2} ${proc_name}验证计划`;
 };
 
 let handlePlanList = async data => {
-  let today = lib.ymd();
-
   let {
-    id,
     date_type,
     machine_name,
     num1,
@@ -66,64 +66,62 @@ let handlePlanList = async data => {
     proc_stream2,
     rec_date1,
     rec_date2,
-    complete_num,
-    complete_status,
     alpha_num,
     ProductName
   } = data;
 
-  let reason = getLockReason(data);
-  consola.info("开始任务信息：" + reason);
+  let taskName = getLockReason(data);
+  consola.info("开始任务信息：" + taskName);
   num1 = parseInt(num1, 10);
   num2 = parseInt(num2, 10);
 
+  let today = lib.ymd();
   if (today < rec_date1) {
     consola.error(`exit:任务${rec_date1}尚未开始`);
     return;
   }
-  const IS_DATE_RANGE = date_type == 1;
-  const IS_GZ_CHECK = date_type == 3;
+
   let cartList1 = [],
     cartList2 = [];
-  if (IS_DATE_RANGE) {
-    cartList1 = await db.getCartListWithDate({
-      machine_name,
-      rec_date1,
-      rec_date2
-    });
-  } else if (!IS_GZ_CHECK) {
-    let cartList = await db.getCartList({ machine_name, rec_date1 });
-    if (cartList.length <= num1) {
-      cartList1 = cartList;
-    } else {
-      cartList1 = cartList.slice(0, num1);
-      cartList2 = cartList.slice(num1, num2 + num1);
-    }
-  } else {
-    // IS_GZ_CHECK
-    let cartList1 = await db.getCartListWithGZ({
-      prod_name: ProductName,
-      gz: alpha_num,
-      start_no: num1,
-      end_no: num2
-    });
-    cartList1 = cartList;
+
+  switch (parseInt(date_type, 10)) {
+    case 1:
+      // IS_DATE_RANGE
+      cartList1 = await db.getCartListWithDate({
+        machine_name,
+        rec_date1,
+        rec_date2
+      });
+      break;
+    case 2:
+      // IS_GZ_CHECK
+      cartList1 = await db.getCartListWithGZ({
+        prod_name: ProductName,
+        gz: alpha_num,
+        start_no: num1,
+        end_no: num2
+      });
+      break;
+    case 0:
+    default:
+      let cartList = await db.getCartList({ machine_name, rec_date1 });
+      if (cartList.length <= num1) {
+        cartList1 = cartList;
+      } else {
+        cartList1 = cartList.slice(0, num1);
+        cartList2 = cartList.slice(num1, num2 + num1);
+      }
+      break;
   }
 
   // 立体库接口批量设置产品信息
-  let result = await handleProcStream(cartList1, proc_stream1);
-  result = await handleProcStream(cartList2, proc_stream2);
-
-  // 当前日期信息大于结束时间时
-  const TIME_RELEASED = today > rec_date2 && IS_DATE_RANGE;
-
-  // 产品大万数大于初始设置值
-  const CARTS_FINISHED = cartList1.length === num1 && cartList2.length >= num2;
-
-  // 以上条件同时满足时，任务完成
-  if (TIME_RELEASED && CARTS_FINISHED) {
-    consola.success(`exit:任务${rec_date1}已经结束，此处更新任务状态`);
+  await handleProcStream(cartList1, proc_stream1);
+  if (cartList2.length) {
+    await handleProcStream(cartList2, proc_stream2);
   }
+
+  // 设置完成进度
+  handleFinishStatus({ data, cartList1, cartList2, taskName });
 };
 
 let handleProcStream = async (carnos, procStream) => {
@@ -138,7 +136,52 @@ let handleProcStream = async (carnos, procStream) => {
 
   let result = await wms.setProcs(procs);
   consola.success(result);
+  // 记录日志信息
+  await db.addPrintWmsLog([{
+    remark:JSON.stringify({carnos, procStream}),rec_time:lib.now(),return_info:JSON.stringify(result)
+  }]);
+  
   return result;
+};
+
+// 更新完成状态
+let handleFinishStatus = ({ data, cartList1, cartList2, taskName }) => {
+  let isGZFinish = ({ ProductName, num1, num2, cartList }) => {
+    let kNum = 35;
+    if (ProductName.includes("9602") || ProductName.includes("9603")) {
+      kNum = 40;
+    }
+    return cartList.length >= (num2 - num1) / kNum + 1;
+  };
+
+  let today = lib.ymd();
+  let { id, date_type, num1, num2, rec_date2, ProductName } = data;
+
+  const IS_CARTS_COUNT = date_type == 0;
+  const IS_DATE_RANGE = date_type == 1;
+  const IS_GZ_CHECK = date_type == 2;
+  // 从某段时间开始：产品大万数大于初始设置值
+  const CARTS_FINISHED =
+    IS_CARTS_COUNT && cartList1.length === num1 && cartList2.length >= num2;
+
+  // 某段时间的所有产品：当前日期信息大于结束时间时
+  const TIME_RELEASED = IS_DATE_RANGE && today > rec_date2;
+
+  const IS_ALL_GZ_FINISHED =
+    IS_GZ_CHECK && isGZFinish({ ProductName, num1, num2, cartList: cartList1 });
+
+  let complete_num = cartList1.length + cartList2.length;
+  let complete_status = 0;
+  let update_time = lib.now();
+  // 以上条件同时满足时，任务完成
+  if (TIME_RELEASED || CARTS_FINISHED || IS_ALL_GZ_FINISHED) {
+    complete_status = 1;
+    consola.success(`exit:任务${taskName}已经结束，此处更新任务状态`);
+  }
+
+  // 更新数据库状态及实时处理进度
+  await db.setPrintNewprocPlan({ complete_num, complete_status, update_time, _id:id })
+  console.info(complete_num, complete_status);
 };
 
 module.exports = { init };
