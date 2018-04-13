@@ -1,12 +1,16 @@
-let db = require("./util/db");
+let db = require("../util/db");
 let R = require("ramda");
-let wms = require("./util/wms");
-let lib = require("./util/lib");
+let wms = require("../util/wms");
+let lib = require("../util/lib");
 const consola = require("consola");
+const procHandler = require("../util/procHandler");
 
 let stepIdx = 1;
 
 const init = async () => {
+  let task_name = "四新任务处理";
+  await procHandler.recordHeartbeat(task_name);
+
   consola.start(`step${stepIdx++}: 获取四新任务列表`);
   let data = await db.getPrintNewprocPlan();
 
@@ -22,33 +26,6 @@ const init = async () => {
     await handlePlanList(item);
   });
 };
-
-let getProcStream = id =>
-  [
-    { proc_stream_id: 0, proc_stream_name: "全检品", remark: "8位清分机全检" },
-    { proc_stream_id: 2, proc_stream_name: "码后核查", remark: "正常码后核查" },
-    {
-      proc_stream_id: 4,
-      proc_stream_name: "全检品",
-      remark: "自动分配(人工拉号或8位全检)"
-    },
-    {
-      proc_stream_id: 1,
-      proc_stream_name: "人工拉号",
-      remark: "人工拉号"
-    },
-    {
-      proc_stream_id: 3,
-      proc_stream_name: "码后核查工艺验证",
-      remark: "码后核查工艺验证 "
-    },
-    {
-      proc_stream_id: 5,
-      proc_stream_name: "码后核查工艺验证",
-      remark: "自动分配(人工拉号或码后核查验证)"
-    },
-    { proc_stream_id: 6, proc_stream_name: "补品", remark: "补票" }
-  ][id];
 
 let getLockReason = data => {
   let {
@@ -134,72 +111,23 @@ let handlePlanList = async data => {
   }
 
   // 立体库接口批量设置产品信息
-  await handleProcStream(cartList1, proc_stream1);
+  await handleProcStream({
+    carnos: cartList1,
+    proc_stream: proc_stream1,
+    check_type: "四新验证"
+  });
 
   if (cartList2.length) {
-    await handleProcStream(cartList2, proc_stream2);
+    // 立体库接口批量设置产品信息
+    await handleProcStream({
+      carnos: cartList2,
+      proc_stream: proc_stream2,
+      check_type: "四新验证"
+    });
   }
 
   // 设置完成进度
   handleFinishStatus({ data, cartList1, cartList2, taskName });
-};
-
-// 人工拉号
-let manualHandle = async carnos => {
-  // await recordRealProc(carnos, "人工拉号", "人工拉号");
-};
-
-// 码后工艺验证
-let mahouProcVerify = async carnos => {
-  // let { proc_stream_name, remark } = getProcStream(procStream);
-  // // 记录实时工艺
-  // await recordRealProc(carnos, proc_stream_name, remark);
-};
-
-let recordRealProc = async (carnos, proc_stream_name, remark) => {
-  // 此处分别增加产品预置工艺，实际设置工艺。
-  let rec_time = lib.now();
-  let insertData = carnos.map(cart_number => ({
-    cart_number,
-    gz_num: "",
-    proc_plan: remark,
-    proc_real: proc_stream_name,
-    rec_time
-  }));
-  await db.addPrintWmsProclist(insertData);
-};
-
-// 调整工艺流程
-let handleProcStream = async (carnos, procStream) => {
-  if (carnos.length === 0) {
-    return false;
-  }
-  let { proc_stream_name, remark } = getProcStream(procStream);
-
-  // 记录实时工艺
-  await recordRealProc(carnos, proc_stream_name, remark);
-
-  // 全检品、补品、码后核查，直接设置到现有工艺
-  if ([0, 2, 4, 6].includes(procStream)) {
-    let procs = { carnos, checkType: proc_stream_name };
-    let result = await wms.setProcs(procs);
-    consola.success(result);
-  } else if ([3, 5].includes(procStream)) {
-    await mahouProcVerify(carnos);
-  } else {
-    await manualHandle(carnos);
-  }
-
-  // 记录日志信息
-  await db.addPrintWmsLog([
-    {
-      remark: JSON.stringify({ carnos, procStream }),
-      rec_time: lib.now(),
-      return_info: JSON.stringify(result)
-    }
-  ]);
-
-  return result;
 };
 
 // 更新任务完成状态

@@ -80,6 +80,107 @@ const addPrintWmsProclist = async values =>
     }
   }).then(res => res);
 
+/**
+ *   @database: { 质量信息系统 }
+ *   @desc:     { 未处理的异常品列表 }
+ */
+const getPrintAbnormalProd = async () =>
+  await axios({
+    url: "/93/ba126b61bf.json"
+  }).then(res => res);
+
+/**
+ *   @database: { 质量信息系统 }
+ *   @desc:     { 记录异常品任务处理状态 }
+ */
+const setPrintAbnormalProd = async cart_number =>
+  await axios({
+    url: "/94/ae030c585f.json",
+    params: {
+      cart_number
+    }
+  }).then(res => res);
+
+/**
+*   @database: { 质量信息系统 }
+*   @desc:     { 更新NodeJS 服务心跳 } 
+    const { rec_time, task_name } = params;
+*/
+const addPrintWmsHeartbeat = async params =>
+  await axios({
+    url: "/95/eb4416dc92.json",
+    params
+  }).then(res => res);
+
+/**
+ *   @database: { 质量信息系统 }
+ *   @desc:     { 查询NodeJS 服务心跳 }
+ */
+const getPrintWmsHeartbeat = async () =>
+  await axios({
+    url: "/96/8d7c52c835.json"
+  }).then(res => res);
+/**
+*   @database: { 质量信息系统 }
+*   @desc:     { 更新Nodejs 服务心跳 } 
+    const { rec_time, task_name } = params;
+*/
+const setPrintWmsHeartbeat = async params =>
+  await axios({
+    url: "/97/c7677a2271.json",
+    params
+  }).then(res => res);
+
+/**
+ *   @database: { 质量信息系统 }
+ *   @desc:     { 自动排活待处理列表 }
+ */
+const getPrintSampleCartlist = async () =>
+  await axios({
+    url: "/98/8832903756.json"
+  }).then(res => res);
+
+/**
+ *   @database: { 质量信息系统 }
+ *   @desc:     { 连续废通知未生产完毕车号列表 }
+ */
+const getPrintMachinecheckMultiweak = async () =>
+  await axios({
+    url: "/99/4c9141bdd3.json"
+  }).then(res => res);
+
+/**
+*   @database: { 机台作业 }
+*   @desc:     { 车号最近生产工序 } 
+    const { cart1, cart2 } = params;
+*/
+const getViewCartfinder = async params =>
+  await axios({
+    url: "/100/97cfc715f4.json",
+    params
+  }).then(res => res);
+/* 
+{
+  "data": [{
+    "cart_number": "1820A233",
+    "last_proc": "抽查",
+    "machine_name": "挑残机-2号"
+  }, {
+    "cart_number": "1820A234",
+    "last_proc": "裁封",
+    "machine_name": "裁封-7号"
+  }, {
+    "cart_number": "1880A321",
+    "last_proc": "抽查",
+    "machine_name": "清分机-1号"
+  }],
+  "title": "车号最近生产工序",
+  "rows": 3,
+  "time": "155.693ms",
+  "header": ["cart_number", "last_proc", "machine_name"]
+}
+*/
+
 module.exports = {
   getPrintNewprocPlan,
   getCartList,
@@ -89,5 +190,13 @@ module.exports = {
   addPrintWmsLog,
   setPrintNewprocPlan,
   addPrintWmsLog,
-  addPrintWmsProclist
+  addPrintWmsProclist,
+  getPrintAbnormalProd,
+  setPrintAbnormalProd,
+  addPrintWmsHeartbeat,
+  getPrintWmsHeartbeat,
+  setPrintWmsHeartbeat,
+  getPrintSampleCartlist,
+  getPrintMachinecheckMultiweak,
+  getViewCartfinder
 };

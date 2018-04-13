@@ -8,6 +8,7 @@ let host = dev
   : "http://mac.cdyc.cbpm:8080/wms/if";
 
 host = "http://10.8.60.202:8080/wms/if";
+host = "http://mactest.cdyc.cbpm:8080/wms/if";
 
 // 公共函数
 // 根据库房id获取库房名

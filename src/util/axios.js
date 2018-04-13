@@ -13,16 +13,23 @@ let getMainContent = () => {
   return str.replace(/\\/g, "/");
 };
 
+let getTokenFromUrl = async () => {
+  let url = host + "authorize.json?user=develop&psw=111111";
+  let token = await http.get(url).then(res => res.data.token);
+  saveToken(token);
+  return { token };
+};
+
 let getToken = async shopId => {
   let fileName = `${getMainContent()}/src/util/token.json`;
   try {
     let token = fs.readFileSync(fileName, "utf-8");
-    return token;
+    if (token.length == 0) {
+      return getTokenFromUrl();
+    }
+    return JSON.parse(token);
   } catch (e) {
-    let url = host + "authorize.json?user=develop&psw=111111";
-    let token = await http.get(url).then(res => res.data.token);
-    saveToken(token);
-    return token;
+    return getTokenFromUrl();
   }
 };
 
@@ -36,12 +43,12 @@ let getType = data =>
 
 const saveToken = token => {
   let fileName = `${getMainContent()}/src/util/token.json`;
-  fs.writeFileSync(fileName, token);
+  fs.writeFileSync(fileName, JSON.stringify({ token }));
 };
 
 // 自动处理token更新，data 序列化等
 let axios = async option => {
-  let token = await getToken();
+  let { token } = await getToken();
   saveToken(token);
 
   option = Object.assign(option, {
