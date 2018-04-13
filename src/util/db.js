@@ -159,27 +159,47 @@ const getViewCartfinder = async params =>
     url: "/100/97cfc715f4.json",
     params
   }).then(res => res);
-/* 
-{
-  "data": [{
-    "cart_number": "1820A233",
-    "last_proc": "抽查",
-    "machine_name": "挑残机-2号"
-  }, {
-    "cart_number": "1820A234",
-    "last_proc": "裁封",
-    "machine_name": "裁封-7号"
-  }, {
-    "cart_number": "1880A321",
-    "last_proc": "抽查",
-    "machine_name": "清分机-1号"
-  }],
-  "title": "车号最近生产工序",
-  "rows": 3,
-  "time": "155.693ms",
-  "header": ["cart_number", "last_proc", "machine_name"]
-}
+
+/**
+*   @database: { 质量信息系统 }
+*   @desc:     { 更新连续废通知产品生产进度信息 } 
+	以下参数在建立过程中与系统保留字段冲突，已自动替换:
+	@id:_id. 参数说明：api 索引序号
+    const { last_proc, last_machine, last_rec_time, _id } = params;
 */
+const setPrintMachinecheckMultiweak = async params =>
+  await axios({
+    url: "/101/f4f2a8ef0f.json",
+    params
+  }).then(res => res);
+
+/**
+*   @database: { 质量信息系统 }
+*   @desc:     { 根据id信息查询连续废通知情况 } 
+	以下参数在建立过程中与系统保留字段冲突，已自动替换:
+	@id:_id. 参数说明：api 索引序号
+      */
+const getPrintMachinecheckMultiweakById = async _id =>
+  await axios({
+    url: "/102/66373f0467.json",
+    params: {
+      _id
+    }
+  }).then(res => res);
+
+/**
+*   @database: { 质量信息系统 }
+*   @desc:     { 连续废通知产品已完工 } 
+	以下参数在建立过程中与系统保留字段冲突，已自动替换:
+	@id:_id. 参数说明：api 索引序号
+      */
+const setPrintMachinecheckMultiweakStatus = async _id =>
+  await axios({
+    url: "/103/1db66c49a0.json",
+    params: {
+      _id
+    }
+  }).then(res => res);
 
 module.exports = {
   getPrintNewprocPlan,
@@ -198,5 +218,8 @@ module.exports = {
   setPrintWmsHeartbeat,
   getPrintSampleCartlist,
   getPrintMachinecheckMultiweak,
-  getViewCartfinder
+  getViewCartfinder,
+  setPrintMachinecheckMultiweak,
+  getPrintMachinecheckMultiweakById,
+  setPrintMachinecheckMultiweakStatus
 };
