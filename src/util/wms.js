@@ -7,7 +7,7 @@ let host = dev
   ? "http://mactest.cdyc.cbpm:8080/wms/if"
   : "http://mac.cdyc.cbpm:8080/wms/if";
 
-host = "http://10.8.60.202:8080/wms/if";
+// host = "http://10.8.60.202:8080/wms/if";
 host = "http://mactest.cdyc.cbpm:8080/wms/if";
 
 // 公共函数
@@ -50,6 +50,14 @@ let getProcStatus = psc =>
     { pscode: "dzhp", psname: "大张号票" }
   ].find(({ pscode }) => pscode === psc);
 
+let reasonCode = [
+  { reason_code: "incomplete", reason_desc: "未完工" },
+  { reason_code: "czbz_quality", reason_desc: "钞纸质量问题" },
+  { reason_code: "q_handCheck", reason_desc: "人工全检锁车" },
+  { reason_code: "q_newProc", reason_desc: "四新批量锁车" },
+  { reason_code: "q_abnormalProd", reason_desc: "异常品锁车" }
+];
+
 // 数据库交互
 
 // 1.批量车号在库查询
@@ -64,9 +72,9 @@ let getStockStatus = async carnos => {
   }).then(res => res.data);
 
   // 返回值：车号，库房ID，批次数量，工序code
-  let json = JSON.stringify([
-    { pscode: "bz", orgid: "1449", carno: "1840K000", quantity: "350000" }
-  ]);
+  // let json = JSON.stringify([
+  //   { pscode: "bz", orgid: "1449", carno: "1840K000", quantity: "350000" }
+  // ]);
 
   return data;
 };
@@ -103,10 +111,10 @@ let setBlackList = async ({ carnos, reason_code }) => {
   }).then(res => res.data);
 
   // 返回值：未处理车号列表，已处理车号列表
-  let json = JSON.stringify({
-    unhandledList: ["1880A211", "1880A232"],
-    handledList: ["1820A211", "1820A233"]
-  });
+  // let json = JSON.stringify({
+  //   unhandledList: ["1880A211", "1880A232"],
+  //   handledList: ["1820A211", "1820A233"]
+  // });
 
   return data;
 };
@@ -148,36 +156,37 @@ let getBlackReason = async () => {
 
   // 返回值：未处理车号列表，已处理车号列表
   // 见接口5的回答
-  let json = JSON.stringify([
-    { reason_code: "这里的枚举是哪些", reason_desc: "对应的描述信息" }
-  ]);
+  // let json = JSON.stringify([
+  //   { reason_code: "这里的枚举是哪些", reason_desc: "对应的描述信息" }
+  // ]);
 
   return data;
 };
 
 // 4 添加锁车原因
 // 状态码，锁车描述
-let addBlackReason = async ({ reason_desc }) => {
+let addBlackReason = async ({ reason_code, reason_desc }) => {
   let data = await axios({
     method: "post",
     url: host + "/lockR",
     data: {
+      reason_code,
       reason_desc
     }
   }).then(res => res.data);
 
   // 返回值：
   // let json = JSON.stringify({ status: false, errMsg: "失败原因" });
-  let json = JSON.stringify([
-    {
-      status: true,
-      reason_code: 15
-    },
-    {
-      status: false,
-      errMsg: "失败原因"
-    }
-  ]);
+  // let json = JSON.stringify([
+  //   {
+  //     status: true,
+  //     reason_code: 15
+  //   },
+  //   {
+  //     status: false,
+  //     errMsg: "失败原因"
+  //   }
+  // ]);
 
   return data;
 };
@@ -194,10 +203,10 @@ let setWhiteList = async carnos => {
   }).then(res => res.data);
 
   // 返回值：未处理车号列表，已处理车号列表
-  let json = JSON.stringify({
-    unhandledList: ["1880A211", "1880A232"],
-    handledList: ["1820A211", "1820A233"]
-  });
+  // let json = JSON.stringify({
+  //   unhandledList: ["1880A211", "1880A232"],
+  //   handledList: ["1820A211", "1820A233"]
+  // });
 
   return data;
 };

@@ -7,6 +7,8 @@ const procHandler = require("../util/procHandler");
 
 let task_name = "人工拉号自动排活";
 const init = async () => {
+  consola.success("该部分功能移至前台，后台不做任务扫描");
+  return;
   consola.success("开始任务：" + task_name);
   let result = await procHandler.recordHeartbeat(task_name);
 

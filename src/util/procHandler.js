@@ -35,21 +35,32 @@ let getProcStream = id =>
 let recordRealProc = async (carnos, proc_stream_name, remark, check_type) => {
   let rec_time = lib.now();
   console.log("此处读取产品冠字信息");
+  let gz_infos = await db.getViewCartfinderGZ(carnos);
 
-  let insertData = carnos.map(cart_number => ({
-    cart_number,
-    gz_num: "",
-    proc_plan: remark,
-    proc_real: proc_stream_name,
-    rec_time,
-    check_type
-  }));
+  let insertData = carnos.map(cart_number => {
+    let gz = R.find(R.propEq("cart_number", cart_number))(gz_infos.data);
+    let gz_num;
+    if (!R.isNil(gz)) {
+      gz_num = gz.gz_num;
+      if (R.isNil(gz_num)) {
+        gz_num = "";
+      }
+    }
+    return {
+      cart_number,
+      gz_num,
+      proc_plan: remark,
+      proc_real: proc_stream_name,
+      rec_time,
+      check_type
+    };
+  });
   await db.addPrintWmsProclist(insertData);
 };
 
-// 人工拉号
-let manualHandle = async carnos =>
-  await wms.setBlackList({ carnos, reason_code: "handCheck" });
+// 人工拉号,默认设为人工异常品拉号，人工拉号时需锁定车号信息。
+let manualHandle = async (carnos, reason_code = "q_abnormalProd") =>
+  await wms.setBlackList({ carnos, reason_code });
 
 // 码后工艺验证
 let mahouProcVerify = async carnos => {
@@ -57,7 +68,12 @@ let mahouProcVerify = async carnos => {
 };
 
 // 设置工艺流程至立体库
-let adjustProcInfo = async ({ proc_stream, proc_stream_name, carnos }) => {
+let adjustProcInfo = async ({
+  proc_stream,
+  proc_stream_name,
+  carnos,
+  reason_code
+}) => {
   let result;
   // 全检品、补品、码后核查，直接设置到现有工艺
   if ([0, 2, 4, 6].includes(proc_stream)) {
@@ -65,7 +81,7 @@ let adjustProcInfo = async ({ proc_stream, proc_stream_name, carnos }) => {
   } else if ([3, 5].includes(proc_stream)) {
     result = await mahouProcVerify(carnos);
   } else {
-    result = await manualHandle(carnos);
+    result = await manualHandle(carnos, reason_code);
   }
 
   consola.success(result);
@@ -77,10 +93,16 @@ let adjustProcInfo = async ({ proc_stream, proc_stream_name, carnos }) => {
       return_info: JSON.stringify(result)
     }
   ]);
+  return result;
 };
 
 // 调整工艺流程
-let handleProcStream = async ({ carnos, proc_stream, check_type }) => {
+let handleProcStream = async ({
+  carnos,
+  proc_stream,
+  check_type,
+  reason_code
+}) => {
   if (carnos.length === 0) {
     return false;
   }
@@ -95,15 +117,23 @@ let handleProcStream = async ({ carnos, proc_stream, check_type }) => {
   let result = await adjustProcInfo({
     carnos,
     proc_stream_name,
-    proc_stream
+    proc_stream,
+    reason_code
   });
 
+  console.log(
+    "立体库返回信息,失败车数：" +
+      result.unhandledList.length +
+      ",成功车数：" +
+      result.handledList.length
+  );
   console.log(result);
 
   return result;
 };
 
 const recordHeartbeat = async task_name => {
+  consola.success("i am alive :)");
   let { data } = await db.getPrintWmsHeartbeat();
   let isFind = R.filter(R.propEq("task_name", task_name))(data);
   if (isFind.length) {

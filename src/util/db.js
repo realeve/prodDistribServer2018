@@ -201,6 +201,18 @@ const setPrintMachinecheckMultiweakStatus = async _id =>
     }
   }).then(res => res);
 
+/**
+ *   @database: { 机台作业 }
+ *   @desc:     { 车号查冠字 }
+ */
+const getViewCartfinderGZ = async carnos =>
+  await axios({
+    url: "/105/153ec8ad02.json",
+    params: {
+      carnos
+    }
+  }).then(res => res);
+
 module.exports = {
   getPrintNewprocPlan,
   getCartList,
@@ -219,6 +231,7 @@ module.exports = {
   getPrintSampleCartlist,
   getPrintMachinecheckMultiweak,
   getViewCartfinder,
+  getViewCartfinderGZ,
   setPrintMachinecheckMultiweak,
   getPrintMachinecheckMultiweakById,
   setPrintMachinecheckMultiweakStatus
