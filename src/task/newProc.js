@@ -7,26 +7,45 @@ const procHandler = require("../util/procHandler");
 
 let stepIdx = 1;
 
+let check_type = "四新验证";
+let reason_code = "q_newProc";
+
+/**
+ * @desc:四新验证，初始化。
+ * 按数据库的CRUD，具体流程如下：
+ * 1.心跳记录，进入该流程；
+ * 2.获取待处理的获取四新任务列表;
+ * 3.依次对以上列表中的任务处理。
+ */
 const init = async () => {
   let task_name = "四新任务处理";
+  consola.success("待加入对已处理车号的过滤");
+
   await procHandler.recordHeartbeat(task_name);
 
   consola.start(`step${stepIdx++}: 获取四新任务列表`);
   let data = await db.getPrintNewprocPlan();
 
   if (data.rows === 0) {
-    consola.info(`step${stepIdx++}: 四新任务列表为空`);
+    consola.info(`step${stepIdx++}: 四新任务列表为空，下个循环继续。`);
+    return;
   }
 
   consola.success("读取到以下任务列表:" + JSON.stringify(data.data));
 
   consola.success(`step${stepIdx++}: 共获取到${data.rows}条任务`);
+
+  // 调试模式只处理一项信息
+  await handlePlanList(data.data[0]);
+  return;
+
   data.data.forEach(async (item, idx) => {
     consola.info(`       开始处理任务${idx + 1}/${data.rows}:`);
     await handlePlanList(item);
   });
 };
 
+// 根据预置的信息拼凑验证名称；
 let getLockReason = data => {
   let {
     date_type,
@@ -51,9 +70,22 @@ let getLockReason = data => {
   return `${ProductName}品${alpha_num}冠字${num1}至${num2} ${proc_name}验证计划`;
 };
 
-// 处理计划任务列表
+/**
+ * @desc:处理计划任务列表
+ * 按数据库的CRUD，具体流程如下：
+ * 1.根据时间段类型，读取对应的车号列表（按冠字，按时间段，从某天开始）
+ * 2.读取已经处理完毕的车号列表，同时仅处理未记录的车号信息;
+ * 说明：
+ * a.由于任务会以5-10分钟定时触发，在第1步读出的车号列表中需要做筛选，避免重复设置工艺/重新记录产品实际工艺信息。
+ * 这样可保证每次提交到后台（立体库/日志库）中的信息均是未处理过的车号。
+ * b.对于第1次设置工艺A，第二次设置工艺B的情况，通过新建任务来分别处理。
+ *
+ * 3.按车号列表批量设置产品工艺流程至立体库；
+ * 4.更新任务完成状态，在此过程中按立体库返回的实际车号列表信息做状态变更处理。
+ */
 let handlePlanList = async data => {
   let {
+    id,
     date_type,
     machine_name,
     num1,
@@ -78,60 +110,111 @@ let handlePlanList = async data => {
   }
 
   let cartList1 = [],
-    cartList2 = [];
+    cartList2 = [],
+    cartList = [];
 
   switch (parseInt(date_type, 10)) {
     case 1:
       // IS_DATE_RANGE
-      cartList1 = await db.getCartListWithDate({
+      cartList = await db.getCartListWithDate({
         machine_name,
         rec_date1,
         rec_date2
       });
+      cartList1 = cartList.data;
       break;
     case 2:
       // IS_GZ_CHECK
-      cartList1 = await db.getCartListWithGZ({
+      cartList = await db.getCartListWithGZ({
         prod_name: ProductName,
         gz: alpha_num,
         start_no: num1,
         end_no: num2
       });
+      cartList1 = R.map(R.nth(0))(cartList.data);
       break;
     case 0:
     default:
-      let cartList = await db.getCartList({ machine_name, rec_date1 });
-      if (cartList.length <= num1) {
-        cartList1 = cartList;
+      let maxCarts = num1 + num2;
+      cartList = await db.getCartList({
+        machine_name,
+        rec_date: rec_date1,
+        max_carts: maxCarts
+      });
+      if (cartList.rows <= num1) {
+        cartList1 = cartList.data;
       } else {
-        cartList1 = cartList.slice(0, num1);
-        cartList2 = cartList.slice(num1, num2 + num1);
+        cartList1 = cartList.data.slice(0, num1);
+        cartList2 = cartList.data.slice(num1, num2 + num1);
       }
       break;
   }
 
-  // 立体库接口批量设置产品信息
-  await handleProcStream({
-    carnos: cartList1,
-    proc_stream: proc_stream1,
-    check_type: "四新验证"
+  // 数组平铺
+  cartList1 = R.compose(R.uniq, R.flatten)(cartList1);
+  cartList2 = R.compose(R.uniq, R.flatten)(cartList2);
+
+  // 已经插入的车号列表
+  let handledCartInfo = await db.getPrintWmsProclist({
+    check_type,
+    task_id: id
   });
+  let handledCarts = R.map(R.prop("cart_number"))(handledCartInfo.data);
+  consola.success("已处理的车号列表");
+  console.log(handledCarts);
+
+  // R.difference(),求差集。求第一个列表中，未包含在第二个列表中的任一元素的集合。对象和数组比较数值相等，而非引用相等。
+  cartList1 = R.difference(cartList1, handledCarts);
+  cartList2 = R.difference(cartList2, handledCarts);
+
+  // console.log(cartList1);
+  // console.log(cartList2);
+  // return;
+
+  // 立体库处理结果
+  let wmsRes;
+  if (cartList1.length) {
+    // 立体库接口批量设置产品信息
+    wmsRes = await procHandler.handleProcStream({
+      carnos: cartList1,
+      proc_stream: proc_stream1,
+      check_type,
+      reason_code,
+      task_id: id
+    });
+
+    // 处理成功的列表
+    cartList1 = wmsRes.status ? wmsRes.result.handledList : [];
+  }
 
   if (cartList2.length) {
     // 立体库接口批量设置产品信息
-    await handleProcStream({
+    wmsRes = await procHandler.handleProcStream({
       carnos: cartList2,
       proc_stream: proc_stream2,
-      check_type: "四新验证"
+      check_type,
+      reason_code,
+      task_id: id
     });
+
+    // 处理成功的列表
+    cartList2 = wmsRes.status ? wmsRes.result.handledList : [];
   }
 
   // 设置完成进度
-  handleFinishStatus({ data, cartList1, cartList2, taskName });
+  // 此处仅记录在两次立体库信息入库中，处理成功的车号列表信息，如果入库数量满足预先设置的工艺流程中记录的信息，则将任务完成状态置为已完成。
+  await handleFinishStatus({ data, cartList1, cartList2, taskName });
 };
 
-// 更新任务完成状态
+/**
+ * @desc:更新任务完成状态
+ * 三种情况按以下规则确定是否已经处理完毕：
+ * 1.按冠字：冠字段的车号数是否等于实时处理完毕的车号数;
+ * 2.按时间段：当天时间是否大于结束时间；
+ * 3.按某天起大万数：已处理的大数万是否等于实时大万数；
+ */
 let handleFinishStatus = async ({ data, cartList1, cartList2, taskName }) => {
+  // 数据预处理
   let isGZFinish = ({ ProductName, num1, num2, cartList }) => {
     let kNum = 35;
     if (ProductName.includes("9602") || ProductName.includes("9603")) {
@@ -148,7 +231,7 @@ let handleFinishStatus = async ({ data, cartList1, cartList2, taskName }) => {
   const IS_GZ_CHECK = date_type == 2;
   // 从某段时间开始：产品大万数大于初始设置值
   const CARTS_FINISHED =
-    IS_CARTS_COUNT && cartList1.length === num1 && cartList2.length >= num2;
+    IS_CARTS_COUNT && cartList1.length == num1 && cartList2.length >= num2;
 
   // 某段时间的所有产品：当前日期信息大于结束时间时
   const TIME_RELEASED = IS_DATE_RANGE && today > rec_date2;
@@ -172,7 +255,7 @@ let handleFinishStatus = async ({ data, cartList1, cartList2, taskName }) => {
     update_time,
     _id: id
   });
-  console.info(complete_num, complete_status);
+  console.info(`当前任务完成车号${complete_num}万,任务状态${complete_status}`);
 };
 
 module.exports = { init };

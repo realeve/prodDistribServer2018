@@ -29,7 +29,9 @@ const handlePlanList = async ({ cart_number }) => {
   let result = await procHandler.handleProcStream({
     carnos: [cart_number],
     proc_stream: 1,
-    check_type: task_name
+    check_type: task_name,
+    reason_code: "q_handCheck",
+    task_id: 0
   });
   console.log(result);
   // await db.setPrintAbnormalProd(cart_number);

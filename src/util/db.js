@@ -5,36 +5,45 @@ let { axios } = require("./axios");
 *   @desc:     { 未完成的全检任务计划列表 } 
 
   2018-04-11 更新
-  SELECT a.id,a.date_type,a.machine_name,a.proc_name,b.ProductName,a.reason,isnull(a.num1,0) num1,isnull(a.num2,0) num2,a.proc_stream1,a.proc_stream2,CONVERT (VARCHAR,a.rec_date1,112) rec_date1,CONVERT (VARCHAR,a.rec_date2,112) rec_date2,a.complete_num,a.complete_status,a.alpha_num FROM dbo.print_newproc_plan AS a INNER JOIN ProductData b on a.prod_id = b.ProductID WHERE a.complete_status = 0
+  SELECT a.id,a.date_type,a.machine_name,a.proc_name,rtrim(b.ProductName) ProductName,a.reason,isnull(a.num1,0) num1,isnull(a.num2,0) num2,a.proc_stream1,a.proc_stream2,CONVERT (VARCHAR,a.rec_date1,112) rec_date1,CONVERT (VARCHAR,a.rec_date2,112) rec_date2,a.complete_num,a.complete_status,a.alpha_num FROM dbo.print_newproc_plan AS a INNER JOIN ProductData b on a.prod_id = b.ProductID WHERE a.complete_status = 0
 */
 const getPrintNewprocPlan = async () =>
   await axios({
     url: "/78/b36aab89f7.json"
   }).then(res => res);
 
-const getCartList = async ({ machine_name, rec_date1 }) => {
-  let arr = [];
-  for (let i = 100; i < 200; i++) {
-    arr.push(`1620A${i}`);
-  }
-  return arr;
-};
+/**
+*   @database: { 机台作业 }
+*   @desc:     { 机台从某天起生产的X万产品车号列表 } 
+    const { machine_name,  rec_date,  max_carts } = params;
+*/
+const getCartList = async params =>
+  await axios({
+    url: "/106/f47aa951dd/array.json",
+    params
+  }).then(res => res);
 
-const getCartListWithDate = async ({ machine_name, rec_date1, rec_date2 }) => {
-  let arr = [];
-  for (let i = 100; i < 200; i++) {
-    arr.push(`1620A${i}`);
-  }
-  return arr;
-};
+/**
+*   @database: { 质量信息系统 }
+*   @desc:     { 机台某段时间生产的车号列表 } 
+    const { machine_name,rec_date1,rec_date2 } = params;
+*/
+const getCartListWithDate = async params =>
+  await axios({
+    url: "/107/4463f2c07c/array.json",
+    params
+  }).then(res => res);
 
-const getCartListWithGZ = async ({ prod_name, gz, start_no, end_no }) => {
-  let arr = [];
-  for (let i = 100; i < 200; i++) {
-    arr.push(`1620A${i}`);
-  }
-  return arr;
-};
+/**
+*   @database: { 机台作业 }
+*   @desc:     { 某冠字号段车号列表 } 
+    const { prod_name,  gz,  start_no,  end_no } = params;
+*/
+const getCartListWithGZ = async params =>
+  await axios({
+    url: "/108/cf760bfe6d/array.json",
+    params
+  }).then(res => res);
 
 /**
 *   @database: { 质量信息系统 }
@@ -152,6 +161,7 @@ const getPrintMachinecheckMultiweak = async () =>
 /**
 *   @database: { 机台作业 }
 *   @desc:     { 车号最近生产工序 } 
+    @sql:  select 车号 "cart_number",工序 "last_proc",机台 "machine_name" to_char(生产时间,'YYYY-MM-DD HH24:mi:ss') rec_time from VIEW_CARTFINDER where key_recid in (select max(key_recid) key_recid from VIEW_CARTFINDER t where 车号 in (?) group by 车号) and 车号 in (?)
     const { cart1, cart2 } = params;
 */
 const getViewCartfinder = async params =>
@@ -213,6 +223,17 @@ const getViewCartfinderGZ = async carnos =>
     }
   }).then(res => res);
 
+/**
+*   @database: { 质量信息系统 }
+*   @desc:     { 过滤已处理的四新或异常品车号列表 } 
+    const { check_type, task_id } = params;
+*/
+const getPrintWmsProclist = async params =>
+  await axios({
+    url: "/109/95aa0001e8.json",
+    params
+  }).then(res => res);
+
 module.exports = {
   getPrintNewprocPlan,
   getCartList,
@@ -234,5 +255,6 @@ module.exports = {
   getViewCartfinderGZ,
   setPrintMachinecheckMultiweak,
   getPrintMachinecheckMultiweakById,
-  setPrintMachinecheckMultiweakStatus
+  setPrintMachinecheckMultiweakStatus,
+  getPrintWmsProclist
 };
