@@ -17,10 +17,10 @@ const init = async () => {
   // 调试完毕
   // await abnormalProd.init();
   // 调试完毕
-  // await wms.init().catch(e => console.log(e));
+  await wms.init().catch(e => console.log(e));
   // 前台处理，无需后端扫描
   // await manualCheck.init();
-  await newProc.init().catch(e => console.log(e));
+  // await newProc.init().catch(e => console.log(e));
   // await multiWeak.init();
 };
 

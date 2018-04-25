@@ -3,56 +3,53 @@ const axios = require("axios");
 // 测试环境
 const { dev } = require("./axios");
 
-let host = dev
-  ? "http://mactest.cdyc.cbpm:8080/wms/if"
-  : "http://mac.cdyc.cbpm:8080/wms/if";
+let host = dev ?
+  "http://mactest.cdyc.cbpm:8080/wms/if" :
+  "http://mac.cdyc.cbpm:8080/wms/if";
 
 // host = "http://10.8.60.202:8080/wms/if";
 host = "http://mactest.cdyc.cbpm:8080/wms/if";
 
 // 公共函数
 // 根据库房id获取库房名
-let getStoreRoom = org =>
-  [
-    { orgid: 1445, orgname: "数管2号库房" },
-    { orgid: 1446, orgname: "数管3号库房" },
-    { orgid: 1447, orgname: "数管4号库房" },
-    { orgid: 1448, orgname: "数管5号库房" },
-    { orgid: 1449, orgname: "数管6号库房" },
-    { orgid: 1450, orgname: "数管7号库房" },
-    { orgid: 1451, orgname: "数管8号库房" },
-    { orgid: 1452, orgname: "数管9号库房" },
-    { orgid: 1453, orgname: "数管10号库房" },
-    { orgid: 1455, orgname: "数管11号库房" },
-    { orgid: 1460, orgname: "立体库" },
-    { orgid: 250, orgname: "检封库房大张号票库区" },
-    { orgid: 251, orgname: "检封库房小张号票库区" },
-    { orgid: 252, orgname: "检封库房补票库区" }
-  ].find(({ orgid }) => orgid === org);
+let getStoreRoom = org => [
+  { orgid: 1445, orgname: "数管2号库房" },
+  { orgid: 1446, orgname: "数管3号库房" },
+  { orgid: 1447, orgname: "数管4号库房" },
+  { orgid: 1448, orgname: "数管5号库房" },
+  { orgid: 1449, orgname: "数管6号库房" },
+  { orgid: 1450, orgname: "数管7号库房" },
+  { orgid: 1451, orgname: "数管8号库房" },
+  { orgid: 1452, orgname: "数管9号库房" },
+  { orgid: 1453, orgname: "数管10号库房" },
+  { orgid: 1455, orgname: "数管11号库房" },
+  { orgid: 1460, orgname: "立体库" },
+  { orgid: 250, orgname: "检封库房大张号票库区" },
+  { orgid: 251, orgname: "检封库房小张号票库区" },
+  { orgid: 252, orgname: "检封库房补票库区" }
+].find(({ orgid }) => orgid === org);
 
 // 工序列表
-let getProcStatus = psc =>
-  [
-    { pscode: "wzbz", psname: "物资白纸" },
-    { pscode: "czbz", psname: "钞纸白纸" },
-    { pscode: "bz", psname: "白纸" },
-    { pscode: "jydg", psname: "胶一印待干品" },
-    { pscode: "jyyp", psname: "胶一印品" },
-    { pscode: "jedg", psname: "胶二印待干品" },
-    { pscode: "jeyp", psname: "胶二印品" },
-    { pscode: "sydg", psname: "丝印待干品" },
-    { pscode: "syyp", psname: "丝印品" },
-    { pscode: "wydg", psname: "凹一印待干品" },
-    { pscode: "wyyp", psname: "凹一印品" },
-    { pscode: "wedg", psname: "凹二印待干品" },
-    { pscode: "weyp", psname: "凹二印品" },
-    { pscode: "dhdg", psname: "大张号票待干品" },
-    { pscode: "dzhp", psname: "大张号票" }
-  ].find(({ pscode }) => pscode === psc);
+let getProcStatus = psc => [
+  { pscode: "wzbz", psname: "物资白纸" },
+  { pscode: "czbz", psname: "钞纸白纸" },
+  { pscode: "bz", psname: "白纸" },
+  { pscode: "jydg", psname: "胶一印待干品" },
+  { pscode: "jyyp", psname: "胶一印品" },
+  { pscode: "jedg", psname: "胶二印待干品" },
+  { pscode: "jeyp", psname: "胶二印品" },
+  { pscode: "sydg", psname: "丝印待干品" },
+  { pscode: "syyp", psname: "丝印品" },
+  { pscode: "wydg", psname: "凹一印待干品" },
+  { pscode: "wyyp", psname: "凹一印品" },
+  { pscode: "wedg", psname: "凹二印待干品" },
+  { pscode: "weyp", psname: "凹二印品" },
+  { pscode: "dhdg", psname: "大张号票待干品" },
+  { pscode: "dzhp", psname: "大张号票" }
+].find(({ pscode }) => pscode === psc);
 
 let reasonCode = [
   { reason_code: "incomplete", reason_desc: "未完工" },
-  { reason_code: "czbz_quality", reason_desc: "钞纸质量问题" },
   { reason_code: "q_handCheck", reason_desc: "人工全检锁车" },
   { reason_code: "q_newProc", reason_desc: "四新批量锁车" },
   { reason_code: "q_abnormalProd", reason_desc: "异常品锁车" }
