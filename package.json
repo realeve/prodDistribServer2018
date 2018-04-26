@@ -3,11 +3,14 @@
     "axios": "^0.18.0"
   },
   "scripts": {
-    "start": "node app.js"
+    "dev": "pandora dev",
+    "start": "pandora start",
+    "stop": "pandora stop"
   },
   "dependencies": {
     "consola": "^1.2.0",
     "moment": "^2.22.0",
+    "pandora": "^1.8.18",
     "qs": "^6.5.1",
     "ramda": "^0.25.0"
   }

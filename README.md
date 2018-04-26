@@ -2,6 +2,10 @@
 
 前台：https://github.com/realeve/prodDistrib2018
 
+# 1.安装 pandora.js 管理 node 服务
+
+npm i pandora -g
+
 ## 文件入口
 
 ./src/index.js
