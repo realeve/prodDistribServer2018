@@ -36,8 +36,8 @@ const init = async () => {
   consola.success(`step${stepIdx++}: 共获取到${data.rows}条任务`);
 
   // 调试模式只处理一项信息
-  await handlePlanList(data.data[0]);
-  return;
+  // await handlePlanList(data.data[0]);
+  // return;
 
   data.data.forEach(async (item, idx) => {
     consola.info(`       开始处理任务${idx + 1}/${data.rows}:`);
@@ -141,12 +141,16 @@ let handlePlanList = async data => {
         rec_date: rec_date1,
         max_carts: maxCarts
       });
+
       if (cartList.rows <= num1) {
         cartList1 = cartList.data;
       } else {
         cartList1 = cartList.data.slice(0, num1);
         cartList2 = cartList.data.slice(num1, num2 + num1);
       }
+      // console.log(cartList1.length);
+      // console.log(cartList2.length);
+      // return;
       break;
   }
 
@@ -167,6 +171,7 @@ let handlePlanList = async data => {
   cartList1 = R.difference(cartList1, handledCarts);
   cartList2 = R.difference(cartList2, handledCarts);
 
+  // console.log('查看待处理车号列表：')
   // console.log(cartList1);
   // console.log(cartList2);
   // return;
@@ -200,6 +205,7 @@ let handlePlanList = async data => {
     // 处理成功的列表
     cartList2 = wmsRes.status ? wmsRes.result.handledList : [];
   }
+
 
   // 设置完成进度
   // 此处仅记录在两次立体库信息入库中，处理成功的车号列表信息，如果入库数量满足预先设置的工艺流程中记录的信息，则将任务完成状态置为已完成。
@@ -242,6 +248,8 @@ let handleFinishStatus = async ({ data, cartList1, cartList2, taskName }) => {
   let complete_num = cartList1.length + cartList2.length;
   let complete_status = 0;
   let update_time = lib.now();
+
+
   // 以上条件同时满足时，任务完成
   if (TIME_RELEASED || CARTS_FINISHED || IS_ALL_GZ_FINISHED) {
     complete_status = 1;

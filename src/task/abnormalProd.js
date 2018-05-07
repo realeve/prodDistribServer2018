@@ -20,7 +20,6 @@ const init = async () => {
   // 读取未处理的异常品车号，如果有多个工艺，按最后一次添加的为准
   let { data } = await db.getPrintAbnormalProd();
   console.log(data);
-
   if (R.isNil(data) || data.length === 0) {
     consola.info("所有任务处理完毕，下个周期继续");
     return;
@@ -48,6 +47,7 @@ const handleAbnormalItem = async ({ cart_number, proc_stream, id }) => {
     check_type,
     task_id: id
   });
+
   let handledCarts = R.map(R.prop("cart_number"))(handledCartInfo.data);
   consola.success("已处理的车号列表");
   console.log(handledCarts);

@@ -16,6 +16,7 @@ let stockStatus = async () => {
 
 // 接口2：批量车号设定质检工艺
 let setProc = async () => {
+  let cartList = ['1840K010'];
   let { result } = await wms.setProcs({
     carnos: cartList,
     checkType: "全检品"
@@ -51,7 +52,7 @@ let addLockReason = async () => {
 };
 
 // 接口5：批量锁车
-batchLockCarts = async () => {
+let batchLockCarts = async () => {
   let carnos = ["1840K028", "1840K029", "1880K039", "1820K012", '1820K013', '1860K999'];
   let { result } = await wms.setBlackList({
     reason_code: "q_handCheck",
@@ -62,21 +63,32 @@ batchLockCarts = async () => {
 };
 
 // 接口6：批量解锁
-unlockCarts = async () => {
+let unlockCarts = async () => {
   let carnos = ["1840K028", "1840K029", "1880K039", "1820K012", '1820K013', '1860K999'];
   let { result } = await wms.setWhiteList(carnos);
   consola.success(JSON.stringify(result));
   console.log(R.without(result.handledList, carnos))
 };
 
+// 接口7：码后核查工艺验证测试
+let setProcCheck = async () => {
+  let carnos = ["1820K012", "1840J999"];
+  let { result } = await wms.setReviewList({
+    carnos,
+    review: 0
+  });
+  consola.success(JSON.stringify(result));
+};
+
 const init = async () => {
   // stockStatus();
-  // setProc();
+  setProc();
   // addLockReason();
   // getLockReason();
 
   // batchLockCarts();
   // unlockCarts();
+  // setProcCheck();
 };
 
 module.exports = { init };

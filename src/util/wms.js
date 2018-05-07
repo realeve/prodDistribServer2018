@@ -208,6 +208,19 @@ let setWhiteList = async carnos => {
   return data;
 };
 
+// 码后验证。review:1设置验证,0取消验证
+let setReviewList = async ({ carnos, review }) => {
+  let data = await axios({
+    method: "post",
+    url: host + "/reviewH",
+    data: {
+      carnos,
+      review
+    }
+  }).then(res => res.data);
+  return data;
+};
+
 module.exports = {
   getStoreRoom,
   getProcStatus,
@@ -216,5 +229,6 @@ module.exports = {
   getBlackReason,
   addBlackReason,
   setBlackList,
-  setWhiteList
+  setWhiteList,
+  setReviewList
 };
