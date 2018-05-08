@@ -1,5 +1,11 @@
 let { axios } = require("./axios");
+let http = require('axios');
 
+// const {title,msg,receiver} = params
+const pushRTXInfo = async params => await http({
+  url: 'http://10.8.2.133/datainterface/rtxpush',
+  params
+})
 /**
 *   @database: { 质量信息系统 }
 *   @desc:     { 未完成的全检任务计划列表 } 
@@ -256,5 +262,6 @@ module.exports = {
   setPrintMachinecheckMultiweak,
   getPrintMachinecheckMultiweakById,
   setPrintMachinecheckMultiweakStatus,
-  getPrintWmsProclist
+  getPrintWmsProclist,
+  pushRTXInfo
 };
