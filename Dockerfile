@@ -1,6 +1,7 @@
 FROM node:8.11.1
-COPY . /app
-WORKDIR /app
+WORKDIR /usr/src/app
+COPY package*.json ./
 RUN npm install --registry=https://registry.npm.taobao.org
+COPY . .
 EXPOSE 3000
-CMD node ./app.js
+CMD [ "npm", "start" ]
