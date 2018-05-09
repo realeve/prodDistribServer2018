@@ -1,0 +1,1 @@
+docker save -o ./dist/prod-distrib prod-distrib
