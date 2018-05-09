@@ -1,2 +1,9 @@
 const app = require("./src/index");
-app.init();
+const proxy = require('./src/apiProxy');
+
+const init = () => {
+  proxy.init();
+  // app.init();
+}
+
+init();
