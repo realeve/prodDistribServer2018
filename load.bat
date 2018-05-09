@@ -1,1 +1,1 @@
-docker load --input ./dist/prod-distrib
+docker load --input ./dist/prod-distrib.tar

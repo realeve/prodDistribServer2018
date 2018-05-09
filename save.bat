@@ -1,1 +1,1 @@
-docker save -o ./dist/prod-distrib prod-distrib
+docker save -o ./dist/prod-distrib.tar prod-distrib
