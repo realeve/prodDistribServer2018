@@ -1,5 +1,5 @@
 rem 运行 docker image
-rem docker run prod-distrib
+rem docker run -p 4000:3000 prod-distrib
 
 rem 列出容器
 rem docker ps -a
