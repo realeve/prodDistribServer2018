@@ -40,12 +40,16 @@ const init = async () => {
   let timeInterval = 5 * 60 * 1000;
   let times = 1;
 
+  consola.start('启动物流调度服务');
+  mainThread();
+
   setInterval(() => {
     consola.start(`\n${lib.now()}: 第${times++}次采集`)
     mainThread();
     // 清除次数
     times = times > 1000 ? 1 : times;
   }, timeInterval);
+
 };
 
 module.exports = { init };
