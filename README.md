@@ -27,3 +27,14 @@ load.bat 载入镜象
 publish.bat 发布镜象
 
 run.bat 运行镜象/进入 container 的系列命令，附带注释
+
+## 运行服务
+
+1.  build
+2.  run
+3.  ^+c
+4.  docker ps -a
+5.  docker exec -it containerName /bin/bash
+6.  pm2 start ./bin/www.js
+7.  pm2 start ./bin/app.js
+8.  pm2 monit
