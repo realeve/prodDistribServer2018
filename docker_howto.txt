@@ -1,0 +1,56 @@
+docker
+
+$ yum remove docker \
+                  docker-client \
+                  docker-client-latest \
+                  docker-common \
+                  docker-latest \
+                  docker-latest-logrotate \
+                  docker-logrotate \
+                  docker-selinux \
+                  docker-engine-selinux \
+                  docker-engine
+$ yum install -y yum-utils \
+  device-mapper-persistent-data \
+  lvm2
+$ yum-config-manager \
+    --add-repo \
+    https://download.docker.com/linux/centos/docker-ce.repo
+$ yum-config-manager --disable docker-ce-edge
+$ yum install  selinux-policy-targeted
+$ rpm -ivh container-selinux-2.21-1.el7.noarch.rpm docker-ce-18.03.1.ce-1.el7.centos.x86_64.rpm docker-ce-selinux-17.03.2.ce-1.el7.centos.noarch.rpm
+$ reboot
+$ docker version
+$ systemctl start docker
+$ systemctl enable docker
+
+$ yum install git
+$ git clone https://github.com/realeve/prodDistribServer2018
+$ nano .dockerignore
+##########
+.git
+node_modules
+npm-debug.log
+##########
+$ nano Dockerfile
+###############
+FROM node:8.11.1
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm i --registry=https://registry.npm.taobao.org && npm i -g pm2 --registry=https://registry.npm.taobao.org && rm -f package-lock.json
+COPY . .
+EXPOSE 3000
+CMD [ "pm2-runtime", "./bin/app.js","--web","./log/app.log" ]
+###############
+$ docker build -t prod-distrib .
+# 独立运行
+$ docker run -p 8000:3000 -d prod-distrib
+# 容器随docker服务加载
+docker run -dit --restart always -p 4000:3000 -p 9615:9615 prod-distrib
+$ docker ps
+$ docker logs [containerID|containerName]
+$ docker logs -f [containerID|containerName]
+$ docker exec -it [containerID] /bin/bash
+$ docker kill [containerID|containerName]
+$ docker save -o ./dist/prod-distrib.tar prod-distrib
+$ docker load --input ./dist/prod-distrib.tar
