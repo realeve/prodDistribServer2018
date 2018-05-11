@@ -1,5 +1,10 @@
 rem 运行 docker image
-docker run --rm -p 4000:3000 --rm -p 9615:9615 prod-distrib
+docker run -p 4000:3000 -p 9615:9615 prod-distrib
+rem 容器随docker服务加载
+docker run -dit --restart always -p 4000:3000 -p 9615:9615 prod-distrib
+
+rem 查看日志
+docker logs -f [containerid]
 rem -it --rm  /bin/bash
 
 rem 列出容器
