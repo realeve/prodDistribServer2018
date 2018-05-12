@@ -38,19 +38,21 @@ FROM node:8.11.1
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm i --registry=https://registry.npm.taobao.org && npm i -g pm2 --registry=https://registry.npm.taobao.org && rm -f package-lock.json
+RUN echo "Asia/Shanghai" > /etc/timezone
+RUN dpkg-reconfigure -f noninteractive tzdata
 COPY . .
 EXPOSE 3000
-CMD [ "pm2-runtime", "./bin/app.js","--web","./log/app.log" ]
+CMD [ "pm2-runtime", "./bin/app.js","--web","--output","./log/app.log" ]
 ###############
-$ docker build -t prod-distrib .
+$ docker build -t prod-distrib:1.0 .
 # 独立运行
-$ docker run -p 8000:3000 -d prod-distrib
+$ docker run --rm -dit -p 4000:3000 -p 9615:9615 prod-distrib:1.0
 # 容器随docker服务加载
-docker run -dit --restart always -p 4000:3000 -p 9615:9615 prod-distrib
+docker run -dit --restart always -p 4000:3000 -p 9615:9615 prod-distrib:1.0
 $ docker ps
 $ docker logs [containerID|containerName]
 $ docker logs -f [containerID|containerName]
 $ docker exec -it [containerID] /bin/bash
 $ docker kill [containerID|containerName]
-$ docker save -o ./dist/prod-distrib.tar prod-distrib
+$ docker save -o ~/dist/prod-distrib.tar prod-distrib
 $ docker load --input ./dist/prod-distrib.tar

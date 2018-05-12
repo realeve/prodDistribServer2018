@@ -9,7 +9,8 @@ let host = dev ? "http://127.0.0.1:90/api/" : "http://10.8.1.25:100/api/";
 // 程序主目录
 let getMainContent = () => {
   let PROGRAM_NAME = "prodDistribServer2018";
-  let str = process.cwd().split(PROGRAM_NAME)[0] + PROGRAM_NAME;
+  // let str = process.cwd().split(PROGRAM_NAME)[0] + PROGRAM_NAME;
+  let str = process.cwd();
   return str.replace(/\\/g, "/");
 };
 
@@ -36,10 +37,10 @@ let getToken = async shopId => {
 // 判断数据类型，对于FormData使用 typeof 方法会得到 object;
 let getType = data =>
   Object.prototype.toString
-    .call(data)
-    .match(/\S+/g)[1]
-    .replace("]", "")
-    .toLowerCase();
+  .call(data)
+  .match(/\S+/g)[1]
+  .replace("]", "")
+  .toLowerCase();
 
 const saveToken = token => {
   let fileName = `${getMainContent()}/src/util/token.json`;
