@@ -26,11 +26,12 @@ module.exports = {
     return: { status: true }
   },
   '/api/multiweak': {
-    desc: '读取某万产品是否有连续废通知',
+    desc: '读取指定大万列表产品是否有连续废通知',
+    url: 'http://localhost:3000/api/multiweak?cart=1820A234&cart=1860B008&cart=1860B362',
     param: {
       cart: 'varchar,车号'
     },
-    return: { "data": [{ "cart_number": "1820A234", "count": "2" }], "title": "当前车号是否有连续废通知", "rows": 1, "time": "2.572ms", "header": ["cart_number", "count"], "status": true }
+    return: { "data": [{ "cart_number": "1820A234", "count": "2" }, { "cart_number": "1860B008", "count": "1" }, { "cart_number": "1860B362", "count": "1" }], "title": "当前车号是否有连续废通知", "rows": 3, "time": "1.982ms", "header": ["cart_number", "count"], "status": true }
   },
   '/api/user/:username': {
     desc: '根据用户名腾讯通用户信息',

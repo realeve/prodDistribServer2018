@@ -65,8 +65,7 @@ const handleAbnormalItem = async ({ cart_number, proc_stream, id }) => {
     reason_code,
     task_id: id
   });
-  console.log("工艺流程处理完毕");
-
+  console.log("异常品工艺流程处理完毕");
   if (res.status) {
     // 异常品处理只会传入一万产品信息，如果返回的成功数据列表中只有一条，视为处理成功，更改后续的状态。
     if (res.result.handledList.length) {

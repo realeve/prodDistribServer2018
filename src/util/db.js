@@ -1,11 +1,12 @@
 let { axios } = require("./axios");
-let http = require('axios');
+let http = require("axios");
 
 // const {title,msg,receiver} = params
-const pushRTXInfo = async params => await http({
-  url: 'http://10.8.2.133/datainterface/rtxpush',
-  params
-})
+const pushRTXInfo = async params =>
+  await http({
+    url: "http://10.8.2.133/datainterface/rtxpush",
+    params
+  });
 /**
 *   @database: { 质量信息系统 }
 *   @desc:     { 未完成的全检任务计划列表 } 
@@ -80,15 +81,16 @@ const addPrintWmsLog = async values =>
     }
   }).then(res => res);
 
-/**质量信息系统
- * 更新wms日志信息
- * @param {params} {return_info,_id} 
- */
-const setPrintWmsLog = async params => await axios({
-  url: '/120/e7d88969ca.json',
-  params
-}).then(res => res);
-
+/**
+*   @database: { 质量信息系统 }
+*   @desc:     { 更新wms日志信息 } 
+    const { return_info, _id } = params;
+*/
+const setPrintWmsLog = async params =>
+  await axios({
+    url: "/120/e7d88969ca.json",
+    params
+  }).then(res => res);
 
 /**
 *   @database: { 质量信息系统 }

@@ -63,9 +63,23 @@ const setPrintMachinecheckMultiweak = async params => await axios({
   url: '/119/fc4fd73e9e.json',
   params,
 }).then(res => res);
+
+
+/**
+ *   @database: { 质量信息系统 }
+ *   @desc:     { 更新四新及异常品人工抽检产品领用状态 } 
+ */
+const setPrintWmsProclistStatus = async cart => await axios({
+  url: '/122/9343c77d3b.json',
+  params: {
+    cart
+  },
+}).then(res => res);
+
 module.exports = {
   setPrintSampleCartlist,
   setPrintWmsProclist,
+  setPrintWmsProclistStatus,
   getPrintMachinecheckMultiweak,
   setPrintSampleMachine,
   setPrintAbnormalProd,

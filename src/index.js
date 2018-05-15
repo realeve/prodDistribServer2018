@@ -36,8 +36,8 @@ const mainThread = async () => {
 
 const init = async () => {
 
-  // 间隔时间 5 分钟。
-  let timeInterval = 5 * 1 * 1000;
+  // 间隔时间 1 分钟。
+  let timeInterval = 1 * 60 * 1000;
   let times = 1;
 
   consola.start('启动物流调度服务');

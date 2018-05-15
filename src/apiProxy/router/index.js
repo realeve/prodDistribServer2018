@@ -30,6 +30,7 @@ router.get('/api/manual_status', async ctx => {
   let data = await db.setPrintSampleCartlist(cart);
   // step2: 添加该车产品对应的机台具体抽检万数
   await db.setPrintSampleMachine(cart);
+  await db.setPrintWmsProclistStatus(cart);
 
   data.status = true;
   ctx.body = data;
@@ -57,7 +58,7 @@ router.get('/api/after_print', async ctx => {
 
 // 连续废通知
 router.get('/api/multiweak', async ctx => {
-  let validInfo = util.validateParam(ctx, 'cart'.split(','));
+  let validInfo = util.validateParam(ctx, ['cart']);
   if (!validInfo.status) {
     ctx.body = validInfo
     return;
@@ -97,16 +98,5 @@ router.get('/api/rtxlist/:proc', async ctx => {
   let { proc } = ctx.params;
   ctx.body = rtx.getRtxList(proc)
 });
-
-// router.get('/api/addlog', async ctx => {
-//   // 记录日志信息，wms提交及返回的数据全部入库
-//   let logInfo = await db2.addPrintWmsLog([{
-//     remark: 'JSON.stringify({ carnos, proc_stream })',
-//     rec_time: lib.now(),
-//     return_info: 'JSON.stringify(result)'
-//   }]);
-//   ctx.body = logInfo
-// })
-
 
 module.exports = router;
