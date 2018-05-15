@@ -1,0 +1,12 @@
+apps:
+  - script   : './bin/app.js'
+    name     : 'ROBOT'
+    exec_mode: 'cluster'
+    instances: 1
+    error_file: './log/appErr.log'
+    out_file  : './log/app.log'
+  - script   : './bin/www.js'
+    name      : "PORTAL"
+    exec_mode:  'fork'
+    error_file: './log/portalErr.log'
+    out_file  : './log/portal.log'

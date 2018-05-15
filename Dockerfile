@@ -6,4 +6,4 @@ RUN echo "Asia/Shanghai" > /etc/timezone
 RUN dpkg-reconfigure -f noninteractive tzdata
 COPY . .
 EXPOSE 3000
-CMD [ "pm2-runtime", "./bin/app.js","--web","--output","./log/app.log" ]
+CMD [ "pm2-runtime", "./prod-distrib.yml","--web" ]
