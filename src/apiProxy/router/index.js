@@ -7,6 +7,7 @@ const api_doc = require('./api_document')
 const users = require('../../util/rtx')
 const R = require('ramda');
 const rtx = require('../rtx/index')
+const db2 = require('../../util/db')
 
 router.get('/', ctx => {
   ctx.body = 'hello worlds';
@@ -96,6 +97,16 @@ router.get('/api/rtxlist/:proc', async ctx => {
   let { proc } = ctx.params;
   ctx.body = rtx.getRtxList(proc)
 });
+
+// router.get('/api/addlog', async ctx => {
+//   // 记录日志信息，wms提交及返回的数据全部入库
+//   let logInfo = await db2.addPrintWmsLog([{
+//     remark: 'JSON.stringify({ carnos, proc_stream })',
+//     rec_time: lib.now(),
+//     return_info: 'JSON.stringify(result)'
+//   }]);
+//   ctx.body = logInfo
+// })
 
 
 module.exports = router;

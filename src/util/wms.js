@@ -97,13 +97,14 @@ let getStockStatus = async carnos => {
 3.四新验证
 4.其它
 */
-let setBlackList = async ({ carnos, reason_code }) => {
+let setBlackList = async ({ carnos, reason_code, log_id }) => {
   let data = await axios({
     method: "post",
     url: host + "/lockH",
     data: {
       carnos,
-      reason_code
+      reason_code,
+      log_id
     }
   }).then(res => res.data);
 
@@ -125,13 +126,14 @@ let setBlackList = async ({ carnos, reason_code }) => {
   { proc_stream_id: 2, proc_stream_name: "系统自动分配" }
 ]
 carnos:[carno1,carno2,carno3]*/
-let setProcs = async ({ checkType, carnos }) => {
+let setProcs = async ({ checkType, carnos, log_id }) => {
   let data = await axios({
     method: "post",
     url: host + "/carnoH",
     data: {
       checkType,
-      carnos
+      carnos,
+      log_id
     }
   }).then(res => res.data);
   return data;
@@ -209,13 +211,14 @@ let setWhiteList = async carnos => {
 };
 
 // 码后验证。review:1设置验证,0取消验证
-let setReviewList = async ({ carnos, review }) => {
+let setReviewList = async ({ carnos, review, log_id }) => {
   let data = await axios({
     method: "post",
     url: host + "/reviewH",
     data: {
       carnos,
-      review
+      review,
+      log_id
     }
   }).then(res => res.data);
   return data;

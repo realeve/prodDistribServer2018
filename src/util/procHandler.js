@@ -79,11 +79,11 @@ let recordRealProc = async (
 };
 
 // 人工拉号,默认设为人工异常品拉号，人工拉号时需锁定车号信息。
-let manualHandle = async (carnos, reason_code = "q_abnormalProd") =>
-  await wms.setBlackList({ carnos, reason_code });
+let manualHandle = async (carnos, reason_code = "q_abnormalProd", log_id) =>
+  await wms.setBlackList({ carnos, reason_code, log_id });
 
 // 码后工艺验证
-let mahouProcVerify = async carnos => await wms.setReviewList({ carnos, review: 1 })
+let mahouProcVerify = async (carnos, log_id) => await wms.setReviewList({ carnos, review: 1, log_id })
 
 // 设置工艺流程至立体库
 let adjustProcInfo = async ({
@@ -94,25 +94,40 @@ let adjustProcInfo = async ({
 }) => {
   let result;
   let pStream = parseInt(proc_stream);
+
+  // 记录日志信息，wms提交及返回的数据全部入库
+  // 20180515调整日志添加接口
+  let logInfo = await db.addPrintWmsLog([{
+    remark: JSON.stringify({ carnos, proc_stream }),
+    rec_time: lib.now()
+  }]);
+
+  // 添加日志正常？
+  if (logInfo.rows < 1 || logInfo.data[0].affected_rows < 1) {
+    console.log(logInfo);
+    return {
+      status: false
+    }
+  }
+
+  let log_id = logInfo.data[0].id;
+
   // 全检品、补品、码后核查，直接设置到对应工艺
   if ([0, 2, 4, 6].includes(pStream)) {
     consola.success('更改产品工艺：');
-    result = await wms.setProcs({ carnos, checkType: proc_stream_name });
+    result = await wms.setProcs({ carnos, checkType: proc_stream_name, log_id });
   } else if ([3, 5].includes(pStream)) {
     // 码后工艺验证
-    result = await mahouProcVerify(carnos);
+    result = await mahouProcVerify(carnos, log_id);
   } else {
     // 人工拉号锁车
-    result = await manualHandle(carnos, reason_code);
+    result = await manualHandle(carnos, reason_code, log_id);
   }
   consola.success(result);
 
-  // 记录日志信息，wms提交及返回的数据全部入库
-  await db.addPrintWmsLog([{
-    remark: JSON.stringify({ carnos, proc_stream }),
-    rec_time: lib.now(),
-    return_info: JSON.stringify(result)
-  }]);
+  // 更新日志返回信息
+  await db.setPrintWmsLog({ return_info: JSON.stringify(result), _id: log_id });
+
   return result;
 };
 

@@ -69,7 +69,7 @@ const setPrintNewprocPlan = async params =>
 *   @database: { 质量信息系统 }
 *   @desc:     { 批量记录库管系统日志信息 } 
 	以下参数在建立过程中与系统保留字段冲突，已自动替换:
-	@desc:批量插入数据时，约定使用二维数组values参数，格式为[{remark,rec_time,return_info }]，数组的每一项表示一条数据*/
+	@desc:批量插入数据时，约定使用二维数组values参数，格式为[{remark,rec_time }]，数组的每一项表示一条数据*/
 const addPrintWmsLog = async values =>
   await axios({
     method: "post",
@@ -79,6 +79,16 @@ const addPrintWmsLog = async values =>
       nonce: "f0500427cb"
     }
   }).then(res => res);
+
+/**质量信息系统
+ * 更新wms日志信息
+ * @param {params} {return_info,_id} 
+ */
+const setPrintWmsLog = async params => await axios({
+  url: '/120/e7d88969ca.json',
+  params
+}).then(res => res);
+
 
 /**
 *   @database: { 质量信息系统 }
@@ -247,8 +257,8 @@ module.exports = {
   getCartListWithGZ,
   setPrintNewprocPlan,
   addPrintWmsLog,
+  setPrintWmsLog,
   setPrintNewprocPlan,
-  addPrintWmsLog,
   addPrintWmsProclist,
   getPrintAbnormalProd,
   setPrintAbnormalProd,
