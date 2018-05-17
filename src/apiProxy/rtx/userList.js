@@ -27,7 +27,7 @@ let userList = [{
 }, {
   rtxInfo: [{
     dept_name: '印码制作部',
-    userList: ['汪雄'],
+    userList: ['汪雄', '周海兵'],
   }, {
     dept_name: '印钞管理部',
     userList: ['钟鸣', '舒粤', '马可', '徐闵', '张立力', '朱振华', '潘成', '金鑫'],
