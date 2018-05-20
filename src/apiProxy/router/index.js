@@ -87,7 +87,7 @@ router.get('/api/before_print', async ctx => {
 
   // 产品为异常品或四新产品，经现有流程处理风险
   // 产品为机台连续废通知产品通知工艺员。
-  let haveMultiweakNotice = await db.getPrintMachinecheckMultiweakByCart(cart)
+  let haveMultiweakNotice = await db2.getPrintMachinecheckMultiweakByCart(cart)
   let data = {
     status: true
   }
