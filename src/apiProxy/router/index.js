@@ -79,8 +79,24 @@ router.get('/api/before_print', async ctx => {
   }
 
   let { process, machine_name, cart } = ctx.query;
-  let msg = `车号${cart}已由机台${machine_name}领用至${process}工序(${lib.now()}).\n[(点击此处查看详情)|http://10.8.2.133/topic/multiweak.html?cart=${cart}]`
-  let data = await rtx.pushMsg({ proc: process, msg });
+
+  // 检封工序上机需要更新wms车号调整列表中的领用情况
+  if (process == '检封') {
+    await db.setPrintWmsProclistStatus(cart);
+  }
+
+  // 产品为异常品或四新产品，经现有流程处理风险
+  // 产品为机台连续废通知产品通知工艺员。
+  let haveMultiweakNotice = await db.getPrintMachinecheckMultiweakByCart(cart)
+  let data = {
+    status: true
+  }
+
+  if (haveMultiweakNotice.rows > 0) {
+    let msg = `车号${cart}已由机台${machine_name}领用至${process}工序(${lib.now()}).\n[(点击此处查看详情)|http://10.8.2.133/topic/multiweak.html?cart=${cart}]`
+    data = await rtx.pushMsg({ proc: process, msg });
+  }
+
   ctx.body = data
 })
 

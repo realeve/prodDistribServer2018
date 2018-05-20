@@ -252,6 +252,17 @@ const getPrintWmsProclist = async params =>
     params
   }).then(res => res);
 
+/**
+ *   @database: { 质量信息系统 }
+ *   @desc:     { 当前车号是否有连续废通知 } 
+ */
+const getPrintMachinecheckMultiweakByCart = async cart => await axios({
+  url: '/116/c96d2b8975.json',
+  params: {
+    cart
+  },
+}).then(res => res);
+
 module.exports = {
   getPrintNewprocPlan,
   getCartList,
@@ -275,5 +286,6 @@ module.exports = {
   getPrintMachinecheckMultiweakById,
   setPrintMachinecheckMultiweakStatus,
   getPrintWmsProclist,
-  pushRTXInfo
+  pushRTXInfo,
+  getPrintMachinecheckMultiweakByCart
 };
