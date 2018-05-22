@@ -125,11 +125,14 @@ let handlePlanList = async data => {
       break;
     case 2:
       // IS_GZ_CHECK
+      let start = '000' + num1;
+      let end = '000' + num2;
+
       cartList = await db.getCartListWithGZ({
         prod_name: ProductName,
         gz: alpha_num,
-        start_no: num1,
-        end_no: num2
+        start_no: start.slice(start.length - 4),
+        end_no: end.slice(end.length - 4)
       });
       cartList1 = R.map(R.nth(0))(cartList.data);
       break;
@@ -148,15 +151,15 @@ let handlePlanList = async data => {
         cartList1 = cartList.data.slice(0, num1);
         cartList2 = cartList.data.slice(num1, num2 + num1);
       }
-      // console.log(cartList1.length);
-      // console.log(cartList2.length);
-      // return;
       break;
   }
-
   // 数组平铺
   cartList1 = R.compose(R.uniq, R.flatten)(cartList1);
   cartList2 = R.compose(R.uniq, R.flatten)(cartList2);
+
+  // console.log(cartList1);
+  // console.log(cartList2);
+  // return;
 
   // 已经插入的车号列表
   let handledCartInfo = await db.getPrintWmsProclist({
@@ -206,10 +209,17 @@ let handlePlanList = async data => {
     cartList2 = wmsRes.status ? wmsRes.result.handledList : [];
   }
 
+  // handledCart大万数达到条件
+  if (cartList1.length + cartList2.length == 0) {
+    await handleFinishStatus({ data, cartList: handledCarts, taskName });
+  } else {
+    await handleFinishStatus({ data, cartList: [...cartList1, ...cartList2], taskName });
+  }
+
 
   // 设置完成进度
   // 此处仅记录在两次立体库信息入库中，处理成功的车号列表信息，如果入库数量满足预先设置的工艺流程中记录的信息，则将任务完成状态置为已完成。
-  await handleFinishStatus({ data, cartList1, cartList2, taskName });
+
 };
 
 /**
@@ -219,7 +229,8 @@ let handlePlanList = async data => {
  * 2.按时间段：当天时间是否大于结束时间；
  * 3.按某天起大万数：已处理的大数万是否等于实时大万数；
  */
-let handleFinishStatus = async ({ data, cartList1, cartList2, taskName }) => {
+let handleFinishStatus = async ({ data, cartList, taskName }) => {
+
   // 数据预处理
   let isGZFinish = ({ ProductName, num1, num2, cartList }) => {
     let kNum = 35;
@@ -237,15 +248,15 @@ let handleFinishStatus = async ({ data, cartList1, cartList2, taskName }) => {
   const IS_GZ_CHECK = date_type == 2;
   // 从某段时间开始：产品大万数大于初始设置值
   const CARTS_FINISHED =
-    IS_CARTS_COUNT && cartList1.length == num1 && cartList2.length >= num2;
+    IS_CARTS_COUNT && cartList.length >= num2 + num1;
 
   // 某段时间的所有产品：当前日期信息大于结束时间时
   const TIME_RELEASED = IS_DATE_RANGE && today > rec_date2;
 
   const IS_ALL_GZ_FINISHED =
-    IS_GZ_CHECK && isGZFinish({ ProductName, num1, num2, cartList: cartList1 });
+    IS_GZ_CHECK && isGZFinish({ ProductName, num1, num2, cartList });
 
-  let complete_num = cartList1.length + cartList2.length;
+  let complete_num = cartList.length;
   let complete_status = 0;
   let update_time = lib.now();
 

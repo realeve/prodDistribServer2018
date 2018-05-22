@@ -72,7 +72,8 @@ let unlockCarts = async () => {
 
 // 接口7：码后核查工艺验证测试
 let setProcCheck = async () => {
-  let carnos = ["1820K012", "1840J999"];
+  let carnos = ['1880B579', '1880B560', '1880B541', '1880B558', '1880B538', '1880B582', '1880A911', '1880A970', '1880B592', '1880B006', '1880B526', '1880B390', '1880B575'];
+  // 取消任务
   let { result } = await wms.setReviewList({
     carnos,
     review: 0
@@ -82,13 +83,13 @@ let setProcCheck = async () => {
 
 const init = async () => {
   // stockStatus();
-  setProc();
+  // setProc();
   // addLockReason();
   // getLockReason();
 
   // batchLockCarts();
   // unlockCarts();
-  // setProcCheck();
+  setProcCheck();
 };
 
 module.exports = { init };
