@@ -83,7 +83,7 @@ let manualHandle = async (carnos, reason_code = "q_abnormalProd", log_id) =>
   await wms.setBlackList({ carnos, reason_code, log_id });
 
 // 码后工艺验证
-let mahouProcVerify = async (carnos, log_id) => await wms.setReviewList({ carnos, review: 0, log_id })
+let mahouProcVerify = async (carnos, log_id) => await wms.setReviewList({ carnos, review: 1, log_id })
 
 // 设置工艺流程至立体库
 let adjustProcInfo = async ({
