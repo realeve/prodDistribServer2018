@@ -1,5 +1,12 @@
 module.exports = {
   '/api': 'API列表',
+  '/api/remark_info': {
+    desc: '产品锁车原因说明',
+    param: {
+      cart: 'varchar,车号'
+    },
+    return: { "data": [{ "remark": "【异常品】M81D-2号 33K-40K国徽有点浅" }, { "remark": "【人工大张日常抽检】" }], "title": "产品锁车原因", "rows": 2, "time": "7.394ms", "header": ["remark"], "status": true }
+  },
   '/api/manual_status': {
     desc: '人工大张拉号，车号已领取后，更新状态。',
     param: {

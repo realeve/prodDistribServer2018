@@ -76,6 +76,16 @@ const setPrintWmsProclistStatus = async cart => await axios({
   },
 }).then(res => res);
 
+/**
+*   @database: { 质量信息系统 }
+*   @desc:     { 产品锁车原因 } 
+    const { cart1, cart2, cart3 } = params;
+*/
+const getPrintWmsProclist = async params => await axios({
+  url: '/134/dc12ffbbae.json',
+  params,
+}).then(res => res);
+
 module.exports = {
   setPrintSampleCartlist,
   setPrintWmsProclist,
@@ -83,5 +93,6 @@ module.exports = {
   getPrintMachinecheckMultiweak,
   setPrintSampleMachine,
   setPrintAbnormalProd,
-  setPrintMachinecheckMultiweak
+  setPrintMachinecheckMultiweak,
+  getPrintWmsProclist
 };

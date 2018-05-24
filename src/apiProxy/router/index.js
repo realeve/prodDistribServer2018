@@ -17,6 +17,21 @@ router.get('/api', ctx => {
   ctx.body = api_doc
 });
 
+
+// 产品指定车号锁车日志
+router.get('/api/remark_info', async ctx => {
+  let validInfo = util.validateParam(ctx, ['cart']);
+  if (!validInfo.status) {
+    ctx.body = validInfo
+    return;
+  }
+
+  let { cart } = ctx.query;
+  let data = await db.getPrintWmsProclist({ cart1: cart, cart2: cart, cart3: cart });
+  data.status = true;
+  ctx.body = data;
+});
+
 // 人工大张拉号，车号已领取后，更新状态。
 router.get('/api/manual_status', async ctx => {
   let validInfo = util.validateParam(ctx, ['cart']);
@@ -114,5 +129,7 @@ router.get('/api/rtxlist/:proc', async ctx => {
   let { proc } = ctx.params;
   ctx.body = rtx.getRtxList(proc)
 });
+
+
 
 module.exports = router;
