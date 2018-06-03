@@ -83,7 +83,7 @@ let manualHandle = async (carnos, reason_code = "q_abnormalProd", log_id) =>
   await wms.setBlackList({ carnos, reason_code, log_id });
 
 // 码后工艺验证
-let mahouProcVerify = async (carnos, log_id) => await wms.setReviewList({ carnos, review: 1, log_id })
+let mahouProcVerify = async (carnos, log_id, review) => await wms.setReviewList({ carnos, review: review ? 1 : 0, log_id })
 
 // 设置工艺流程至立体库
 let adjustProcInfo = async ({
@@ -116,9 +116,9 @@ let adjustProcInfo = async ({
   if ([0, 2, 4, 6].includes(pStream)) {
     consola.success('更改产品工艺：');
     result = await wms.setProcs({ carnos, checkType: proc_stream_name, log_id });
-  } else if ([3, 5].includes(pStream)) {
+  } else if ([3, 5, 8].includes(pStream)) {
     // 码后工艺验证
-    result = await mahouProcVerify(carnos, log_id);
+    result = await mahouProcVerify(carnos, log_id, pStream !== 8);
   } else {
     // 人工拉号锁车
     result = await manualHandle(carnos, reason_code, log_id);

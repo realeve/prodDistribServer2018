@@ -52,7 +52,11 @@ let reasonCode = [
   { reason_code: "incomplete", reason_desc: "未完工" },
   { reason_code: "q_handCheck", reason_desc: "人工全检锁车" },
   { reason_code: "q_newProc", reason_desc: "四新批量锁车" },
-  { reason_code: "q_abnormalProd", reason_desc: "异常品锁车" }
+  { reason_code: "q_abnormalProd", reason_desc: "异常品锁车" },
+  {
+    reason_code: "q_batchLock",
+    reason_desc: "人工批量锁车,不拉号"
+  }
 ];
 
 // 数据库交互

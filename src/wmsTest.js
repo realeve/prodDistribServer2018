@@ -43,9 +43,14 @@ let addLockReason = async () => {
   //   reason_desc: "四新批量锁车"
   // });
 
+  // let data = await wms.addBlackReason({
+  //   reason_code: "q_abnormalProd",
+  //   reason_desc: "异常品锁车"
+  // });
+
   let data = await wms.addBlackReason({
-    reason_code: "q_abnormalProd",
-    reason_desc: "异常品锁车"
+    reason_code: "q_batchLock",
+    reason_desc: "人工批量锁车,不拉号"
   });
 
   consola.success(JSON.stringify(data));
@@ -72,7 +77,9 @@ let unlockCarts = async () => {
 
 // 接口7：码后核查工艺验证测试
 let setProcCheck = async () => {
-  let carnos = ['1880B579', '1880B560', '1880B541', '1880B558', '1880B538', '1880B582', '1880A911', '1880A970', '1880B592', '1880B006', '1880B526', '1880B390', '1880B575'];
+  // let carnos = ['1880B579', '1880B560', '1880B541', '1880B558', '1880B538', '1880B582', '1880A911', '1880A970', '1880B592', '1880B006', '1880B526', '1880B390', '1880B575'];
+
+  let carnos = ['1880B250', '1880B253'];
   // 取消任务
   let { result } = await wms.setReviewList({
     carnos,
@@ -80,6 +87,7 @@ let setProcCheck = async () => {
   });
   consola.success(JSON.stringify(result));
 };
+
 
 const init = async () => {
   // stockStatus();
