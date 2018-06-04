@@ -13,6 +13,9 @@ let userList = [{
   }, {
     dept_name: '印钞管理部',
     userList: ['徐东海', '李宾', '李超群', '蒲明玥']
+  }, {
+    dept_name: '企划信息部',
+    userList: ['倪震']
   }],
   proc_name: procList0
 }, {
@@ -22,6 +25,9 @@ let userList = [{
   }, {
     dept_name: '印钞管理部',
     userList: ['陈文革', '李宾', '李超群', '蒲明玥']
+  }, {
+    dept_name: '企划信息部',
+    userList: ['倪震']
   }],
   proc_name: procList1
 }, {
@@ -30,7 +36,10 @@ let userList = [{
     userList: ['汪雄', '周海兵'],
   }, {
     dept_name: '印钞管理部',
-    userList: ['钟鸣', '舒粤', '马可', '徐闵', '张立力', '朱振华', '潘成', '金鑫'],
+    userList: ['李宾', '钟鸣', '舒粤', '马可', '徐闵', '张立力', '朱振华', '潘成', '金鑫'],
+  }, {
+    dept_name: '企划信息部',
+    userList: ['倪震']
   }],
   proc_name: procList2
 }, {
@@ -39,7 +48,10 @@ let userList = [{
     userList: ['吕从飞'],
   }, {
     dept_name: '印钞管理部',
-    userList: ['袁长虹', '杨林', '胡新玥', '任礼科', '蒋荣', '冯诗伟'],
+    userList: ['李宾', '袁长虹', '杨林', '胡新玥', '任礼科', '蒋荣', '冯诗伟'],
+  }, {
+    dept_name: '企划信息部',
+    userList: ['倪震']
   }],
   proc_name: procList3
 }]

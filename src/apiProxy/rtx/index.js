@@ -49,8 +49,8 @@ let pushMsg = async ({ proc, msg }) => {
   let receiver = R.map(R.prop('rtxuid'))(rtxList)
 
   // 测试信息，推送至李宾
-  receiver = [10654, 10093]
-  console.log(receiver);
+  // receiver = [10654, 10093]
+  // console.log(receiver);
   let { data } = await rtxPush({ msg, receiver });
 
   console.log(data);
