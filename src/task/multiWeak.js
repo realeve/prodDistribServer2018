@@ -2,7 +2,7 @@ let db = require("../util/db");
 let R = require("ramda");
 let wms = require("../util/wms");
 let lib = require("../util/lib");
-const consola = require("consola");
+// const consola = require("consola");
 const procHandler = require("../util/procHandler");
 
 let task_name = "机台连续废通知";
@@ -15,13 +15,13 @@ let task_name = "机台连续废通知";
  * 3.依次对以上列表中的任务处理。
  */
 const init = async () => {
-  consola.success("开始任务：" + task_name);
+  console.log("开始任务：" + task_name);
   let result = await procHandler.recordHeartbeat(task_name);
 
   let { data } = await db.getPrintMachinecheckMultiweak();
 
   if (R.isNil(data) || data.length === 0) {
-    consola.info("所有任务处理完毕，下个周期继续");
+    console.info("所有任务处理完毕，下个周期继续");
     return;
   }
 
@@ -79,7 +79,7 @@ const handlePlanItem = async ({ cart_number, id, last_proc }, data) => {
 
   // 此处要判断是否更新成功
   if (res.rows == 0 || res.data[0].affected_rows == 0) {
-    consola.log('数据更新失败:')
+    console.log('数据更新失败:')
     console.log({
       last_proc,
       last_machine: machine_name,
@@ -132,7 +132,7 @@ const handlePlanItem = async ({ cart_number, id, last_proc }, data) => {
 // 根据cart_id推送信息至工艺员
 // const pushDataByRTX = async id => {
 //   // 如果这万产品属于机台通知了连续废的，在印码工序刷卡出库的时候通知推送，质量平台转发信息至工艺员/机检人员。
-//   consola.success("该部分信息由服务端处理，此处不再处理");
+//   console.log("该部分信息由服务端处理，此处不再处理");
 //   return;
 
 //   let pushText = await getPushInfoById(id);
@@ -140,7 +140,7 @@ const handlePlanItem = async ({ cart_number, id, last_proc }, data) => {
 //     return;
 //   }
 //   // 增加数据推送接口
-//   consola.success("此处需要推送消息");
+//   console.log("此处需要推送消息");
 // };
 
 // 发布质量信息

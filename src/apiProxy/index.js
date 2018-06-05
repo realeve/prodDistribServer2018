@@ -29,7 +29,7 @@ const init = () => {
     .use(router.routes())
     .use(router.allowedMethods());
   app.listen(port);
-  consola.success(`start api server success:\n http://localhost:${port};`)
+  console.log(`start api server success:\n http://localhost:${port};`)
 }
 
 module.exports = { init };

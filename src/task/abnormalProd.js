@@ -2,7 +2,7 @@ let db = require("../util/db");
 let R = require("ramda");
 let wms = require("../util/wms");
 let lib = require("../util/lib");
-const consola = require("consola");
+// const consola = require("consola");
 const procHandler = require("../util/procHandler");
 
 /**
@@ -21,7 +21,7 @@ const init = async () => {
   let { data } = await db.getPrintAbnormalProd();
   console.log(data);
   if (R.isNil(data) || data.length === 0) {
-    consola.info("所有任务处理完毕，下个周期继续");
+    console.info("所有任务处理完毕，下个周期继续");
     return;
   }
 
@@ -48,13 +48,16 @@ const handleAbnormalItem = async ({ cart_number, proc_stream, id }) => {
     task_id: id
   });
 
+  console.log(handledCartInfo);
+
   let handledCarts = R.map(R.prop("cart_number"))(handledCartInfo.data);
-  consola.success("已处理的车号列表");
+  console.log("已处理的车号列表");
   console.log(handledCarts);
   cartList = R.difference(cartList, handledCarts);
 
   if (cartList.length === 0) {
-    consola.info("当前车号已处理");
+    console.info("当前车号已处理");
+    await db.setPrintAbnormalProd(cart_number);
     return;
   }
 

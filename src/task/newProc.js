@@ -2,7 +2,7 @@ let db = require("../util/db");
 let R = require("ramda");
 let wms = require("../util/wms");
 let lib = require("../util/lib");
-const consola = require("consola");
+// const consola = require("consola");
 const procHandler = require("../util/procHandler");
 
 let stepIdx = 1;
@@ -19,28 +19,28 @@ let reason_code = "q_newProc";
  */
 const init = async () => {
   let task_name = "四新任务处理";
-  consola.success("待加入对已处理车号的过滤");
+  console.log("待加入对已处理车号的过滤");
 
   await procHandler.recordHeartbeat(task_name);
 
-  consola.start(`step${stepIdx++}: 获取四新任务列表`);
+  console.info(`step${stepIdx++}: 获取四新任务列表`);
   let data = await db.getPrintNewprocPlan();
 
   if (data.rows === 0) {
-    consola.info(`step${stepIdx++}: 四新任务列表为空，下个循环继续。`);
+    console.info(`step${stepIdx++}: 四新任务列表为空，下个循环继续。`);
     return;
   }
 
-  consola.success("读取到以下任务列表:" + JSON.stringify(data.data));
+  console.log("读取到以下任务列表:" + JSON.stringify(data.data));
 
-  consola.success(`step${stepIdx++}: 共获取到${data.rows}条任务`);
+  console.log(`step${stepIdx++}: 共获取到${data.rows}条任务`);
 
   // 调试模式只处理一项信息
   // await handlePlanList(data.data[0]);
   // return;
 
   data.data.forEach(async (item, idx) => {
-    consola.info(`       开始处理任务${idx + 1}/${data.rows}:`);
+    console.info(`       开始处理任务${idx + 1}/${data.rows}:`);
     await handlePlanList(item);
   });
 };
@@ -99,13 +99,13 @@ let handlePlanList = async data => {
   } = data;
 
   let taskName = getLockReason(data);
-  consola.info("开始任务信息：" + taskName);
+  console.info("开始任务信息：" + taskName);
   num1 = parseInt(num1, 10);
   num2 = parseInt(num2, 10);
 
   let today = lib.ymd();
   if (today < rec_date1) {
-    consola.error(`exit:任务${rec_date1}尚未开始`);
+    console.error(`exit:任务${rec_date1}尚未开始`);
     return;
   }
 
@@ -167,7 +167,7 @@ let handlePlanList = async data => {
     task_id: id
   });
   let handledCarts = R.map(R.prop("cart_number"))(handledCartInfo.data);
-  consola.success("已处理的车号列表");
+  console.log("已处理的车号列表");
   console.log(handledCarts);
 
   // R.difference(),求差集。求第一个列表中，未包含在第二个列表中的任一元素的集合。对象和数组比较数值相等，而非引用相等。
@@ -264,7 +264,7 @@ let handleFinishStatus = async ({ data, cartList, taskName }) => {
   // 以上条件同时满足时，任务完成
   if (TIME_RELEASED || CARTS_FINISHED || IS_ALL_GZ_FINISHED) {
     complete_status = 1;
-    consola.success(`exit:任务${taskName}已经结束，此处更新任务状态`);
+    console.log(`exit:任务${taskName}已经结束，此处更新任务状态`);
   }
 
   // 更新数据库状态及实时处理进度

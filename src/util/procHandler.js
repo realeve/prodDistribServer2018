@@ -1,7 +1,7 @@
 let db = require("./db");
 let lib = require("./lib");
 let wms = require("./wms");
-const consola = require("consola");
+// const consola = require("consola");
 let R = require("ramda");
 
 /**
@@ -114,7 +114,7 @@ let adjustProcInfo = async ({
 
   // 全检品、补品、码后核查，直接设置到对应工艺
   if ([0, 2, 4, 6].includes(pStream)) {
-    consola.success('更改产品工艺：');
+    console.log('更改产品工艺：');
     result = await wms.setProcs({ carnos, checkType: proc_stream_name, log_id });
   } else if ([3, 5, 8].includes(pStream)) {
     // 码后工艺验证
@@ -123,7 +123,7 @@ let adjustProcInfo = async ({
     // 人工拉号锁车
     result = await manualHandle(carnos, reason_code, log_id);
   }
-  consola.success(result);
+  console.log(result);
 
   // 更新日志返回信息
   await db.setPrintWmsLog({ return_info: JSON.stringify(result), _id: log_id });
@@ -196,7 +196,7 @@ let handleProcStream = async ({
 };
 
 const recordHeartbeat = async task_name => {
-  consola.success("i am alive :)");
+  console.log("i am alive :)");
   let { data } = await db.getPrintWmsHeartbeat();
   let isFind = R.filter(R.propEq("task_name", task_name))(data);
   if (isFind.length) {

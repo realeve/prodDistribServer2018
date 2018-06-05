@@ -2,20 +2,20 @@ let db = require("../util/db");
 let R = require("ramda");
 let wms = require("../util/wms");
 let lib = require("../util/lib");
-const consola = require("consola");
+// const consola = require("consola");
 const procHandler = require("../util/procHandler");
 
 let task_name = "人工拉号自动排活";
 const init = async () => {
-  consola.success("该部分功能移至前台，后台不做任务扫描");
+  console.log("该部分功能移至前台，后台不做任务扫描");
   return;
-  consola.success("开始任务：" + task_name);
+  console.log("开始任务：" + task_name);
   let result = await procHandler.recordHeartbeat(task_name);
 
   let { data } = await db.getPrintSampleCartlist();
 
   if (R.isNil(data) || data.length === 0) {
-    consola.info("所有任务处理完毕，下个周期继续");
+    console.info("所有任务处理完毕，下个周期继续");
     return;
   }
 

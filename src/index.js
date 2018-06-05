@@ -23,15 +23,15 @@ const mainThread = async () => {
   // 调试完毕-2018057全部通过。
   await abnormalProd.init();
 
-  consola.info('1.异常品处理完毕\n');
+  console.info('1.异常品处理完毕\n');
 
   // 调试完毕
   await newProc.init().catch(e => console.log(e));
-  consola.info('2.四新产品处理完毕\n');
+  console.info('2.四新产品处理完毕\n');
 
   // 测试完毕
   await multiWeak.init();
-  consola.info('3.连续废通知产品进度处理完毕\n\n');
+  console.info('3.连续废通知产品进度处理完毕\n\n');
 }
 
 const init = async () => {
@@ -40,11 +40,11 @@ const init = async () => {
   let timeInterval = 1 * 60 * 1000;
   let times = 1;
 
-  consola.start('启动物流调度服务');
+  console.info('启动物流调度服务');
   mainThread();
 
   setInterval(() => {
-    consola.start(`\n${lib.now()}: 第${times++}次采集`)
+    console.info(`\n${lib.now()}: 第${times++}次采集`)
     mainThread();
     // 清除次数
     times = times > 1000 ? 1 : times;
