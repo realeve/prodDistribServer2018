@@ -348,6 +348,7 @@ let users = [
   { dept_id: 29, rtx_id: 54002806, username: '杨智勇', rtxuid: 10741, gender: 0 },
   { dept_id: 29, rtx_id: 54002751, username: '李超群', rtxuid: 10883, gender: 1 },
   { dept_id: 29, rtx_id: 54002781, username: '柏宇立', rtxuid: 10888, gender: 1 },
+  { dept_id: 29, rtx_id: 540000181, username: '印码机检组', rtxuid: 11200, gender: 0 },
   { dept_id: 29, rtx_id: 54002780, username: '李宾', rtxuid: 10654, gender: 0 },
   { dept_id: 29, rtx_id: 54002512, username: '鲁可', rtxuid: 11035, gender: 0 },
   { dept_id: 29, rtx_id: 54002790, username: '李展', rtxuid: 10649, gender: 0 },
