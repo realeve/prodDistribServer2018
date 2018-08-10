@@ -38,3 +38,8 @@ run.bat 运行镜象/进入 container 的系列命令，附带注释
 6.  pm2 start ./bin/www.js
 7.  pm2 start ./bin/app.js
 8.  pm2 monit
+
+## 拷贝文件
+
+docker ps -a
+docker cp ./docker-dist/index.js vibrant_goldwasser:/usr/src/app/src/apiProxy/index.js
