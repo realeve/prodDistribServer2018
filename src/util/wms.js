@@ -4,8 +4,8 @@ const axios = require("axios");
 const { dev } = require("./axios");
 
 let host = dev ?
-  "http://mactest.cdyc.cbpm:8080/wms/if" :
-  "http://cognosdb.cdyc.cbpm:8080/wms/if";
+    "http://mactest.cdyc.cbpm:8080/wms/if" :
+    "http://cognosdb.cdyc.cbpm:8080/wms/if";
 
 // host = "http://10.8.60.202:8080/wms/if";
 // host = "http://mactest.cdyc.cbpm:8080/wms/if";
@@ -13,50 +13,50 @@ let host = dev ?
 // 公共函数
 // 根据库房id获取库房名
 let getStoreRoom = org => [
-  { orgid: 1445, orgname: "数管2号库房" },
-  { orgid: 1446, orgname: "数管3号库房" },
-  { orgid: 1447, orgname: "数管4号库房" },
-  { orgid: 1448, orgname: "数管5号库房" },
-  { orgid: 1449, orgname: "数管6号库房" },
-  { orgid: 1450, orgname: "数管7号库房" },
-  { orgid: 1451, orgname: "数管8号库房" },
-  { orgid: 1452, orgname: "数管9号库房" },
-  { orgid: 1453, orgname: "数管10号库房" },
-  { orgid: 1455, orgname: "数管11号库房" },
-  { orgid: 1460, orgname: "立体库" },
-  { orgid: 250, orgname: "检封库房大张号票库区" },
-  { orgid: 251, orgname: "检封库房小张号票库区" },
-  { orgid: 252, orgname: "检封库房补票库区" }
+    { orgid: 1445, orgname: "数管2号库房" },
+    { orgid: 1446, orgname: "数管3号库房" },
+    { orgid: 1447, orgname: "数管4号库房" },
+    { orgid: 1448, orgname: "数管5号库房" },
+    { orgid: 1449, orgname: "数管6号库房" },
+    { orgid: 1450, orgname: "数管7号库房" },
+    { orgid: 1451, orgname: "数管8号库房" },
+    { orgid: 1452, orgname: "数管9号库房" },
+    { orgid: 1453, orgname: "数管10号库房" },
+    { orgid: 1455, orgname: "数管11号库房" },
+    { orgid: 1460, orgname: "立体库" },
+    { orgid: 250, orgname: "检封库房大张号票库区" },
+    { orgid: 251, orgname: "检封库房小张号票库区" },
+    { orgid: 252, orgname: "检封库房补票库区" }
 ].find(({ orgid }) => orgid === org);
 
 // 工序列表
 let getProcStatus = psc => [
-  { pscode: "wzbz", psname: "物资白纸" },
-  { pscode: "czbz", psname: "钞纸白纸" },
-  { pscode: "bz", psname: "白纸" },
-  { pscode: "jydg", psname: "胶一印待干品" },
-  { pscode: "jyyp", psname: "胶一印品" },
-  { pscode: "jedg", psname: "胶二印待干品" },
-  { pscode: "jeyp", psname: "胶二印品" },
-  { pscode: "sydg", psname: "丝印待干品" },
-  { pscode: "syyp", psname: "丝印品" },
-  { pscode: "wydg", psname: "凹一印待干品" },
-  { pscode: "wyyp", psname: "凹一印品" },
-  { pscode: "wedg", psname: "凹二印待干品" },
-  { pscode: "weyp", psname: "凹二印品" },
-  { pscode: "dhdg", psname: "大张号票待干品" },
-  { pscode: "dzhp", psname: "大张号票" }
+    { pscode: "wzbz", psname: "物资白纸" },
+    { pscode: "czbz", psname: "钞纸白纸" },
+    { pscode: "bz", psname: "白纸" },
+    { pscode: "jydg", psname: "胶一印待干品" },
+    { pscode: "jyyp", psname: "胶一印品" },
+    { pscode: "jedg", psname: "胶二印待干品" },
+    { pscode: "jeyp", psname: "胶二印品" },
+    { pscode: "sydg", psname: "丝印待干品" },
+    { pscode: "syyp", psname: "丝印品" },
+    { pscode: "wydg", psname: "凹一印待干品" },
+    { pscode: "wyyp", psname: "凹一印品" },
+    { pscode: "wedg", psname: "凹二印待干品" },
+    { pscode: "weyp", psname: "凹二印品" },
+    { pscode: "dhdg", psname: "大张号票待干品" },
+    { pscode: "dzhp", psname: "大张号票" }
 ].find(({ pscode }) => pscode === psc);
 
 let reasonCode = [
-  { reason_code: "incomplete", reason_desc: "未完工" },
-  { reason_code: "q_handCheck", reason_desc: "人工全检锁车" },
-  { reason_code: "q_newProc", reason_desc: "四新批量锁车" },
-  { reason_code: "q_abnormalProd", reason_desc: "异常品锁车" },
-  {
-    reason_code: "q_batchLock",
-    reason_desc: "人工批量锁车,不拉号"
-  }
+    { reason_code: "incomplete", reason_desc: "未完工" },
+    { reason_code: "q_handCheck", reason_desc: "人工全检锁车" },
+    { reason_code: "q_newProc", reason_desc: "四新批量锁车" },
+    { reason_code: "q_abnormalProd", reason_desc: "异常品锁车" },
+    {
+        reason_code: "q_batchLock",
+        reason_desc: "人工批量锁车,不拉号"
+    }
 ];
 
 // 数据库交互
@@ -64,20 +64,20 @@ let reasonCode = [
 // 1.批量车号在库查询
 // let [carno1,carno2,carno3] = carnos
 let getStockStatus = async carnos => {
-  let data = await axios({
-    method: "post",
-    url: host + "/carnoQ",
-    data: {
-      carnos
-    }
-  }).then(res => res.data);
+    let data = await axios({
+        method: "post",
+        url: host + "/carnoQ",
+        data: {
+            carnos
+        }
+    }).then(res => res.data);
 
-  // 返回值：车号，库房ID，批次数量，工序code
-  // let json = JSON.stringify([
-  //   { pscode: "bz", orgid: "1449", carno: "1840K000", quantity: "350000" }
-  // ]);
+    // 返回值：车号，库房ID，批次数量，工序code
+    // let json = JSON.stringify([
+    //   { pscode: "bz", orgid: "1449", carno: "1840K000", quantity: "350000" }
+    // ]);
 
-  return data;
+    return data;
 };
 
 // 5.批量锁车
@@ -101,25 +101,33 @@ let getStockStatus = async carnos => {
 3.四新验证
 4.其它
 */
-let setBlackList = async ({ carnos, reason_code, log_id }) => {
-  let data = await axios({
-    method: "post",
-    url: host + "/lockH",
-    data: {
-      carnos,
-      reason_code,
-      log_id
-    }
-  }).then(res => res.data);
+let setBlackList = async({ carnos, reason_code, log_id }) => {
+    let data = await axios({
+        method: "post",
+        url: host + "/lockH",
+        data: {
+            carnos,
+            reason_code,
+            log_id
+        }
+    }).then(res => res.data);
 
-  // 返回值：未处理车号列表，已处理车号列表
-  // let json = JSON.stringify({
-  //   unhandledList: ["1880A211", "1880A232"],
-  //   handledList: ["1820A211", "1820A233"]
-  // });
+    // 返回值：未处理车号列表，已处理车号列表
+    // let json = JSON.stringify({
+    //   unhandledList: ["1880A211", "1880A232"],
+    //   handledList: ["1820A211", "1820A233"]
+    // });
 
-  return data;
+    return data;
 };
+
+// 批量取消人工拉号状态
+const unlockCart = async carno => await axios({
+    url: 'http://10.8.1.27:4000/api/manual_status',
+    params: {
+        carno
+    }
+}).then(res => res);
 
 // 2.批量车号设定质检工艺
 /*checkType:'全检品'||'码后核查'||'补品'
@@ -130,112 +138,117 @@ let setBlackList = async ({ carnos, reason_code, log_id }) => {
   { proc_stream_id: 2, proc_stream_name: "系统自动分配" }
 ]
 carnos:[carno1,carno2,carno3]*/
-let setProcs = async ({ checkType, carnos, log_id }) => {
-  let data = await axios({
-    method: "post",
-    url: host + "/carnoH",
-    data: {
-      checkType,
-      carnos,
-      log_id
-    }
-  }).then(res => res.data);
-  return data;
+let setProcs = async({ checkType, carnos, log_id }) => {
+    let data = await axios({
+        method: "post",
+        url: host + "/carnoH",
+        data: {
+            checkType,
+            carnos,
+            log_id
+        }
+    }).then(res => res.data);
 
-  // // 返回值：未处理车号列表，已处理车号列表
-  // let json = JSON.stringify({
-  //   unhandledList: ["1880A211", "1880A232"],
-  //   handledList: ["1820A211", "1820A233"]
-  // });
-  // return json;
+    // 全检品单独处理,需取消人工拉号
+    if (checkType == 0) {
+        unlockCart(carnos);
+    }
+    return data;
+
+    // // 返回值：未处理车号列表，已处理车号列表
+    // let json = JSON.stringify({
+    //   unhandledList: ["1880A211", "1880A232"],
+    //   handledList: ["1820A211", "1820A233"]
+    // });
+    // return json;
 };
 
 // 3 锁车原因列表
-let getBlackReason = async () => {
-  let data = await axios({
-    method: "post",
-    url: host + "/lockQ"
-  }).then(res => res.data);
+let getBlackReason = async() => {
+    let data = await axios({
+        method: "post",
+        url: host + "/lockQ"
+    }).then(res => res.data);
 
-  // 返回值：未处理车号列表，已处理车号列表
-  // 见接口5的回答
-  // let json = JSON.stringify([
-  //   { reason_code: "这里的枚举是哪些", reason_desc: "对应的描述信息" }
-  // ]);
+    // 返回值：未处理车号列表，已处理车号列表
+    // 见接口5的回答
+    // let json = JSON.stringify([
+    //   { reason_code: "这里的枚举是哪些", reason_desc: "对应的描述信息" }
+    // ]);
 
-  return data;
+    return data;
 };
 
 // 4 添加锁车原因
 // 状态码，锁车描述
-let addBlackReason = async ({ reason_code, reason_desc }) => {
-  let data = await axios({
-    method: "post",
-    url: host + "/lockR",
-    data: {
-      reason_code,
-      reason_desc
-    }
-  }).then(res => res.data);
+let addBlackReason = async({ reason_code, reason_desc }) => {
+    let data = await axios({
+        method: "post",
+        url: host + "/lockR",
+        data: {
+            reason_code,
+            reason_desc
+        }
+    }).then(res => res.data);
 
-  // 返回值：
-  // let json = JSON.stringify({ status: false, errMsg: "失败原因" });
-  // let json = JSON.stringify([
-  //   {
-  //     status: true,
-  //     reason_code: 15
-  //   },
-  //   {
-  //     status: false,
-  //     errMsg: "失败原因"
-  //   }
-  // ]);
+    // 返回值：
+    // let json = JSON.stringify({ status: false, errMsg: "失败原因" });
+    // let json = JSON.stringify([
+    //   {
+    //     status: true,
+    //     reason_code: 15
+    //   },
+    //   {
+    //     status: false,
+    //     errMsg: "失败原因"
+    //   }
+    // ]);
 
-  return data;
+    return data;
 };
 
 // 6.批量解锁
 // let [carno1,carno2,carno3] = carnos
 let setWhiteList = async carnos => {
-  let data = await axios({
-    method: "post",
-    url: host + "/unlockH",
-    data: {
-      carnos
-    }
-  }).then(res => res.data);
+    let data = await axios({
+        method: "post",
+        url: host + "/unlockH",
+        data: {
+            carnos
+        }
+    }).then(res => res.data);
 
-  // 返回值：未处理车号列表，已处理车号列表
-  // let json = JSON.stringify({
-  //   unhandledList: ["1880A211", "1880A232"],
-  //   handledList: ["1820A211", "1820A233"]
-  // });
+    // 返回值：未处理车号列表，已处理车号列表
+    // let json = JSON.stringify({
+    //   unhandledList: ["1880A211", "1880A232"],
+    //   handledList: ["1820A211", "1820A233"]
+    // });
 
-  return data;
+    return data;
 };
 
 // 码后验证。review:1设置验证,0取消验证
-let setReviewList = async ({ carnos, review, log_id }) => {
-  let data = await axios({
-    method: "post",
-    url: host + "/reviewH",
-    data: {
-      carnos,
-      review,
-      log_id
-    }
-  }).then(res => res.data);
-  return data;
+let setReviewList = async({ carnos, review, log_id }) => {
+    let data = await axios({
+        method: "post",
+        url: host + "/reviewH",
+        data: {
+            carnos,
+            review,
+            log_id
+        }
+    }).then(res => res.data);
+    return data;
 };
 
 module.exports = {
-  getStoreRoom,
-  getProcStatus,
-  getStockStatus,
-  setProcs,
-  getBlackReason,
-  addBlackReason,
-  setBlackList,
-  setWhiteList,
-  setReviewList
+    getStoreRoom,
+    getProcStatus,
+    getStockStatus,
+    setProcs,
+    getBlackReason,
+    addBlackReason,
+    setBlackList,
+    setWhiteList,
+    setReviewList
 };
