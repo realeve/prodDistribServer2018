@@ -17,7 +17,13 @@ let wms = require("./wmsTest");
 // 机台通知连续废
 let multiWeak = require("./task/multiWeak");
 
+// 同步严重废锁定图像
+let syncSeriousImg = require('./task/syncSeriousImg');
+
 const mainThread = async() => {
+
+    // 严重废锁图同步
+    await syncSeriousImg.init();
 
     // 调试完毕
     // await wms.init().catch(e => console.log(e));

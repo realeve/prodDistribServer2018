@@ -42,16 +42,23 @@ run.bat 运行镜象/进入 container 的系列命令，附带注释
 ## 拷贝文件
 
 docker ps -a
-docker cp ./docker-dist/src/apiProxy/router/index.js vibrant_goldwasser:/usr/src/app/src/apiProxy/router/index.js
 
-docker cp ./docker-dist/src/apiProxy/router/api_document.js vibrant_goldwasser:/usr/src/app/src/apiProxy/router/api_document.js
+<!-- 待拷贝文件 -->
 
-docker cp ./docker-dist/src/apiProxy/router/api_document.js vibrant_goldwasser:/usr/src/app/src/apiProxy/router/api_document.js
+docker cp ./docker-dist/src/task/syncSeriousImg.js vibrant_goldwasser:/usr/src/app/src/task/syncSeriousImg.js
 
-docker cp ./docker-dist/src/task/lockCartMsg.js vibrant_goldwasser:/usr/src/app/src/task/lockCartMsg.js
-
-docker cp ./docker-dist/src/util/db.js vibrant_goldwasser:/usr/src/app/src/util/db.js
-
-docker cp ./docker-dist/src/util/wms.js vibrant_goldwasser:/usr/src/app/src/util/wms.js
+docker cp ./docker-dist/src/util/db_node.js vibrant_goldwasser:/usr/src/app/src/util/db_node.js
 
 docker cp ./docker-dist/src/index.js vibrant_goldwasser:/usr/src/app/src/index.js
+
+<!-- 重启服务 -->
+
+systemctl restart docker
+
+<!-- 进入容器 -->
+
+docker exec -it vibrant_goldwasser /bin/bash
+
+<!-- 查看文件是否成功拷贝 -->
+
+cat ./src/index.js
