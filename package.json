@@ -1,18 +1,19 @@
 {
-  "name": "prod-distrib-server",
-  "devDependencies": {
-    "axios": "^0.18.0"
-  },
-  "scripts": {
-    "start": "node ./app.js"
-  },
-  "dependencies": {
-    "consola": "^1.2.0",
-    "koa": "^2.5.1",
-    "koa-router": "^7.4.0",
-    "koa2-cors": "^2.0.5",
-    "moment": "^2.22.0",
-    "qs": "^6.5.1",
-    "ramda": "^0.25.0"
-  }
+    "name": "prod-distrib-server",
+    "devDependencies": {
+        "axios": "^0.18.0"
+    },
+    "scripts": {
+        "start": "node ./app.js",
+        "www": "node ./bin/www.js"
+    },
+    "dependencies": {
+        "consola": "^1.2.0",
+        "koa": "^2.5.1",
+        "koa-router": "^7.4.0",
+        "koa2-cors": "^2.0.5",
+        "moment": "^2.22.0",
+        "qs": "^6.5.1",
+        "ramda": "^0.25.0"
+    }
 }

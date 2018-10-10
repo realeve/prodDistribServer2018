@@ -45,11 +45,7 @@ docker ps -a
 
 <!-- 待拷贝文件 -->
 
-docker cp ./docker-dist/src/task/syncSeriousImg.js vibrant_goldwasser:/usr/src/app/src/task/syncSeriousImg.js
-
-docker cp ./docker-dist/src/util/db_node.js vibrant_goldwasser:/usr/src/app/src/util/db_node.js
-
-docker cp ./docker-dist/src/index.js vibrant_goldwasser:/usr/src/app/src/index.js
+docker cp ./docker-dist/src/apiProxy/rtx/userList.js vibrant_goldwasser:/usr/src/app/src/apiProxy/rtx/userList.js
 
 <!-- 重启服务 -->
 
@@ -61,4 +57,4 @@ docker exec -it vibrant_goldwasser /bin/bash
 
 <!-- 查看文件是否成功拷贝 -->
 
-cat ./src/index.js
+cat ./src/apiProxy/rtx/userList.js

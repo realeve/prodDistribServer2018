@@ -7,7 +7,8 @@ const api_doc = require('./api_document')
 const users = require('../../util/rtx')
 const R = require('ramda');
 const rtx = require('../rtx/index')
-const db2 = require('../../util/db')
+const db2 = require('../../util/db');
+const db3 = require('./db_hecha');
 
 router.get('/', ctx => {
     ctx.body = 'hello worlds';
@@ -139,6 +140,13 @@ router.get('/api/rtxlist/:proc', async ctx => {
     ctx.body = rtx.getRtxList(proc)
 });
 
+// 图像判废排活
+router.get('/api/hecha/task', async ctx => {
+    let { tstart, tend, user_list } = ctx.query;
+    db3.handleHechaTask({ tstart, tend });
+
+    ctx.body = { tstart, tend, user_list };
+});
 
 
 module.exports = router;
