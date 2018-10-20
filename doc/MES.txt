@@ -1,0 +1,29 @@
+{
+    "unupload_carts": [
+        "1820B876",
+        "1820C012"
+    ],
+    "task_list": [
+        {
+            "user_name": "张三",
+            "user_no": 2322,
+            "cart_number": "1820A233",
+            "err_num": 2322,
+            "is_upload": true
+        },
+        {
+            "user_name": "张三",
+            "user_no": 2322,
+            "cart_number": "1820A231",
+            "err_num": 232,
+            "is_upload": false
+        },
+        {
+            "user_name": "张三",
+            "user_no": 2322,
+            "cart_number": "1820A230",
+            "err_num": 222,
+            "is_upload": true
+        }
+    ]
+}

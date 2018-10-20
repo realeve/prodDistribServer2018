@@ -5,7 +5,7 @@
     },
     "scripts": {
         "start": "node ./app.js",
-        "www": "node ./bin/www.js"
+        "www": "cls && node ./bin/www.js"
     },
     "dependencies": {
         "consola": "^1.2.0",
