@@ -1,6 +1,7 @@
 const db = require('./db_image_judge');
 const R = require('ramda');
-const dev = true;
+const { dev } = require('../../util/axios');
+
 module.exports.dev = dev;
 
 // 100条以内不重排
@@ -67,7 +68,7 @@ const getTaskBaseInfo = async ({ user_list, uploadData, tstart, tend }) => {
   let cartsPerWorker = uploadData.length / totalWorkLongTime;
 
   let users = R.clone(user_list);
-  return users.map(item => {
+  return users.map((item) => {
     let userPfNum = R.filter(R.propEq('operator_name', item.user_name))(
       pfNumByMonth
     );
@@ -110,7 +111,7 @@ const distribTasks = ({ users, uploadData, ascend }) => {
   }
 
   // 用户信息更新
-  users = R.map(curUser => {
+  users = R.map((curUser) => {
     // 如果完成了，继续
     if (curUser.success || uploadData.length == 0) {
       return curUser;
@@ -148,13 +149,13 @@ const distribTasks = ({ users, uploadData, ascend }) => {
 };
 
 // 更优方案中各大万的判废量情况；
-const getExpectedPFNum = user =>
-  R.map(item => {
+const getExpectedPFNum = (user) =>
+  R.map((item) => {
     item.pf_num = item.pf_num - user.delta_num;
     return item;
   })(user.data);
 
-const updateStatData = user => {
+const updateStatData = (user) => {
   // 汇总缺陷总数
   user.real_num = calcTotalData('pf_num', user.data);
   user.delta_num = user.real_num - user.expect_num;

@@ -1,0 +1,1 @@
+{ "data": [{ "opennum": "29", "real_fake": "40" }], "title": "指定车号丝印开包量", "rows": 1, "time": "120.387ms", "header": ["opennum", "real_fake"], "source": "数据来源：全幅面" }
