@@ -16,7 +16,8 @@ const mainThread = async () => {
 
 const init = async () => {
   // 间隔时间 1 分钟。
-  let timeInterval = 100 * 60 * 1000;
+  // 此处设为100分钟，预计为12000条历史数据同步的时间，完成后将200改为1；
+  let timeInterval = 200 * 60 * 1000;
   let times = 1;
 
   console.info('启动数据同步服务');
