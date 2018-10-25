@@ -6,6 +6,10 @@
 
 ./src/index.js
 
+./src/src.js
+
+./src/wmsTest.js
+
 ## 任务说明
 
 abnormalProd.js: 异常品
@@ -34,7 +38,7 @@ run.bat 运行镜象/进入 container 的系列命令，附带注释
 2.  run
 3.  ^+c
 4.  docker ps -a
-5.  docker exec -it containerName /bin/bash
+5.  docker exec -it prod_dist /bin/bash
 6.  pm2 start ./bin/www.js
 7.  pm2 start ./bin/app.js
 8.  pm2 monit
@@ -45,7 +49,7 @@ docker ps -a
 
 <!-- 待拷贝文件 -->
 
-docker cp ./docker-dist/src/apiProxy/rtx/userList.js vibrant_goldwasser:/usr/src/app/src/apiProxy/rtx/userList.js
+docker cp ./docker-dist/src/apiProxy/rtx/userList.js prod_dist:/usr/src/app/src/apiProxy/rtx/userList.js
 
 <!-- 重启服务 -->
 
@@ -53,8 +57,37 @@ systemctl restart docker
 
 <!-- 进入容器 -->
 
-docker exec -it vibrant_goldwasser /bin/bash
+docker exec -it prod_dist /bin/bash
 
 <!-- 查看文件是否成功拷贝 -->
 
 cat ./src/apiProxy/rtx/userList.js
+
+## 20181025 更新：编译流程
+
+### 0.编译
+
+> docker build -t prod-distrib .
+
+### 1.导出镜象
+
+> docker save -o ./dist/prod-distrib.tar prod-distrib
+
+### 2.导入镜象
+
+> docker load --input ./dist/prod-distrib.tar
+
+### 3.重新编译镜象
+
+指定容器名为 prod_dist，同时随启动加载
+
+> docker run -dit --restart always --name prod_dist -p 4000:3000 -p 9615:9615 prod-distrib
+
+## 运行服务
+
+1.  docker ps -a
+2.  docker exec -it prod_dist /bin/bash
+3.  pm2 list
+4.  pm2 start ./bin/www.js
+5.  pm2 start ./bin/app.js
+6.  pm2 monit

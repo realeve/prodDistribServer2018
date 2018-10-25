@@ -1,7 +1,9 @@
 rem 运行 docker image
 docker run -p 4000:3000 -p 9615:9615 prod-distrib
 rem 容器随docker服务加载
-docker run -dit --restart always -p 4000:3000 -p 9615:9615 prod-distrib
+rem docker run -dit --restart always -p 4000:3000 -p 9615:9615 prod-distrib
+
+docker run -dit --restart always --name prod_dist -p 4000:3000 -p 9615:9615 prod-distrib
 
 rem 查看日志
 docker logs -f [containerid]
