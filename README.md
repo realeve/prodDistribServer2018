@@ -63,27 +63,37 @@ docker exec -it prod_dist /bin/bash
 
 cat ./src/apiProxy/rtx/userList.js
 
-## 20181025 更新：编译流程
+## 20181025 更新：有大量更新后的编译流程
 
-### 0.编译
+### 1.编译
 
 > docker build -t prod-distrib .
 
-### 1.导出镜象
+### 2.导出镜象
 
 > docker save -o ./dist/prod-distrib.tar prod-distrib
 
-### 2.导入镜象
+### 3.服务端导入镜象
+
+#### 关闭 docker
+
+> docker kill prod_dist
+
+#### 删除实例
+
+> docker rm prod_dist
+
+#### 导入数据
 
 > docker load --input ./dist/prod-distrib.tar
 
-### 3.重新编译镜象
+### 4.运行 docker 任务
 
 指定容器名为 prod_dist，同时随启动加载
 
 > docker run -dit --restart always --name prod_dist -p 4000:3000 -p 9615:9615 prod-distrib
 
-## 运行服务
+### 5.运行 nodejs 服务
 
 1.  docker ps -a
 2.  docker exec -it prod_dist /bin/bash
