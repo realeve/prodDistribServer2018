@@ -101,3 +101,5 @@ cat ./src/apiProxy/rtx/userList.js
 4.  pm2 start ./bin/www.js
 5.  pm2 start ./bin/app.js
 6.  pm2 monit
+
+7.systemctl restart docker
