@@ -6,6 +6,13 @@ const cartInfo = require('./sync/cartInfo');
 const imgVerify = require('./sync/imgVerify');
 
 const mainThread = async() => {
+
+    // 同步人工判废黑图数据
+    // 20181031 已完成
+    await manualCheck.updateHisData().catch(e => {
+        console.log(e)
+    });
+
     // 特征图像判废结果同步
     await imgVerify.init().catch(e => {
         console.log(e)
@@ -20,12 +27,6 @@ const mainThread = async() => {
     await manualCheck.init().catch(e => {
         console.log(e)
     });
-
-    // 同步人工判废历史数据
-    // 20181031 已完成
-    // await manualCheck.updateHisData().catch(e => {
-    //     console.log(e)
-    // });
 
     // 严重废锁图同步
     await syncSeriousImg.init().catch(e => {

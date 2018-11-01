@@ -18,38 +18,32 @@ const mahou = async() => {
 
 const handleMahouTask = async({ id, cart_number: cart, date_diff }) => {
     // 判废结果
-
-    let {
-        data: [verify]
-    } = await db.getQfmQaTempQatbl(cart);
+    let { data: [verify] } = await db.getQfmQaTempQatbl({ cart, cart2: cart });
 
     if (R.isNil(verify)) {
-        console.log(cart + '读取判废信息失败，该万产品可能还未判废，稍后将重试.');
-        if (parseInt(date_diff) > 20) {
-            // 更新任务状态
-            await db.setMahoudata(id);
-        }
+        console.log(cart + '读取判废信息失败.');
         return;
     }
-
     // 号码开包量
     let {
         data: [code]
     } = await db.getWipJobs(cart);
 
-    // 丝印开包量
+    // 丝印开包量,增加丝印黑图分析，未完成。20181031
     let {
         data: [siyin]
-    } = await db.getQaTempQatbl(cart);
+    } = await db.getWipJobsSiyin({ cart, cart2: cart });
+
     if (R.isNil(siyin)) {
         siyin = {
             opennum: 0,
-            real_fake: 0
+            real_fake: 0,
+            check_black_img: 0,
+            machine_black_img: 0
         };
     }
 
     let {
-        cart_number: cartnumber,
         product_name: producttypename,
         start_date: producetime,
         verify_date: verifytime,
@@ -58,19 +52,23 @@ const handleMahouTask = async({ id, cart_number: cart, date_diff }) => {
         real_paper_num: vbigpiececount,
         real_kai_num: vkaicount,
         real_pic_num: vrealtotalcount,
-        pm_opennum: opennum
+        pm_opennum: opennum,
+        black_img_print
     } = verify;
 
     let appendData = {
         opennum_code: code.opennum || 0,
         realfake_code: code.real_fake || 0,
         opennum_siyin: siyin.opennum,
-        realfake_siyin: siyin.real_fake
+        realfake_siyin: siyin.real_fake,
+        black_img_code: code.black_img_code || 0,
+        black_img_siyin_check: siyin.check_black_img || 0,
+        black_img_siyin_machine: siyin.machine_black_img || 0
     };
+
     let params = {
         ...appendData,
-        mahouid: id,
-        cartnumber,
+        _id,
         producttypename,
         producetime,
         verifytime,
@@ -79,7 +77,8 @@ const handleMahouTask = async({ id, cart_number: cart, date_diff }) => {
         vbigpiececount,
         vkaicount,
         vrealtotalcount,
-        opennum
+        opennum,
+        black_img_print, // 票面黑图
     };
     console.log(params);
 
@@ -108,71 +107,50 @@ const updateHisData = async() => {
     }
 };
 
-const updateTask = async({ id: _id, cart_number: cart }) => {
-    // 判废结果
-
-    let {
-        data: [verify]
-    } = await db.getQfmQaTempQatbl(cart);
-
+const updateTask = async({ id: _id, cart }) => {
+    // 判废结果 
+    let { data: [verify] } = await db.getQfmWipJobsUpdate(cart);
     if (R.isNil(verify)) {
         console.log(cart + '读取判废信息失败.');
         return;
     }
+    let {
+        black_img_print
+    } = verify;
 
     // 号码开包量
     let {
         data: [code]
-    } = await db.getWipJobs(cart);
+    } = await db.getWipJobsCode(cart);
 
-    // 丝印开包量
+    // 丝印开包量,增加丝印黑图分析，未完成。20181031
     let {
         data: [siyin]
-    } = await db.getQaTempQatbl(cart);
+    } = await db.getWipJobsSiyinUpdate(cart);
+
     if (R.isNil(siyin)) {
         siyin = {
-            opennum: 0,
-            real_fake: 0
+            check_black_img: 0,
+            machine_black_img: 0
         };
     }
 
-    let {
-        product_name: producttypename,
-        start_date: producetime,
-        verify_date: verifytime,
-        operator_name: verifyoperatorname,
-        err_count: totalcount,
-        real_paper_num: vbigpiececount,
-        real_kai_num: vkaicount,
-        real_pic_num: vrealtotalcount,
-        pm_opennum: opennum
-    } = verify;
-
     let appendData = {
-        opennum_code: code.opennum || 0,
-        realfake_code: code.real_fake || 0,
-        opennum_siyin: siyin.opennum,
-        realfake_siyin: siyin.real_fake
+        black_img_code: code.black_img_code || 0,
+        black_img_siyin_check: siyin.check_black_img || 0,
+        black_img_siyin_machine: siyin.machine_black_img || 0
     };
+
     let params = {
         ...appendData,
         _id,
-        producttypename,
-        producetime,
-        verifytime,
-        verifyoperatorname,
-        totalcount,
-        vbigpiececount,
-        vkaicount,
-        vrealtotalcount,
-        opennum
+        black_img_print
     };
-    console.log(params);
 
     // 插入人工判废结果
     let {
         data: [{ affected_rows }]
-    } = await db.setManualverifydata(params);
+    } = await db.setManualverifydataBlackimg(params);
     if (affected_rows == 0) {
         console.log(cart + '判废结果回写失败.');
         return;
