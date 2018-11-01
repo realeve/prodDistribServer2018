@@ -1,7 +1,11 @@
 const Koa = require('koa');
-const consola = require('consola');
-const app = new Koa();
+const bodyParser = require('koa-bodyparser');
 const router = require('./router');
+
+const app = new Koa();
+// app.use(async ctx => {
+//     ctx.body = ctx.request.body;
+// })
 
 const port = 3000;
 
@@ -24,8 +28,7 @@ app.use(cors({
 
 
 const init = () => {
-
-    app
+    app.use(bodyParser())
         .use(router.routes())
         .use(router.allowedMethods());
     app.listen(port);
