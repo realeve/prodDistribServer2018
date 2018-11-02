@@ -208,7 +208,7 @@ router.get('/api/hecha/task', async ctx => {
      * need_convert，默认做数据行列转换，不转换时将输出更详细的内容
      *  */
     
-    $.ajax({ method: 'POST', url, data }).done(res => {
+    $.ajax({ method: 'POST', url:url, data:data }).done(res => {
         console.log(res)
     })
     
