@@ -382,6 +382,21 @@ module.exports = {
                     proc_name: '码后核查',
                     machine_name: '多功能-2号'
                 }
+            ],
+            unhandle_carts: [{
+                    prod_name: '9607T',
+                    cart_number: '1880E726',
+                    proc_name: '全检品',
+                    machine_name: 'M97-1号',
+                    pf_num: 21000
+                },
+                {
+                    prod_name: '9603A',
+                    cart_number: '1830C720',
+                    proc_name: '码后核查',
+                    machine_name: '多功能-2号',
+                    pf_num: 21200
+                }
             ]
         }
     }

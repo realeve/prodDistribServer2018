@@ -1,5 +1,5 @@
-url = 'http://localhost:3000/api/hecha/task';
-data = {
+var url = 'http://10.8.1.27:4000/api/hecha/task';
+var data = {
     tstart: 20181101,
     tend: 20181101,
     user_list: [{
@@ -38,7 +38,13 @@ data = {
     need_convert: 1,
     precision: 100
 };
-
+/** 
+ * 参数说明：limit,prod,need_convert,precision四个参数可以不传。
+ * limit表示默认20000条以下参与排活，超过不排活
+ * prod:默认全部品种参与排活，指定品种则像demo一样传出品种名
+ * precision:每包相差100条时不再遍历
+ * need_convert，默认做数据行列转换，不转换时将输出更详细的内容
+ *  */
 $.ajax({ method: 'POST', url, data }).done(res => {
     console.log(res)
 })
