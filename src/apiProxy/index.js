@@ -3,9 +3,6 @@ const bodyParser = require('koa-bodyparser');
 const router = require('./router');
 
 const app = new Koa();
-// app.use(async ctx => {
-//     ctx.body = ctx.request.body;
-// })
 
 const port = 3000;
 
