@@ -12,7 +12,7 @@ const port = 3000;
 const cors = require('koa2-cors');
 
 // CORS 白名单列表
-const whiteList = ['http://10.8.2.11:8080', 'http://localhost:8080', 'http://cognosdb.cdyc.cbpm:8001', 'http://cognosdb.cdyc.cbpm:8080', 'http://10.8.2.133:92']
+const whiteList = ['http://10.8.2.11:8080', 'http://localhost:8080', 'http://cognosdb.cdyc.cbpm:8001', 'http://cognosdb.cdyc.cbpm:8080', 'http://10.8.2.133:92', 'http://10.9.3.1:7700']
 
 // 具体参数我们在后面进行解释
 app.use(cors({
