@@ -63,7 +63,9 @@ app.use(async(ctx, next) => {
     if (!xml) {
         return;
     }
-    ctx.body = '<data>' + parser.parse(ctx.body) + '</data>';
+    ctx.body = parser.parse({
+        data: ctx.body
+    });
     ctx.response.type = 'application/xml';
 
 });
