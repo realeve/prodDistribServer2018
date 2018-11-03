@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "consola": "^1.2.0",
+    "fast-xml-parser": "^3.12.5",
     "he": "^1.2.0",
     "koa": "^2.5.1",
     "koa-bodyparser": "^4.2.1",
