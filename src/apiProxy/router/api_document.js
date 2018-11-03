@@ -1,4 +1,10 @@
 module.exports = {
+    '/': {
+        desc: '页面首页，用于 post及get测试',
+        param: {
+            xml: '全局参数，当 xml=1时以xml格式返回，否则以json返回'
+        }
+    },
     '/api': 'API列表',
     '/api/remark_info': {
         desc: '产品锁车原因说明',
