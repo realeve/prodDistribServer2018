@@ -219,15 +219,24 @@ router.get('/api/hecha/task', async ctx => {
 router.post('/api/hecha/task', async ctx => {
     let { tstart, tend, user_list } = ctx.request.body;
     if (typeof tstart == 'undefined') {
-        ctx.body = 'tstart参数必须传入，示例：20181102';
+        ctx.body = {
+            msg: 'tstart参数必须传入，示例：20181102',
+            status: 401
+        };
         return;
     }
     if (typeof tend == 'undefined') {
-        ctx.body = 'tend参数必须传入，示例：20181102';
+        ctx.body = {
+            msg: 'tend参数必须传入，示例：20181102',
+            status: 401
+        };
         return;
     }
     if (typeof user_list == 'undefined') {
-        ctx.body = 'user_list参数必须传入，默认为数组类型';
+        ctx.body = {
+            msg: 'user_list参数必须传入，默认为数组类型',
+            status: 401
+        };
         return;
     }
     ctx.body = await hechaTask(ctx, ctx.request.body);
