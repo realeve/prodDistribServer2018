@@ -77,17 +77,17 @@ module.exports.getWipJobsSiyin = params => axios({
     params,
 });
 
+
 /** NodeJS服务端调用：
 *
 *   @database: { 质量信息系统 }
 *   @desc:     { 插入图像判废同步结果 } 
-    const { cartnumber, producttypename, producetime, verifytime, verifyoperatorname, totalcount, vbigpiececount, kaicount, vkaicount, vrealtotalcount, opennum, opennum_code, realfake_code, opennum_siyin, realfake_siyin } = params;
+    const { mahouid, cartnumber, producttypename, producetime, verifytime, verifyoperatorname, totalcount, vbigpiececount, vkaicount, vrealtotalcount, opennum, opennum_code, realfake_code, opennum_siyin, realfake_siyin } = params;
 */
-module.exports.addManualverifydata = async(params) =>
-    await axios({
-        url: '/204/83cf2b1b83.json',
-        params
-    }).then((res) => res);
+module.exports.addManualverifydata = params => axios({
+    url: '/243/15cd589981.json',
+    params,
+});
 
 /** NodeJS服务端调用：
 *

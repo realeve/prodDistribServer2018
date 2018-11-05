@@ -68,7 +68,7 @@ const handleMahouTask = async({ id, cart_number: cart, date_diff }) => {
 
     let params = {
         ...appendData,
-        _id: id,
+        mahouid: id, // 需写入mahouid
         producttypename,
         producetime,
         verifytime,
