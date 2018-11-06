@@ -159,5 +159,11 @@ const updateTask = async({ id: _id, cart }) => {
     }
 };
 
+const updateNullId = async() => {
+    let { data } = await db.getMahoudataNull();
+    data.forEach(async({ id: mahouid, cart: cartnumber }) => {
+        await db.setManualverifydataNull({ mahouid, cartnumber })
+    })
+}
 
-module.exports = { init, updateHisData };
+module.exports = { init, updateHisData, updateNullId };

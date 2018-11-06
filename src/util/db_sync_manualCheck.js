@@ -184,3 +184,24 @@ module.exports.setManualverifydataBlackimg = params => axios({
     url: '/233/7a00fc901b.json',
     params,
 });
+
+/** NodeJS服务端调用：
+ *
+ *   @database: { 质量信息系统 }
+ *   @desc:     { mahouid为空的车号列表 } 
+ */
+module.exports.getMahoudataNull = () => axios({
+    url: '/245/3a1808c809.json'
+});
+
+
+/** NodeJS服务端调用：
+*
+*   @database: { 质量信息系统 }
+*   @desc:     { 更新mahouid为空的车号 } 
+    const { mahouid, cartnumber } = params;
+*/
+module.exports.setManualverifydataNull = params => axios({
+    url: '/246/101f023497.json',
+    params,
+});

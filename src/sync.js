@@ -7,6 +7,11 @@ const imgVerify = require('./sync/imgVerify');
 const fakeAfterSinyin = require('./sync/fakeAfterSinyin');
 
 const mainThread = async() => {
+    // 修复以前的bug，仅更新一次即可
+    // await manualCheck.updateNullId().catch(e => {
+    //     console.log(e);
+    // })
+
     // 丝印后由凹印产生的作废信息
     await fakeAfterSinyin.init().catch((e) => {
         console.log(e);
