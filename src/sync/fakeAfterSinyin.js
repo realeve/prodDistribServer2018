@@ -15,6 +15,7 @@ const init = async() => {
     let { data: taskList } = await db.getManualverifydata();
     let allCheckData = await filterAllCheck(taskList);
     taskList = R.reject(item => allCheckData.includes(item.cart))(taskList);
+    let unCompleteCarts = [];
     for (let i = 0; i < taskList.length; i++) {
         console.log(`${task_name}:${i + 1}/${taskList.length}`);
         let prod_id = taskList[i].cart.substr(2, 1);
@@ -23,10 +24,23 @@ const init = async() => {
             await handleMahouTask(taskList[i]);
             console.log(`码后：${i + 1}/${taskList.length} 同步完成`);
         } else {
+            unCompleteCarts.push(taskList[i].cart);
             console.log(`码后：${i + 1}/${taskList[i].cart} 判废未完成`);
         }
     }
+    handleUnCompleteCart(unCompleteCarts);
 };
+
+// 处理只有一侧有数据的产品
+const handleUnCompleteCart = async carts => {
+    if (carts.length === 0) {
+        return;
+    }
+    let { data } = await db.getViewCartfinderFinshed(carts)
+    let allCheckData = R.compose(R.flatten, R.map(R.prop('carts')))(data);
+    // 更新状态
+    await db.setManualverifydataAllcheck(allCheckData);
+}
 
 const filterAllCheck = async tasks => {
     let carts = R.compose(R.flatten, R.map(R.prop('cart')))(tasks);
@@ -38,6 +52,10 @@ const filterAllCheck = async tasks => {
     return allCheckData;
 }
 
+/** 
+ * 判断一万产品在丝印及印码是否都有判废结果，如果只有一侧有判废结果，则无法汇总到凹印产生的丝印废
+ * 当丝印缺陷较多时，可能不判废，只判码后，导致产品装箱但只有码后有数据 
+ * */
 const isFinished = async({ cart }) => {
     let { rows } = await db.isVerifyComplete({ cart1: cart, cart2: cart });
     return rows >= 2;

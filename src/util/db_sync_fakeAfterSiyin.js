@@ -98,3 +98,16 @@ module.exports.setManualverifydataAllcheck = carts => axios({
         nonce: 'd68e782730'
     },
 });
+
+
+/** NodeJS服务端调用：
+ *
+ *   @database: { 机台作业 }
+ *   @desc:     { 指定车号中已完成抽查的产品 } 
+ */
+module.exports.getViewCartfinderFinshed = carts => axios({
+    url: '/247/0e7fc2bfec.json',
+    params: {
+        carts
+    },
+});
