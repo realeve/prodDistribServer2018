@@ -31,7 +31,7 @@ const init = async() => {
 const filterAllCheck = async tasks => {
     let carts = R.compose(R.flatten, R.map(R.prop('cart')))(tasks);
     let { data } = await db.getViewCartfinder(carts);
-    let allCheckData = R.compose(R.flatten, R.map(R.prop('cart')))(tasks);
+    let allCheckData = R.compose(R.flatten, R.map(R.prop('cart')))(data);
 
     // 更新状态
     await db.setManualverifydata(allCheckData);
