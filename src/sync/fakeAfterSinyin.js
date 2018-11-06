@@ -13,6 +13,8 @@ let task_name = '同步丝印实废';
 
 const init = async() => {
     let { data: taskList } = await db.getManualverifydata();
+    let allCheckData = await filterAllCheck(taskList);
+    taskList = R.reject(item => allCheckData.includes(item.cart))(taskList);
     for (let i = 0; i < taskList.length; i++) {
         console.log(`${task_name}:${i + 1}/${taskList.length}`);
         let prod_id = taskList[i].cart.substr(2, 1);
@@ -25,6 +27,16 @@ const init = async() => {
         }
     }
 };
+
+const filterAllCheck = async tasks => {
+    let carts = R.compose(R.flatten, R.map(R.prop('cart')))(tasks);
+    let { data } = await db.getViewCartfinder(carts);
+    let allCheckData = R.compose(R.flatten, R.map(R.prop('cart')))(tasks);
+
+    // 更新状态
+    await db.setManualverifydata(allCheckData);
+    return allCheckData;
+}
 
 const isFinished = async({ cart }) => {
     let { rows } = await db.isVerifyComplete({ cart1: cart, cart2: cart });

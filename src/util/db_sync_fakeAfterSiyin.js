@@ -70,3 +70,31 @@ module.exports.setManualverifydata = params => axios({
     url: '/242/d4c0e74a28.json',
     params,
 });
+
+/** NodeJS服务端调用：
+ *
+ *   @database: { 机台作业 }
+ *   @desc:     { 指定车号列表中全检品 } 
+ */
+module.exports.getViewCartfinder = carts => axios({
+    method: 'post',
+    data: {
+        carts,
+        id: 210,
+        nonce: 'bb0c2704f1'
+    },
+});
+
+/** NodeJS服务端调用：
+ *
+ *   @database: { 质量信息系统 }
+ *   @desc:     { 批量更新不需要处理的任务 } 
+ */
+module.exports.setManualverifydata = carts => axios({
+    method: 'post',
+    data: {
+        carts,
+        id: 244,
+        nonce: 'd68e782730'
+    },
+});

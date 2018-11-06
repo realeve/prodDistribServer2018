@@ -67,6 +67,7 @@ const handleMahouTask = async({ id, cart_number: cart, date_diff }) => {
     };
 
     let params = {
+        cartnumber: cart,
         ...appendData,
         mahouid: id, // 需写入mahouid
         producttypename,
@@ -80,12 +81,13 @@ const handleMahouTask = async({ id, cart_number: cart, date_diff }) => {
         opennum,
         black_img_print, // 票面黑图
     };
-    console.log(params);
+    // console.log(params);
 
     // 插入人工判废结果
     let {
         data: [{ affected_rows }]
-    } = await db.addManualverifydata(params);
+    } = await db.addManualverifydata(params).catch(e => { console.log(e) });
+
     if (affected_rows == 0) {
         console.log(cart + '判废结果回写失败.');
         return;
