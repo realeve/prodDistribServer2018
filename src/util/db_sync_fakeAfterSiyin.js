@@ -90,7 +90,7 @@ module.exports.getViewCartfinder = carts => axios({
  *   @database: { 质量信息系统 }
  *   @desc:     { 批量更新不需要处理的任务 } 
  */
-module.exports.setManualverifydata = carts => axios({
+module.exports.setManualverifydataAllcheck = carts => axios({
     method: 'post',
     data: {
         carts,
