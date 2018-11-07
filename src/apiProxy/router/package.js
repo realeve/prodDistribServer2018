@@ -105,12 +105,19 @@ const getOpenNum = async carts => {
 
 // 任务分配
 const prodistCarts = (carts, setting) => {
-    return R.compose(R.flatten, R.map(
+    let res = R.compose(R.flatten, R.map(
         prodname => {
             let cartList = R.filter(R.propEq('prodname', prodname))(carts)
             return prodistCartByProd(cartList, setting[prodname])
         }
-    ), R.keys)(setting)
+    ), R.keys)(setting);
+
+    // 按出库顺序排序
+    return R.map(item => {
+        console.log(item)
+        item.data = R.sort(R.ascend(R.prop('idx')))(item.data);
+        return item;
+    })(res);
 }
 
 /**
@@ -121,10 +128,9 @@ const prodistCarts = (carts, setting) => {
 const prodistCartByProd = (carts, setting) => {
     // 计算基础信息:期望包数
     setting = getTaskBaseInfo({ carts, setting });
-
     // 分配任务
-    let res = distribCarts({ setting, carts, ascend: false })
-    return setting;
+    res = distribCarts({ setting, carts, ascend: false })
+    return res.setting;
 }
 
 // 汇总列数据
@@ -161,14 +167,18 @@ const getTaskBaseInfo = ({ setting, carts }) => {
 
 // 首次分配任务
 const distribCarts = ({ setting, carts, ascend }) => {
+
+    // 参与计算的字段
+    const calcKey = 'opennum';
+
     if (carts.length == 0) {
         return { setting, carts };
     }
     // 对carts排序
     if (ascend) {
-        carts = R.sort(R.ascend(R.prop('opennum')))(carts);
+        carts = R.sort(R.ascend(R.prop(calcKey)))(carts);
     } else {
-        carts = R.sort(R.descend(R.prop('opennum')))(carts);
+        carts = R.sort(R.descend(R.prop(calcKey)))(carts);
     }
 
     // 用户信息更新
@@ -184,7 +194,7 @@ const distribCarts = ({ setting, carts, ascend }) => {
         carts = R.tail(carts);
         let { real_num, expect_num, carts_num, num: expect_carts } = curMachine;
         // 更新当前状态
-        real_num = real_num + head.opennum;
+        real_num = real_num + head[calcKey];
         carts_num = carts_num + 1;
         let delta_num = real_num - expect_num;
         let data = [...curMachine.data, head];
