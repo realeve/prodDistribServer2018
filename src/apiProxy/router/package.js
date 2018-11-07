@@ -2,8 +2,11 @@ const R = require('ramda');
 const { dev } = require('../../util/axios');
 const db = require('./db_package');
 
-// 每包开包量小于10时，分配完毕
+// 每包开包量小于5时，分配完毕
 const endNum = 5;
+
+// 参与计算的字段
+const calcKey = 'opennum';
 
 const getCartList = R.compose(R.flatten, R.map(R.prop('carno')));
 
@@ -112,6 +115,9 @@ const prodistCarts = (carts, setting) => {
         }
     ), R.keys)(setting);
 
+    // 交换车号
+    res = exchangeCarts(res);
+
     // 按出库顺序排序
     return R.map(item => {
         console.log(item)
@@ -167,10 +173,6 @@ const getTaskBaseInfo = ({ setting, carts }) => {
 
 // 首次分配任务
 const distribCarts = ({ setting, carts, ascend }) => {
-
-    // 参与计算的字段
-    const calcKey = 'opennum';
-
     if (carts.length == 0) {
         return { setting, carts };
     }
@@ -217,6 +219,120 @@ const distribCarts = ({ setting, carts, ascend }) => {
         carts,
         ascend: !ascend
     });
+};
+
+
+const updateStatData = (user) => {
+    // 汇总缺陷总数
+    user.real_num = calcTotalData(calcKey, user.data);
+    user.delta_num = user.real_num - user.expect_num;
+    return user;
+};
+
+// 交换车号
+const exchangeCarts = (task_list, try_times = 0) => {
+    // console.log(`第${try_times}次循环:`);
+    if (try_times >= 5) {
+        return task_list;
+    }
+
+    let changeFlag = false;
+    // 根据与期望值的差值做排序
+    let carts = R.sort(R.ascend(R.prop('delta_num')))(task_list);
+    let len = carts.length;
+    for (let i = 0; i < len; i++) {
+        let user = R.clone(carts[i]);
+        let isCurIdxChanged = false;
+
+        // 更新finished状态
+        if (Math.abs(user.delta_num) < endNum) {
+            carts[i] = user;
+            continue;
+        }
+
+        let curDirection = user.delta_num > 0;
+
+        // 与前序数据逆向对比，当前组如果差值为负表示缺少判废数量，同正值（多出判废数量）的车号更换
+        for (let j = len - 1; j > 0; j--) {
+            if (i == j) {
+                continue;
+            }
+            let nextUser = R.clone(carts[j]);
+            let nextDirection = nextUser.delta_num && nextUser.delta_num > 0;
+
+            if (Math.abs(nextUser.delta_num) < endNum) {
+                carts[j] = nextUser;
+                continue;
+            }
+
+            // 如果完成了，不交换; 如果都是比预期多或都比预期少，不交换；
+            if (curDirection == nextDirection) {
+                continue;
+            }
+
+            user.data.forEach((item, curIdx) => {
+
+                let nextIdx = -1;
+                let userLength = nextUser.data.length;
+                for (let k = 0; k < userLength && nextIdx === -1; k++) {
+                    // 如果交换后两者均有降低的趋势，则交换；
+                    let nUser = nextUser.data[k];
+                    //如果交换本万，原任务中增加的缺陷条数加上之前与期望值的偏差，原期望值的偏差更小
+                    let curChange =
+                        Math.abs(nUser[calcKey] - item[calcKey] + user.delta_num) <
+                        Math.abs(user.delta_num);
+
+                    // 下个用户交换后偏差更小
+                    let nextChange =
+                        Math.abs(item[calcKey] - nUser[calcKey] + nextUser.delta_num) <
+                        Math.abs(nextUser.delta_num);
+
+                    // console.log(
+                    //   `用户${i + 1},与用户${j + 1}交换。当前条数：${
+                    //     item[calcKey]
+                    //   },要更换的条数${nUser[calcKey]},当前偏差：${
+                    //     user.delta_num
+                    //   },当前任务更换后的偏差:${nUser[calcKey] -
+                    //     item[calcKey] +
+                    //     user.delta_num},下一任务偏差：${
+                    //     nextUser.delta_num
+                    //   },下个任务更换后的偏差:${item[calcKey] -
+                    //     nUser[calcKey] +
+                    //     nextUser.delta_num},是否更换:${curChange && nextChange}`
+                    // );
+
+                    if (curChange && nextChange) {
+                        nextIdx = k;
+                    }
+                }
+
+                if (nextIdx > -1) {
+                    changeFlag = true;
+                    isCurIdxChanged = true;
+                    // 准备待交换数据
+                    let nextChangeItem = R.nth(nextIdx)(nextUser.data);
+                    let curChangeItem = R.clone(item);
+
+                    // 更新data中的内容
+                    user.data[curIdx] = nextChangeItem;
+                    nextUser.data[nextIdx] = curChangeItem;
+
+                    // 用户数据交换
+                    carts[j] = updateStatData(nextUser);
+                    carts[i] = updateStatData(user);
+                    // 刷新当前统计结果
+                    // console.log('do change');
+                }
+            });
+        }
+    }
+    if (!changeFlag) {
+        try_times++;
+        return carts;
+    }
+
+    // 循环测试
+    return exchangeCarts(carts, try_times);
 };
 
 module.exports.dev = dev;
