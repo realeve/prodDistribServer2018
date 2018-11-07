@@ -2,6 +2,9 @@ const R = require('ramda');
 const { dev } = require('../../util/axios');
 const db = require('./db_package');
 
+// 每包开包量小于10时，分配完毕
+const endNum = 5;
+
 const getCartList = R.compose(R.flatten, R.map(R.prop('carno')));
 
 const init = async({ tstart, tend }) => {
@@ -36,7 +39,7 @@ const init = async({ tstart, tend }) => {
     unlockData = getValidCarts(verifiedCarts, setting);
 
     // 待判废车号开包量
-    let dataWithOpennum = getOpenNum(unlockData);
+    let dataWithOpennum = await getOpenNum(unlockData);
 
     // 排活
     let res = prodistCarts(dataWithOpennum, machineSetting);
@@ -102,7 +105,7 @@ const getOpenNum = async carts => {
 
 // 任务分配
 const prodistCarts = (carts, setting) => {
-    R.compose(R.map(
+    return R.compose(R.flatten, R.map(
         prodname => {
             let cartList = R.filter(R.propEq('prodname', prodname))(carts)
             return prodistCartByProd(cartList, setting[prodname])
@@ -116,8 +119,95 @@ const prodistCarts = (carts, setting) => {
  * setting:对应该品种需要分配到几个班次
  */
 const prodistCartByProd = (carts, setting) => {
+    // 计算基础信息:期望包数
+    setting = getTaskBaseInfo({ carts, setting });
 
+    // 分配任务
+    let res = distribCarts({ setting, carts, ascend: false })
+    return setting;
 }
+
+// 汇总列数据
+const calcTotalData = (key, data) =>
+    R.compose(
+        R.reduce(R.add, 0),
+        R.map(R.prop(key))
+    )(data);
+
+// 汇总任务数汇总
+const getTaskBaseInfo = ({ setting, carts }) => {
+    // 汇总开包量总数
+    let totalOpennum = calcTotalData('opennum', carts);
+    // 汇总车号
+    let totalCartsNum = calcTotalData('num', setting);
+    if (totalCartsNum == 0) {
+        return [];
+    }
+    // 每单位开包量
+    let openNumPerUnit = totalOpennum / totalCartsNum;
+    return R.clone(setting).map((item) => {
+        item = Object.assign(item, {
+            expect_num: parseInt(item.num * openNumPerUnit),
+            expect_carts: item.num,
+            real_num: 0,
+            carts_num: 0,
+            delta_num: 0,
+            data: [],
+            success: false
+        });
+        return item;
+    });
+};
+
+// 首次分配任务
+const distribCarts = ({ setting, carts, ascend }) => {
+    if (carts.length == 0) {
+        return { setting, carts };
+    }
+    // 对carts排序
+    if (ascend) {
+        carts = R.sort(R.ascend(R.prop('opennum')))(carts);
+    } else {
+        carts = R.sort(R.descend(R.prop('opennum')))(carts);
+    }
+
+    // 用户信息更新
+    setting = R.map((curMachine) => {
+        // 如果该万已经被分配，继续
+        if (curMachine.success || carts.length == 0) {
+            return curMachine;
+        }
+        // 取第一项数据
+        let head = R.head(carts);
+
+        // 待排活数据删除一项
+        carts = R.tail(carts);
+        let { real_num, expect_num, carts_num, num: expect_carts } = curMachine;
+        // 更新当前状态
+        real_num = real_num + head.opennum;
+        carts_num = carts_num + 1;
+        let delta_num = real_num - expect_num;
+        let data = [...curMachine.data, head];
+        let finished = Math.abs(delta_num) <= endNum;
+
+        // 超过指定万数时，当前任务停止排活
+        let success = carts_num === expect_carts;
+        return Object.assign(curMachine, {
+            real_num,
+            carts_num,
+            delta_num,
+            data,
+            success,
+            finished
+        });
+    })(setting);
+
+    return distribCarts({
+        setting,
+        carts,
+        ascend: !ascend
+    });
+};
 
 module.exports.dev = dev;
 module.exports.init = init;
