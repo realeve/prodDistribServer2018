@@ -9,6 +9,7 @@ const R = require('ramda');
 const rtx = require('../rtx/index');
 const db2 = require('../../util/db');
 const db3 = require('./db_hecha');
+const dbJianFeng = require('./package');
 
 router.get('/', ctx => {
     ctx.body = {
@@ -226,28 +227,16 @@ router.get('/api/hecha/task', async ctx => {
 });
 
 router.post('/api/hecha/task', async ctx => {
-    let { tstart, tend, user_list } = ctx.request.body;
-    if (typeof tstart == 'undefined') {
-        ctx.body = {
-            msg: 'tstart参数必须传入，示例：20181102',
-            status: 401
-        };
+    // 使用全局参数校验函数
+    let validInfo = util.validateParam(
+        ctx,
+        'tstart,tend,user_list'.split(',')
+    );
+    if (!validInfo.status) {
+        ctx.body = validInfo;
         return;
     }
-    if (typeof tend == 'undefined') {
-        ctx.body = {
-            msg: 'tend参数必须传入，示例：20181102',
-            status: 401
-        };
-        return;
-    }
-    if (typeof user_list == 'undefined') {
-        ctx.body = {
-            msg: 'user_list参数必须传入，默认为数组类型',
-            status: 401
-        };
-        return;
-    }
+
     try {
         ctx.body = await hechaTask(ctx, ctx.request.body)
     } catch (err) {
@@ -267,4 +256,20 @@ const hechaTask = async(ctx, { tstart, tend, user_list, limit, precision, prod, 
     let data = await db3.handleHechaTask({ tstart, tend, user_list, limit, precision, prod, need_convert });
     return db3.dev ? { tstart, tend, user_list, limit, precision, prod, need_convert, ...data } : data;
 }
+
+// 检封根据开包量排活
+router.get('/api/package', async ctx => {
+
+    // 使用全局参数校验函数
+    // let validInfo = util.validateParam(
+    //     ctx,
+    //     'tstart,tend'.split(',')
+    // );
+    // if (!validInfo.status) {
+    //     ctx.body = validInfo;
+    //     return;
+    // }
+    ctx.body = await dbJianFeng.init(ctx.params);
+});
+
 module.exports = router;
