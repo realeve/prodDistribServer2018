@@ -1,17 +1,53 @@
 const R = require('ramda');
 const { dev } = require('../../util/axios');
 const db = require('./db_package');
+const { handleOpenNum } = require('../../sync/fakeAfterSinyin');
 
 // 每包开包量小于5时，分配完毕
 const endNum = 5;
 
 // 参与计算的字段
-const calcKey = 'opennum';
+const calcKey = 'ex_opennum';
+
+const limitOpennum = prod => prod === '9607T' ? 200 : 150;
 
 const getCartList = R.compose(R.flatten, R.map(R.prop('carno')));
 
 const init = async({ tstart, tend }) => {
+    // 1.获取白名单
     let { data } = await db.getVwWimWhitelist();
+
+    // 2.获取开包量，筛选未完工或开包量异常的产品
+    let { openNums, verifiedCarts } = await filterValidCarts(data);
+
+    // 3.根据任务设置划分出任务列表
+    let { unlockData, machineSetting } = await getTaskList(verifiedCarts);
+
+    // 4.待判废车号开包量
+    let dataWithOpennum = await getOpenNum(unlockData, openNums);
+
+    // 5.排活
+    let res = prodistCarts(dataWithOpennum, machineSetting);
+    return res;
+}
+
+const getTaskList = async verifiedCarts => {
+
+    // 从后台读取任务设置信息
+    let machineSetting = require('../mock/package_machine_setting');
+    machineSetting = handleMachineSetting(machineSetting);
+
+    let setting = getProdNum(machineSetting);
+
+    // 截取指定数量的车号
+    let unlockData = getValidCarts(verifiedCarts, setting);
+
+    return { unlockData, machineSetting }
+}
+
+const filterValidCarts = async data => {
+
+    // 0.数据预处理
     data = data.map(({ gh, prodname, carno, idx, lock_reason }) => {
         idx = parseInt(idx, 10);
         return {
@@ -22,32 +58,38 @@ const init = async({ tstart, tend }) => {
             lock_reason
         }
     });
-    // 未锁车车号列表
+
+    // 1.去除已锁车产品
     let unlockData = R.filter(({ lock_reason }) => R.isNil(lock_reason))(data);
 
     let cartList = getCartList(unlockData);
 
+    // 2.过滤未完工产品
     let completeCarts = await getVerifyStatus(cartList);
 
-    // 图核判废完成品
+    // 剔除开包量大于一定数量的产品,此处可能还需商议
+    // 读取当前已同步完成的开包量信息
+    let openNums = await db.getManualverifydata(completeCarts);
+
+    // 实际开包量大于一定值时，产品为异常品
+    let abnormalCarts = R.filter(item => item.ex_opennum > limitOpennum(item.prodname))(openNums);
+
+    // 是否需要在此处转异常品
+    console.log('是否需要在此处转异常品', abnormalCarts);
+    let aCartList = R.compose(R.flatten, R.map(R.prop('cart')))(abnormalCarts);
+
+    // 3.去除开包量大于指定值的产品
+    completeCarts = R.reject(item => aCartList.includes(item))(completeCarts);
+
+    // 3.去除判废未完工产品，保证判废完成的产品参与排活
     let verifiedCarts = R.filter(({ carno }) => completeCarts.includes(carno))(unlockData);
 
-    // 从后台读取任务设置信息
-    let machineSetting = require('../mock/package_machine_setting');
-    machineSetting = handleMachineSetting(machineSetting);
-
-    let setting = getProdNum(machineSetting);
-
-    // 截取指定数量的车号
-    unlockData = getValidCarts(verifiedCarts, setting);
-
-    // 待判废车号开包量
-    let dataWithOpennum = await getOpenNum(unlockData);
-
-    // 排活
-    let res = prodistCarts(dataWithOpennum, machineSetting);
-    return res;
+    return {
+        openNums,
+        verifiedCarts
+    }
 }
+
 const handleMachineSetting = machineSetting => {
     machineSetting = R.map(item => {
         item.num = parseInt(item.num, 10);
@@ -82,28 +124,36 @@ const getValidCarts = (carts, setting) => {
 }
 
 // 车号列表判废状态
-const getVerifyStatus = async carts => {
-    // 获取车号判废状态结果，确保所有产品已执行完图像判废；
-    return carts;
-}
+// 获取车号判废状态结果，确保所有产品已执行完图像判废；
+const getVerifyStatus = db.getQfmWipJobs;
 
-// 单万产品开包量
-const getOpenNumByCart = cart => {
+// 生成随机数据
+const getRandomOpenNumByCart = cart => {
     return parseInt(Math.random() * 100 + 50);
 }
 
-// 批量获取开包量
-const getOpenNum = async carts => {
-    // 车号列表
-    let cart = getCartList(carts);
-    // 从服务端获取开包量信息
+// 单万产品开包量
+const getOpenNumByCart = async(cart, openNums) => {
+    // 已同步的车号列表中获取数据
+    let res = R.find(R.propEq('cart', cart))(openNums)
+    if (res) {
+        return res;
+    }
+    res = await handleOpenNum(cart);
+    res.opennum = res.ex_opennum - res.ex_code_opennum - res.ex_siyin_opennum;
+    return { status: false, ...res };
+}
 
-    // 模拟获取对应车号开包量信息
-    carts = carts.map(item => {
-        item.opennum = getOpenNumByCart();
-        return item;
-    })
-    return carts;
+// 批量获取开包量
+const getOpenNum = async(carts, openNums) => {
+    let result = [];
+    for (let i = 0; i < carts.length; i++) {
+        let item = carts[i];
+        let res = await getOpenNumByCart(item.carno, openNums);
+        console.log(i, res);
+        result.push({...item, ...res })
+    }
+    return result;
 }
 
 // 任务分配
@@ -286,20 +336,6 @@ const exchangeCarts = (task_list, try_times = 0) => {
                     let nextChange =
                         Math.abs(item[calcKey] - nUser[calcKey] + nextUser.delta_num) <
                         Math.abs(nextUser.delta_num);
-
-                    // console.log(
-                    //   `用户${i + 1},与用户${j + 1}交换。当前条数：${
-                    //     item[calcKey]
-                    //   },要更换的条数${nUser[calcKey]},当前偏差：${
-                    //     user.delta_num
-                    //   },当前任务更换后的偏差:${nUser[calcKey] -
-                    //     item[calcKey] +
-                    //     user.delta_num},下一任务偏差：${
-                    //     nextUser.delta_num
-                    //   },下个任务更换后的偏差:${item[calcKey] -
-                    //     nUser[calcKey] +
-                    //     nextUser.delta_num},是否更换:${curChange && nextChange}`
-                    // );
 
                     if (curChange && nextChange) {
                         nextIdx = k;

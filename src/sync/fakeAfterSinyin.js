@@ -156,4 +156,4 @@ const handleMahouTask = async({ id, cart }) => {
     console.log(id, '更新完成');
 };
 
-module.exports = { init };
+module.exports = { init, handleOpenNum };
