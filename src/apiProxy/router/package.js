@@ -9,8 +9,6 @@ const endNum = 5;
 // 参与计算的字段
 const calcKey = 'ex_opennum';
 
-const limitOpennum = prod => prod === '9607T' ? 200 : 150;
-
 const getCartList = R.compose(R.flatten, R.map(R.prop('carno')));
 
 const init = async({ tstart, tend }) => {
@@ -72,7 +70,7 @@ const filterValidCarts = async data => {
     let openNums = await db.getManualverifydata(completeCarts);
 
     // 实际开包量大于一定值时，产品为异常品
-    let abnormalCarts = R.filter(item => item.ex_opennum > limitOpennum(item.prodname))(openNums);
+    let abnormalCarts = R.filter(item => item.ex_opennum > item.limit)(openNums);
 
     // 是否需要在此处转异常品
     console.log('是否需要在此处转异常品', abnormalCarts);
@@ -150,7 +148,6 @@ const getOpenNum = async(carts, openNums) => {
     for (let i = 0; i < carts.length; i++) {
         let item = carts[i];
         let res = await getOpenNumByCart(item.carno, openNums);
-        console.log(i, res);
         result.push({...item, ...res })
     }
     return result;
@@ -170,7 +167,6 @@ const prodistCarts = (carts, setting) => {
 
     // 按出库顺序排序
     return R.map(item => {
-        console.log(item)
         item.data = R.sort(R.ascend(R.prop('idx')))(item.data);
         return item;
     })(res);
