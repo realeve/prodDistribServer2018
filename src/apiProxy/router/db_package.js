@@ -6,7 +6,7 @@ const R = require('ramda');
  *   @database: { 库管系统 }
  *   @desc:     { 码后核查在库产品查询 } 
  */
-module.exports.getVwWimWhitelist = (proc_type = '码后核查') => dev ? require('../mock/package_list') : axios({
+module.exports.getVwWimWhitelist = (proc_type = '码后核查') => dev ? require(`../mock/package_list${proc_type =='码后核查'?'':'2'}`) : axios({
     url: '/249/f15c70ab61.json',
     params: {
         proc_type

@@ -19,55 +19,120 @@ const init = async({ tstart, tend }) => {
     let { openNums, verifiedCarts } = await filterValidCarts(data);
 
     // 3.根据任务设置划分出任务列表
-    let { unlockData, machineSetting } = await getTaskList(verifiedCarts);
+    let { unlockData, machineSetting, allCheckData, machineSettingAll } = await getTaskList(verifiedCarts);
 
     // 4.待判废车号开包量
     let dataWithOpennum = await getOpenNum(unlockData, openNums);
 
     // 5.排活
-    let res = prodistCarts(dataWithOpennum, machineSetting);
+    let mahou = prodistCarts(dataWithOpennum, machineSetting);
+
+    // 全检品处理，合并码后与全检数据
+    let res = handleAllCheckData(allCheckData, machineSettingAll, mahou);
     return res;
+}
+
+// 处理全检产品，直接截取即可
+const handleAllCheckData = (carts, setting, mahou) => {
+    // 针对该数据做破坏性操作
+    let cartByProd = R.groupBy(R.prop('prodname'))(carts);
+    let machines = R.compose(R.flatten, R.map(prodname => setting[prodname]), R.keys)(setting)
+
+    // 处理完之后的全检数据
+    let allCheck = machines.map(machine => {
+        let { prod_name, num } = machine;
+        let data = cartByProd[prod_name].splice(0, num);
+        return {...machine, data }
+    })
+
+    // 合并全检及码后数据
+    allCheck.forEach(machine => {
+        let idx = R.findIndex(R.propEq('id', machine.id))(mahou);
+        if (idx == -1) {
+            // 不存在该机台，直接追加
+            mahou.push(mahouItem);
+            return;
+        }
+        let { data, num } = mahou[idx];
+        // 数据合并
+        mahou[idx] = Object.assign(mahou[idx], {
+            type: `码后核查${num}+全检品${machine.num}`,
+            data: [...data, ...machine.data]
+        });
+    })
+    return mahou
+}
+
+// 全检品白名单 
+const getAllCheck = async() => {
+    // 1.获取白名单
+    let { data } = await db.getVwWimWhitelist('全检品');
+    return getUnlockData(data);
 }
 
 const getTaskList = async verifiedCarts => {
 
     // 从后台读取任务设置信息
     let machineSetting = require('../mock/package_machine_setting');
-    machineSetting = handleMachineSetting(machineSetting);
 
-    let setting = getProdNum(machineSetting);
+    let mahou = filterCartsByProc(verifiedCarts, machineSetting, '码后核查');
 
-    // 截取指定数量的车号
-    let unlockData = getValidCarts(verifiedCarts, setting);
+    let data = await getAllCheck();
 
-    return { unlockData, machineSetting }
+    let { unlockData: allCheckData, machineSetting: machineSettingAll } = filterCartsByProc(data, machineSetting, '全检品');
+
+    return {...mahou, allCheckData, machineSettingAll };
 }
 
-const filterValidCarts = async data => {
+// 处理特定工艺产品
+const filterCartsByProc = (carts, setting, type = '码后核查') => {
+    setting = R.filter(R.propEq('type', type))(setting)
+    setting = handleMachineSetting(setting);
+    let prodNum = getProdNum(setting);
+    // 截取指定数量的车号
+    let unlockData = getValidCarts(carts, prodNum);
+    return { unlockData, machineSetting: setting }
+}
 
+const getUnlockData = data => {
     // 0.数据预处理
-    data = data.map(({ gh, prodname, carno, idx, lock_reason }) => {
+    data = data.map(({ gh, prodname, carno, idx, lock_reason, tech }) => {
         idx = parseInt(idx, 10);
         return {
             gh,
             prodname,
             carno,
             idx,
-            lock_reason
+            lock_reason,
+            tech
         }
     });
 
     // 1.去除已锁车产品
-    let unlockData = R.filter(({ lock_reason }) => R.isNil(lock_reason))(data);
+    return R.filter(({ lock_reason }) => R.isNil(lock_reason))(data);
+}
 
+const filterValidCarts = async data => {
+    let unlockData = getUnlockData(data);
     let cartList = getCartList(unlockData);
 
     // 2.过滤未完工产品
-    let completeCarts = await getVerifyStatus(cartList);
+    let completeCarts = dev ? cartList : await getVerifyStatus(cartList);
 
     // 剔除开包量大于一定数量的产品,此处可能还需商议
     // 读取当前已同步完成的开包量信息
-    let openNums = await db.getManualverifydata(completeCarts);
+    let openNums = dev ? completeCarts.map(cart => {
+        let opennum = getRandomOpenNumByCart();
+        let prodname = cart[2] == 2 ? '9602A' : '9607T';
+        return {
+            cart,
+            prodname,
+            opennum,
+            ex_opennum: opennum,
+            ex_code_opennum: opennum,
+            ex_siyin_opennum: opennum
+        }
+    }) : await db.getManualverifydata(completeCarts);
 
     // 实际开包量大于一定值时，产品为异常品
     let abnormalCarts = R.filter(item => item.ex_opennum > item.limit)(openNums);
@@ -88,24 +153,19 @@ const filterValidCarts = async data => {
     }
 }
 
-const handleMachineSetting = machineSetting => {
-    machineSetting = R.map(item => {
-        item.num = parseInt(item.num, 10);
-        return item;
-    })(machineSetting);
+const handleMachineSetting = R.compose(R.groupBy(R.prop('prod_name')), R.map(item => {
+    item.num = parseInt(item.num, 10);
+    return item;
+}));
 
-    return R.groupBy(R.prop('prod_name'))(machineSetting);
-}
-const getProdNum = machineSetting => {
-    return R.compose(R.map(prodname => {
-        let nums = R.compose(R.flatten, R.map(R.prop('num')))(machineSetting[prodname]);
-        let num = R.reduce(R.add, 0)(nums);
-        return {
-            prodname,
-            num
-        }
-    }), R.keys)(machineSetting);
-}
+const getProdNum = machineSetting => R.compose(R.map(prodname => {
+    let nums = R.compose(R.flatten, R.map(R.prop('num')))(machineSetting[prodname]);
+    let num = R.reduce(R.add, 0)(nums);
+    return {
+        prodname,
+        num
+    }
+}), R.keys)(machineSetting);
 
 // 获取每个品种指定的大万数
 const getValidCarts = (carts, setting) => {
@@ -162,8 +222,13 @@ const prodistCarts = (carts, setting) => {
         }
     ), R.keys)(setting);
 
-    // 交换车号
-    res = exchangeCarts(res);
+    /**  
+     * 2018-11-08: 由于设备之间不能跨品种生产，此处交换数据不能跨不同品种：
+     * 流程：对原始数据按品种分组，取键值，对单独品种操作,完毕后重新打平数组
+     */
+    // 交换车号(不能跨品种交换)    
+    let opennumByProd = R.groupBy(R.prop('prod_name'))(res);
+    res = R.compose(R.flatten, R.map(prodname => exchangeCarts(opennumByProd[prodname])), R.keys)(opennumByProd)
 
     // 按出库顺序排序
     return R.map(item => {
