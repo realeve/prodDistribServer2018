@@ -6,4 +6,4 @@ const sync = require('../src/sync');
 
 sync.init();
 
-app.init();
+// app.init();

@@ -41,3 +41,4 @@ module.exports.getManualverifydata = carts => axios({
     item.ex_opennum = parseInt(item.ex_opennum, 10);
     return item;
 })(data))
+
