@@ -32,12 +32,17 @@ const init = async({ tstart, tend }) => {
     // 4.待判废车号开包量
     // dataWithOpennum = await getOpenNum(unlockData, []);
     console.log('开包量信息获取完毕，排活中')
-        // 5.排活
+
+    // 5.排活
     let mahou = prodistCarts(dataWithOpennum, machineSetting);
     console.log('排活完毕')
-        // 全检品处理，合并码后与全检数据
-    let res = handleAllCheckData(allCheckData, machineSettingAll, mahou);
-    return res;
+
+    // 全检品处理，合并码后与全检数据
+    let allCheck = handleAllCheckData(allCheckData, machineSettingAll, mahou);
+
+    // 指定车号
+
+    return allCheck;
 };
 
 // 处理全检产品，直接截取即可
@@ -164,13 +169,15 @@ const filterValidCartsBackup = async(data) => {
 
     // 是否需要在此处转异常品
     console.log('是否需要在此处转异常品', abnormalCarts);
-    let aCartList = R.compose(
+    let abnormalCartList = R.compose(
         R.flatten,
         R.map(R.prop('cart'))
     )(abnormalCarts);
 
     // 3.去除开包量大于指定值的产品
-    completeCarts = R.reject((item) => aCartList.includes(item))(completeCarts);
+    // completeCarts = R.reject((item) => abnormalCartList.includes(item))(completeCarts);
+    
+    completeCarts = R.difference(completeCarts,abnormalCartList);
 
     // 3.去除判废未完工产品，保证判废完成的产品参与排活
     let verifiedCarts = R.filter(({ carno }) => completeCarts.includes(carno))(

@@ -8,11 +8,9 @@ const fakeAfterSinyin = require('./sync/fakeAfterSinyin');
 const openNum2Wms = require('./sync/openNum2Wms');
 
 const mainThread = async () => {
-  
   await openNum2Wms.init().catch((e) => {
     console.log(e);
   });
-  return;
 
   // 丝印后由凹印产生的作废信息
   await fakeAfterSinyin.init().catch((e) => {
