@@ -14,9 +14,16 @@ let lockCartMsg = require('./task/lockCartMsg');
 // 机台通知连续废
 let multiWeak = require('./task/multiWeak');
 
+// 检封排产
+
+let package = require('./apiProxy/router/package');
+
 const mainThread = async () => {
   // 调试完毕
   // await wms.init().catch(e => console.log(e));
+
+  // 启动排活任务
+  await package.init().catch((e) => console.log(e));
 
   // 调试完毕-2018057全部通过。
   await abnormalProd.init();
