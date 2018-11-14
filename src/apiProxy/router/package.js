@@ -2,7 +2,7 @@ const R = require('ramda');
 const { dev } = require('../../util/axios');
 const db = require('./db_package');
 const { handleOpenNum } = require('../../sync/fakeAfterSinyin');
-
+const lib = require('../../util/lib');
 // 每包开包量小于5时，分配完毕
 const endNum = 5;
 
@@ -14,39 +14,148 @@ const getCartList = R.compose(
   R.map(R.prop('carno'))
 );
 
-const init = async ({ tstart, tend }) => {
-  // 1.获取白名单
-  let { data } = await db.getVwWimWhitelist();
+const init = async () => {
+  let needStart = db.getTimeRange();
+  if (needStart == 2) {
+    console.log('当前时间无需排活');
+    return false;
+  }
+  let res = await getProdList();
+  if (!res) {
+    return false;
+  }
+  res = flattenTasks(res);
 
-  // 2.获取开包量，筛选未完工或开包量异常的产品
-  let verifiedCarts = await filterValidCarts(data);
-
-  // 3.根据任务设置划分出任务列表
-  let {
-    unlockData: dataWithOpennum,
-    machineSetting,
-    allCheckData,
-    machineSettingAll
-  } = await getTaskList(verifiedCarts);
-
-  // 4.待判废车号开包量
-  // dataWithOpennum = await getOpenNum(unlockData, []);
-  console.log('开包量信息获取完毕，排活中');
-
-  // 5.排活
-  let mahou = prodistCarts(dataWithOpennum, machineSetting);
-  console.log('排活完毕');
-
-  // 全检品处理，合并码后与全检数据
-  let allCheck = handleAllCheckData(allCheckData, machineSettingAll, mahou);
-
-  // 指定车号数据处理
-
-  return allCheck;
+  let status = await recordTasks(res);
+  if (!status) {
+    return false;
+  }
+  return res;
 };
 
-// 处理全检产品，直接截取即可
-const handleAllCheckData = (carts, setting, mahou) => {
+const recordTasks = async (res) => {
+  let task_id = R.compose(
+    R.uniq,
+    R.flatten,
+    R.map(R.prop('task_id'))
+  )(res);
+  let {
+    data: [dbStatus]
+  } = await db.addPrintCutProdLog(res);
+  if (dbStatus.affected_rows == 0) {
+    console.log('排产数据记录失败');
+    return false;
+  }
+  let {
+    data: [{ affected_rows }]
+  } = await db.setPrintCutTaskStatus(task_id);
+
+  if (affected_rows != task_id.length) {
+    console.log('排产状态更新失败');
+    return false;
+  }
+  return true;
+};
+
+const getProdList = async () => {
+  // 1.从后台读取任务设置信息
+  let { data: settings } = await db.getPrintCutTaskList();
+  if (settings.length === 0) {
+    console.log('检封裁封自动线排产：当前时间段无排产任务或未到指定时间');
+    return false;
+  }
+  // 2.获取白名单
+  let { data } = await db.getVwWimWhitelist();
+
+  // 3.获取开包量，筛选未完工或开包量异常的产品
+  let verifiedCarts = await filterValidCarts(data);
+  if (verifiedCarts.length === 0) {
+    return [];
+  }
+
+  // 4.根据任务设置划分出任务列表
+  let { mahou: res, allCheck, exchangeCart, directSetCart } = await getTaskList(
+    verifiedCarts,
+    settings
+  );
+
+  console.log('排活完毕');
+
+  // 5.数据合并
+  // 合并码后与全检数据
+  res = combineCarts(allCheck, res);
+
+  // 追加补票信息
+  res = combineCarts(exchangeCart, res);
+
+  console.log('检封裁封自动线排产完成');
+  // 指定车号数据处理
+  res = conbineDirectCarts(directSetCart, res);
+  return res;
+};
+
+// 将排活结果输出为可插入数据库的结构
+const flattenTasks = (res) => {
+  let data = res.map((item) => {
+    let task = R.pick(
+      'task_id,type,expect_num,expect_carts,real_num'.split(',')
+    )(item);
+    return item.data.map((taskItem) => {
+      let cartInfo = R.pick(
+        'carts_num,gh,prodid,prodname,tech,carno,ex_opennum'.split(',')
+      )(taskItem);
+      cartInfo.ex_opennum = cartInfo.ex_opennum || '';
+      cartInfo.status = 0;
+      return { ...task, ...cartInfo };
+    });
+  });
+  return R.compose(
+    R.map((item) => {
+      item.rec_date = lib.now();
+      return item;
+    }),
+    R.flatten
+  )(data);
+};
+
+const conbineDirectCarts = (src, dist) => {
+  let leftArr = R.map((item) => {
+    item.type = /\d$/.test(item.type) ? item.type : item.type + item.num;
+    return item;
+  })(src);
+
+  // 合并数据
+  dist = dist.map((machine) => {
+    let idx = R.findIndex(
+      (item) =>
+        item.machine_id == machine.machine_id &&
+        item.worktype_name == machine.worktype_name &&
+        item.prod_name == machine.prod_name
+    )(leftArr);
+
+    if (idx > -1) {
+      let { data, type } = leftArr[idx];
+      // 数据合并
+      machine = Object.assign(machine, {
+        type: `${machine.type}+${type}`,
+        data: [...data, ...machine.data]
+      });
+      leftArr = R.remove(idx, 1)(leftArr);
+    }
+    return machine;
+  });
+
+  return [...dist, ...leftArr];
+};
+// 合并车号信息
+const combineCarts = (
+  { unlockData: carts, machineSetting: setting },
+  mahou
+) => {
+  mahou = mahou.map((item) => {
+    item.type = /\d$/.test(item.type) ? item.type : item.type + item.num;
+    return item;
+  });
   // 针对该数据做破坏性操作
   let cartByProd = R.groupBy(R.prop('prodname'))(carts);
   let machines = R.compose(
@@ -69,43 +178,83 @@ const handleAllCheckData = (carts, setting, mahou) => {
 
   // 合并全检及码后数据
   allCheck.forEach((machine) => {
-    let idx = R.findIndex(R.propEq('machine_id', machine.machine_id))(mahou);
+    let idx = R.findIndex(
+      (item) =>
+        item.machine_id == machine.machine_id &&
+        item.worktype_name == machine.worktype_name
+    )(mahou);
+
     if (idx == -1) {
       // 不存在该机台，直接追加
       mahou.push(machine);
       return;
     }
-    let { data, num } = mahou[idx];
+    let { data, type } = mahou[idx];
     // 数据合并
     mahou[idx] = Object.assign(mahou[idx], {
-      type: `码后核查${num}+全检品${machine.num}`,
+      type: `${type}+${machine.type}${machine.num}`,
       data: [...data, ...machine.data]
     });
   });
   return mahou;
 };
 
-// 全检品白名单
-const getAllCheck = async () => {
+// 指定工艺产品白名单
+const getCartsByProc = async (machineSetting, type = '全检品') => {
   // 1.获取白名单
-  let { data } = await db.getVwWimWhitelist('全检品');
-  return getUnlockData(data);
+  let { data } = await db.getVwWimWhitelist(type);
+  let allCheck = getUnlockData(data);
+  return filterCartsByProc(allCheck, machineSetting, type);
 };
 
-const getTaskList = async (verifiedCarts) => {
-  // 从后台读取任务设置信息
-  let { data: machineSetting } = await db.getPrintCutTaskList();
+const getDirectSetCarts = async (setting) => {
+  let machineList = R.filter(R.propEq('type', '指定车号'))(setting);
+  let carts = [];
+  machineList.forEach((machine) => {
+    let cart = machine.remark.trim().split(',');
+    carts = [...carts, ...cart];
+  });
+  let { data } = await db.getVwWimWhitelistWithCarts(carts);
 
-  let mahou = filterCartsByProc(verifiedCarts, machineSetting, '码后核查');
+  let directSetCart = machineList.map((machine) => {
+    machine.data = R.filter((item) => machine.remark.includes(item.carno))(
+      data
+    );
+    return machine;
+  });
 
-  let data = await getAllCheck();
+  // 直接指定车号的分配结果，不允许排活的车号列表
+  return { directSetCart, notAllowedCarts: carts };
+};
 
-  let {
-    unlockData: allCheckData,
-    machineSetting: machineSettingAll
-  } = filterCartsByProc(data, machineSetting, '全检品');
+const getTaskList = async (verifiedCarts, settings) => {
+  // 2.获取指定车号产品信息，这些产品只允许直接指定，不允许变更信息
+  let { directSetCart, notAllowedCarts } = await getDirectSetCarts(settings);
 
-  return { ...mahou, allCheckData, machineSettingAll };
+  // 过滤车号
+  verifiedCarts = R.reject((item) => notAllowedCarts.includes(item.carno))(
+    verifiedCarts
+  );
+
+  // 3.码后车号处理
+  let { unlockData: dataWithOpennum, machineSetting } = filterCartsByProc(
+    verifiedCarts,
+    settings,
+    '码后核查'
+  );
+
+  console.log('开包量信息获取完毕，排活中');
+
+  // 4.排活
+  let mahou = prodistCarts(dataWithOpennum, machineSetting);
+
+  // 5.全检数据
+  let allCheck = await getCartsByProc(settings, '全检品');
+
+  // 6.补品
+  let exchangeCart = await getCartsByProc(settings, '补品');
+
+  return { mahou, allCheck, exchangeCart, directSetCart };
 };
 
 // 处理特定工艺产品
@@ -196,14 +345,22 @@ const filterValidCartsBackup = async (data) => {
 const filterValidCarts = async (data) => {
   // 1.未锁车产品
   let unlockData = getUnlockData(data);
+  let { data: prodData } = await db.getProductdata();
+  unlockData = unlockData.map((item) => {
+    let res = R.find(R.propEq('prod_name', item.prodname))(prodData);
+    item.limit = res.limit || 150;
+    return item;
+  });
 
   // 2.选择开包量在一定数据量以内的产品
-  let cartsFilterByOpennum = R.reject(
-    (item) => item.ex_opennum > item.limit || item.ex_opennum == 0
+  let cartsFilterByOpennum = R.filter(
+    (item) => item.ex_opennum && item.ex_opennum < item.limit
   )(unlockData);
 
   let cartList = getCartList(cartsFilterByOpennum);
-
+  if (cartList.length === 0) {
+    return [];
+  }
   // 3.过滤未完工产品
   let completeCarts = dev ? cartList : await getVerifyStatus(cartList);
 

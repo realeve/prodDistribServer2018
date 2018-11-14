@@ -1,6 +1,27 @@
 const { axios, dev } = require('../../util/axios');
 const R = require('ramda');
 
+const getTimeRange = () => {
+  let curHour = parseInt(moment().format('HH'), 10);
+  let timeRange = 2;
+  // 下午14点排中班任务,持续到15点
+  if (curHour >= 14 && curHour <= 15) {
+    timeRange = 1;
+  } else if (curHour >= 5 && curHour <= 6) {
+    // 中上5点排白班任务，如果报错一直持续到6点。
+    timeRange = 0;
+  }
+  return timeRange;
+};
+
+const getWorkTypes = () => {
+  let timeRange = getTimeRange();
+  return ['白班', '中班', ''][timeRange];
+};
+
+module.exports.getTimeRange = getTimeRange;
+
+const moment = require('moment');
 /** NodeJS服务端调用：
  *
  *   @database: { 库管系统 }
@@ -53,9 +74,64 @@ module.exports.getManualverifydata = (carts) =>
  *   @database: { 质量信息系统 }
  *   @desc:     { 检封自动排产任务设置 }
  */
-module.exports.getPrintCutTaskList = () =>
+module.exports.getPrintCutTaskList = (worktypes = getWorkTypes()) =>
   dev
     ? require('../mock/package_machine_setting')
     : axios({
-        url: '/267/e0cf91d414.json'
+        url: '/267/e0cf91d414.json',
+        params: {
+          worktypes
+        }
       });
+
+/** NodeJS服务端调用：
+ *
+ *   @database: { 库管系统 }
+ *   @desc:     { 指定车号在库信息查询 }
+ */
+module.exports.getVwWimWhitelistWithCarts = (carts) =>
+  axios({
+    url: '/268/5c9f14f76f.json',
+    params: {
+      carts
+    }
+  });
+
+/** 数据量较大时建议使用post模式：
+  *
+  *   @database: { 质量信息系统 }
+  *   @desc:     { 批量批量记录检封排产任务 } 
+      以下参数在建立过程中与系统保留字段冲突，已自动替换:
+      @desc:批量插入数据时，约定使用二维数组values参数，格式为[{task_id,type,expect_num,real_num,gh,prodname,tech,carno,ex_opennum,status,rec_date }]，数组的每一项表示一条数据*/
+
+module.exports.addPrintCutProdLog = (values) =>
+  axios({
+    method: 'post',
+    data: {
+      values,
+      id: 270,
+      nonce: '6f3ed8e1ec'
+    }
+  });
+
+/**
+ *   @database: { 质量信息系统 }
+ *   @desc:     { 更新任务状态 }
+ */
+module.exports.setPrintCutTaskStatus = (task_id) =>
+  axios({
+    url: '/271/46fd372b56.json',
+    params: {
+      task_id
+    }
+  });
+
+/** NodeJS服务端调用：
+ *
+ *   @database: { 质量信息系统 }
+ *   @desc:     { 各品种开包量限额 }
+ */
+module.exports.getProductdata = () =>
+  axios({
+    url: '/272/eae49a15d0.json'
+  });
