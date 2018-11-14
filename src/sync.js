@@ -56,7 +56,7 @@ const init = async () => {
     console.info(`\n${lib.now()}: 第${times++}次采集`);
     mainThread();
     // 清除次数
-    times = times > 1000 ? 1 : times;
+    times = times % 1000;
   }, timeInterval);
 };
 
