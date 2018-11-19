@@ -148,6 +148,9 @@ router.get('/api/before_print', async (ctx) => {
     data = await rtx.pushMsg({ proc: process, msg });
   }
 
+  // 2018-11-19 更新检封任务排活领用状态
+  await db.setPrintCutProdLog([cart]);
+
   ctx.body = data;
 });
 
