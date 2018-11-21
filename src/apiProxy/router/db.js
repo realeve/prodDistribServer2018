@@ -103,6 +103,17 @@ const setPrintCutProdLog = (carts) =>
       carts
     }
   });
+/** NodeJS服务端调用：
+*
+ *   @database: { 质量信息系统 }
+ *   @desc:     { 中班排产前将未完成产品置为取消领用 } 
+ */
+const setPrintCutProdLogCancel = carts => axios({
+  url: '/278/6c31ebce6b.json',
+  params: {
+    carts
+  },
+});
 
 module.exports = {
   setPrintSampleCartlist,
@@ -113,5 +124,6 @@ module.exports = {
   setPrintAbnormalProd,
   setPrintMachinecheckMultiweak,
   getPrintWmsProclist,
-  setPrintCutProdLog
+  setPrintCutProdLog,
+  setPrintCutProdLogCancel
 };

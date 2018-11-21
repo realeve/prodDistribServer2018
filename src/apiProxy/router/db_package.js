@@ -2,12 +2,12 @@ const { axios, dev } = require('../../util/axios');
 const R = require('ramda');
 
 const getTimeRange = () => {
-  let curHour = parseInt(moment().format('HH'), 10);
+  let curHour = parseInt(moment().format('HHMM'), 10);
   let timeRange = 2;
-  // 下午14点排中班任务,持续到15点
-  if (curHour >= 14 && curHour <= 15) {
+  // 下午14点30排中班任务,持续到15点59
+  if (curHour >= 1430 && curHour <= 1559) {
     timeRange = 1;
-  } else if (curHour >= 5 && curHour <= 6) {
+  } else if (curHour >= 500 && curHour <= 659) {
     // 中上5点排白班任务，如果报错一直持续到6点。
     timeRange = 0;
   }
