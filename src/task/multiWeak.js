@@ -1,11 +1,11 @@
-let db = require("../util/db");
-let R = require("ramda");
-let wms = require("../util/wms");
-let lib = require("../util/lib");
+let db = require('../util/db');
+let R = require('ramda');
+let wms = require('../util/wms');
+let lib = require('../util/lib');
 // const consola = require("consola");
-const procHandler = require("../util/procHandler");
+const procHandler = require('../util/procHandler');
 
-let task_name = "机台连续废通知";
+let task_name = '机台连续废通知';
 
 /**
  * @desc:机台连续废通知，初始化。
@@ -15,13 +15,13 @@ let task_name = "机台连续废通知";
  * 3.依次对以上列表中的任务处理。
  */
 const init = async () => {
-  console.log("开始任务：" + task_name);
+  console.log('开始任务：' + task_name);
   let result = await procHandler.recordHeartbeat(task_name);
 
   let { data } = await db.getPrintMachinecheckMultiweak();
 
   if (R.isNil(data) || data.length === 0) {
-    console.info("所有任务处理完毕，下个周期继续");
+    console.info('所有任务处理完毕，下个周期继续');
     return;
   }
 
@@ -31,17 +31,21 @@ const init = async () => {
   //
 };
 
-const handlePlanList = async planList => {
-  let cartnos = R.map(R.prop("cart_number"), planList);
+const handlePlanList = async (planList) => {
+  let cartnos = R.map(R.prop('cart_number'), planList);
 
   // 批量读取车号最近生产工序
-  let { data } = await db.getViewCartfinder({ cart1: cartnos, cart2: cartnos });
+  let { data } = await db
+    .getViewCartfinder({ cart1: cartnos, cart2: cartnos })
+    .catch((e) => {
+      console.log(task_name, '接口报错，cartnos = ', JSON.stringify(cartnos));
+    });
   if (R.isNil(data) || data.length === 0) {
     return;
   }
 
   // 处理通知的所有产品
-  planList.forEach(item => handlePlanItem(item, data));
+  planList.forEach((item) => handlePlanItem(item, data));
 };
 
 /**
@@ -56,12 +60,13 @@ const handlePlanList = async planList => {
 
 const handlePlanItem = async ({ cart_number, id, last_proc }, data) => {
   // 返回当前大万生产信息
-  let curProdInfo = R.find(R.propEq("cart_number", cart_number))(data);
+  let curProdInfo = R.find(R.propEq('cart_number', cart_number))(data);
 
   // 返回最新的工序信息
   // let curProc = R.propOr("last_proc", false)(curProdInfo);
-  let curProc = Reflect.has(curProdInfo, 'last_proc') ? curProdInfo.last_proc : 'last_proc';
-
+  let curProc = Reflect.has(curProdInfo, 'last_proc')
+    ? curProdInfo.last_proc
+    : 'last_proc';
 
   // 工序未更新时，不处理
   if (curProc == last_proc) {
@@ -79,13 +84,13 @@ const handlePlanItem = async ({ cart_number, id, last_proc }, data) => {
 
   // 此处要判断是否更新成功
   if (res.rows == 0 || res.data[0].affected_rows == 0) {
-    console.log('数据更新失败:')
+    console.log('数据更新失败:');
     console.log({
       last_proc,
       last_machine: machine_name,
       last_rec_time: rec_time,
       _id: id
-    })
+    });
     return;
   }
 
@@ -94,12 +99,12 @@ const handlePlanItem = async ({ cart_number, id, last_proc }, data) => {
   // await pushDataByRTX(id);
 
   switch (curProc) {
-    case "印码":
+    case '印码':
       // 消息推送在服务端处理
       // await publishQualityInfo({ id, last_proc });
       break;
-    case "抽查":
-    case "裁封":
+    case '抽查':
+    case '裁封':
       await db.setPrintMachinecheckMultiweakStatus(id);
       break;
     default:
