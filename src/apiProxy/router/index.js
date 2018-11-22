@@ -272,15 +272,13 @@ const hechaTask = async (
 
 // 检封根据开包量排活
 router.get('/api/package', async (ctx) => {
-  let data = await dbJianFeng.init();
-  if (!data) {
-    ctx.body = {
-      status: false,
-      msg: '当前无需排活'
-    };
-    return;
-  }
-  ctx.body = data;
+  let data = await dbJianFeng.init(true);
+  ctx.body = data.status
+    ? data
+    : {
+        status: false,
+        msg: '当前无需排活'
+      };
 });
 
 module.exports = router;

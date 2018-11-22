@@ -7,7 +7,7 @@ const getTimeRange = () => {
   // 下午14点30排中班任务,持续到15点59
   if (curHour >= 1430 && curHour <= 1559) {
     timeRange = 1;
-  } else if (curHour >= 500 && curHour <= 659) {
+  } else if (curHour >= 630 && curHour <= 730) {
     // 中上5点排白班任务，如果报错一直持续到6点。
     timeRange = 0;
   }
@@ -16,6 +16,19 @@ const getTimeRange = () => {
 
 const getWorkTypes = () => {
   let timeRange = getTimeRange();
+  return ['白班', '中班', ''][timeRange];
+};
+
+const getWorkTypesManual = () => {
+  let curHour = parseInt(moment().format('HHMM'), 10);
+  let timeRange = 2;
+  // 下午14点30排中班任务,持续到15点59
+  if (curHour >= 1430 && curHour <= 2359) {
+    timeRange = 1;
+  } else if (curHour >= 630 && curHour <= 1429) {
+    // 中上5点排白班任务，如果报错一直持续到6点。
+    timeRange = 0;
+  }
   return ['白班', '中班', ''][timeRange];
 };
 
@@ -86,6 +99,19 @@ module.exports.getPrintCutTaskList = (worktypes = getWorkTypes()) =>
 
 /** NodeJS服务端调用：
  *
+ *   @database: { 质量信息系统 }
+ *   @desc:     { 检封自动排产任务设置 }
+ */
+module.exports.getPrintCutTaskListManual = (worktypes = getWorkTypesManual()) =>
+  axios({
+    url: '/279/48ac2dc14d.json',
+    params: {
+      worktypes
+    }
+  });
+
+/** NodeJS服务端调用：
+ *
  *   @database: { 库管系统 }
  *   @desc:     { 指定车号在库信息查询 }
  */
@@ -134,4 +160,14 @@ module.exports.setPrintCutTaskStatus = (task_id) =>
 module.exports.getProductdata = () =>
   axios({
     url: '/272/eae49a15d0.json'
+  });
+
+/** NodeJS服务端调用：
+ *
+ *   @database: { 质量信息系统 }
+ *   @desc:     { 当天产品取消生产 }
+ */
+module.exports.setPrintCutProdLogCancel = () =>
+  axios({
+    url: '/280/a267292c67.json'
   });

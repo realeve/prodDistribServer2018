@@ -14,26 +14,33 @@ const getCartList = R.compose(
   R.map(R.prop('carno'))
 );
 
-const init = async () => {
-  let needStart = db.getTimeRange();
-  if (needStart == 2) {
-    console.log('当前时间无需排活');
-    return false;
+// 手工模式提活，用于数据测试
+const init = async (manualMode = false) => {
+  if (!manualMode) {
+    let needStart = db.getTimeRange();
+    if (needStart == 2) {
+      console.log('当前时间无需排活');
+      return {
+        status: false
+      };
+    }
   }
-  let res = await getProdList();
+
+  let res = await getProdList(manualMode);
   if (!res) {
-    return false;
+    return {
+      status: false
+    };
   }
   res = flattenTasks(res);
-
-  let status = await recordTasks(res);
-  if (!status) {
-    return false;
-  }
+  res.status = await recordTasks(res);
   return res;
 };
 
 const recordTasks = async (res) => {
+  // 将当日未生产完毕的产品置为取消。
+  await db.setPrintCutProdLogCancel();
+
   let task_id = R.compose(
     R.uniq,
     R.flatten,
@@ -57,9 +64,11 @@ const recordTasks = async (res) => {
   return true;
 };
 
-const getProdList = async () => {
+const getProdList = async (manualMode = false) => {
   // 1.从后台读取任务设置信息
-  let { data: settings } = await db.getPrintCutTaskList();
+  let method = manualMode ? 'getPrintCutTaskListManual' : 'getPrintCutTaskList';
+
+  let { data: settings } = await db[method]();
   if (settings.length === 0) {
     console.log('检封裁封自动线排产：当前时间段无排产任务或未到指定时间');
     return false;
