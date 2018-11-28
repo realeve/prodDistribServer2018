@@ -27,6 +27,7 @@ const init = async (manualMode = false) => {
   }
 
   let res = await getProdList(manualMode);
+
   if (!res) {
     return {
       status: false
@@ -46,6 +47,7 @@ const recordTasks = async (res) => {
     R.flatten,
     R.map(R.prop('task_id'))
   )(res);
+
   let {
     data: [dbStatus]
   } = await db.addPrintCutProdLog(res);
@@ -111,10 +113,12 @@ const flattenTasks = (res) => {
     )(item);
     return item.data.map((taskItem) => {
       let cartInfo = R.pick(
-        'carts_num,gh,prodid,prodname,tech,carno,ex_opennum'.split(',')
+        'carts_num,gh,prodid,prodname,tech,carno,ex_opennum,idx'.split(',')
       )(taskItem);
       cartInfo.ex_opennum = cartInfo.ex_opennum || '';
       cartInfo.status = 0;
+      cartInfo.order_idx = cartInfo.idx;
+      Reflect.deleteProperty(cartInfo, 'idx');
       return { ...task, ...cartInfo };
     });
   });

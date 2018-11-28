@@ -4,6 +4,6 @@ const app = require('../src/index');
 // 后台同步服务
 const sync = require('../src/sync');
 
-sync.init();
+// sync.init();
 
 app.init();
