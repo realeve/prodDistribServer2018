@@ -10,6 +10,7 @@ const rtx = require('../rtx/index');
 const db2 = require('../../util/db');
 const db3 = require('./db_hecha');
 const dbJianFeng = require('./package');
+const dbAutoProc = require('./db_auto_proc');
 
 router.get('/', (ctx) => {
   ctx.body = {
@@ -118,6 +119,26 @@ router.get('/api/multiweak', async (ctx) => {
   ctx.body = data;
 });
 
+// http://localhost:3000/api/autoproc?cart=1880F945&process=%E5%87%B9%E4%B8%80%E5%8D%B0
+router.get('/api/autoproc', async (ctx) => {
+  let validInfo = util.validateParam(ctx, 'process,cart'.split(','));
+  if (!validInfo.status) {
+    ctx.body = validInfo;
+    return;
+  }
+  let { process, cart } = ctx.query;
+  // 2018-11-28 码前分流处理
+  let data = await dbAutoProc.init({ process, cart }, true);
+  if (data === false) {
+    ctx.body = {
+      status: 0,
+      msg: '无需转工艺'
+    };
+    return;
+  }
+  ctx.body = data;
+});
+
 // 上机前通知接口
 router.get('/api/before_print', async (ctx) => {
   let validInfo = util.validateParam(
@@ -150,6 +171,9 @@ router.get('/api/before_print', async (ctx) => {
 
   // 2018-11-19 更新检封任务排活领用状态
   await db.setPrintCutProdLog([cart]);
+
+  // 2018-11-28 码前分流处理
+  await dbAutoProc.init({ process, cart });
 
   ctx.body = data;
 });
