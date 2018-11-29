@@ -24,7 +24,7 @@ const mainThread = async () => {
 
   // 启动排活任务
   await package.init().catch((e) => console.log(e));
-  return;
+
   // 调试完毕-2018057全部通过。
   await abnormalProd.init();
 

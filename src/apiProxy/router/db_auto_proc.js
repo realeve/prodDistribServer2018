@@ -27,6 +27,15 @@ const getManualverifydata = () =>
 
 /**
  *   @database: { 小张核查 }
+ *   @desc:     { 实时获取丝印近400车产品建议走码后及全检品实废数 }
+ */
+const getCartThread = () =>
+  axios({
+    url: '/288/951314319e.json'
+  });
+
+/**
+ *   @database: { 小张核查 }
  *   @desc:     { 码前分流-丝印工序判废实废数及开包量 }
  */
 const getQaRectifyMaster = (cart) =>
@@ -50,8 +59,7 @@ const addPrintWmsAutoproc = (params) =>
 
 /**
 *   @database: { 质量信息系统 }
-*   @desc:     { 批量记录库管系统日志信息 } 
-	以下参数在建立过程中与系统保留字段冲突，已自动替换:
+*   @desc:     { 批量记录库管系统日志信息 }  
 	@desc:批量插入数据时，约定使用二维数组values参数，格式为[{remark,rec_time }]，数组的每一项表示一条数据*/
 const addPrintWmsLog = (values) =>
   axios({
@@ -118,9 +126,11 @@ module.exports.init = async ({ cart, process }, devMode = false) => {
   fake_num = parseInt(fake_num);
 
   // 3.2 读取推荐码后、全检丝印实废阈值；
+  // 2018-11-29 从丝印判废中实时读取近400车数据
   let {
     data: [{ mahou, allcheck }]
-  } = await getManualverifydata();
+  } = await getCartThread();
+
   mahou = parseInt(mahou);
   allcheck = parseInt(allcheck);
   // 3.3 判废期望工艺；
