@@ -1,0 +1,174 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="995.333" height="731">
+  <path fill="none" stroke="#34495D" stroke-miterlimit="10" d="M665.642 339.945c0 135.675-109.993 245.668-245.668 245.668-135.677 0-245.667-109.993-245.667-245.668 0-135.677 109.991-245.667 245.667-245.667 135.675 0 245.668 109.991 245.668 245.667z"/>
+  <path fill="none" d="M423.039 85.264C564.225 87.12 677.18 203.083 675.323 344.271"/>
+  <text transform="rotate(15.442 -101.46 1824.771)">
+    <tspan x="0" y="0" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762">干</tspan><tspan x="11.674" y="-.002" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" rotate="2.637">燥</tspan><tspan x="23.35" y=".535" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" rotate="5.276">周</tspan><tspan x="34.959" y="1.604" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" rotate="7.907">期</tspan><tspan x="46.512" y="3.206" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" rotate="10.534">结</tspan><tspan x="57.984" y="5.338" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" rotate="13.159">束</tspan><tspan x="69.366" y="7.996" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" rotate="15.782">的</tspan><tspan x="80.585" y="11.166" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" rotate="18.394">产</tspan><tspan x="91.675" y="14.851" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" rotate="21.006">品</tspan><tspan x="102.568" y="19.032" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" rotate="23.611">自</tspan><tspan x="113.273" y="23.709" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" rotate="26.214">动</tspan><tspan x="123.747" y="28.864" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" rotate="28.815">加</tspan><tspan x="133.974" y="34.488" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" rotate="31.413">入</tspan><tspan x="143.937" y="40.571" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" rotate="34.013">白</tspan><tspan x="153.601" y="47.09" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" rotate="36.611">名</tspan><tspan x="162.987" y="54.06" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" rotate="39.22">单</tspan>
+  </text>
+  <circle cx="419.974" cy="339.945" r="91" fill="#3AB882"/>
+  <text fill="#FFF" font-family="'STHeitiSC-Light'" font-size="36" transform="translate(366.03 349.445)">
+    任务池
+  </text>
+  <circle cx="207.188" cy="462.803" r="7.257" fill="#DA5961" stroke="#FFF" stroke-miterlimit="10" stroke-width="4"/>
+  <circle cx="246.188" cy="513.803" r="7.257" fill="#DA5961" stroke="#FFF" stroke-miterlimit="10" stroke-width="4"/>
+  <circle cx="182.5" cy="403.5" r="7.257" fill="#DA5961" stroke="#FFF" stroke-miterlimit="10" stroke-width="4"/>
+  <circle cx="246.271" cy="166.25" r="7.257" fill="#DA5961" stroke="#FFF" stroke-miterlimit="10" stroke-width="4"/>
+  <circle cx="419.974" cy="94.277" r="7.258" fill="#DA5961" stroke="#FFF" stroke-miterlimit="10" stroke-width="4"/>
+  <circle cx="657.293" cy="403.5" r="7.257" fill="#DA5961" stroke="#FFF" stroke-miterlimit="10" stroke-width="4"/>
+  <circle cx="665.643" cy="339.945" r="7.257" fill="#DA5961" stroke="#FFF" stroke-miterlimit="10" stroke-width="4"/>
+  <circle cx="699.336" cy="196.714" r="7.257" fill="#3AB882" stroke="#FFF" stroke-miterlimit="10" stroke-width="4"/>
+  <circle cx="593.667" cy="513.708" r="7.257" fill="#DA5961" stroke="#FFF" stroke-miterlimit="10" stroke-width="4"/>
+  <path fill="none" stroke="#8699A3" stroke-miterlimit="10" d="M125.179 394.072c23.911 0 23.911 11.431 47.821 11.431"/>
+  <text fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" transform="translate(51.55 398.694)">
+    生产调度下班
+  </text>
+  <text fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" transform="translate(709.289 200.16)">
+    白班自动排产
+  </text>
+  <g fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="10.655">
+    <text transform="translate(868.294 147.705)">
+      立体库出库白名单
+    </text>
+    <text transform="translate(868.294 165.516)">
+      未锁车
+    </text>
+    <text transform="translate(868.294 183.327)">
+      开包量小于阈值
+    </text>
+    <text transform="translate(868.294 201.138)">
+      图像核查已完工
+    </text>
+  </g>
+  <text transform="translate(796.881 167.625)">
+    <tspan x="0" y="0" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762">码后核查</tspan><tspan x="0" y="14.114" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762">与验证</tspan>
+  </text>
+  <text fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" transform="translate(796.881 230.68)">
+    全检品
+  </text>
+  <text fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" transform="translate(796.881 202.68)">
+    指定车号
+  </text>
+  <text fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" transform="translate(850.107 255.925)">
+    直接进入
+  </text>
+  <text transform="translate(917.22 246.255)">
+    <tspan x="0" y="0" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762">根据开包量</tspan><tspan x="0" y="14.114" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762">自动分配</tspan>
+  </text>
+  <text fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="8" transform="translate(877.757 127.61)">
+    有效车号过滤规则
+  </text>
+  <text fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" transform="translate(877.757 291.614)">
+    明日排产任务
+  </text>
+  <text fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" transform="rotate(-6.667 3397.66 -6119.056)">
+    存储
+  </text>
+  <text fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" transform="translate(720.101 424.625)">
+    机台领用白班任务
+  </text>
+  <text fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" transform="translate(654.414 529.812)">
+    调度员确认
+  </text>
+  <text fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" transform="translate(729.154 497.788)">
+    锁车产品
+  </text>
+  <text fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" transform="translate(729.154 530.467)">
+    判废未完工
+  </text>
+  <text fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" transform="translate(729.154 563.144)">
+    开包量异常
+  </text>
+  <text transform="translate(98.55 120.957)">
+    <tspan x="0" y="0" fill="#8699A3" font-family="'SourceHanSansCN-Bold-GBpc-EUC-H'" font-size="11.762">中班生产异常</tspan><tspan x="0" y="16.114" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762">当天未完成车号自</tspan><tspan x="0" y="32.228" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762">动进入下一工作日</tspan>
+  </text>
+  <path fill="none" stroke="#8699A3" stroke-miterlimit="10" d="M154.756 490.752c18.123-15.598 25.58-6.935 43.703-22.532M124.179 394.072c23.911 0 23.911 11.431 47.821 11.431M199.12 130.705c22.275 8.69 18.121 19.339 40.396 28.029M714.989 418.251c-21.324-10.815-26.495-.621-47.82-11.436M649.88 525.739c-22.457-8.208-26.381 2.528-48.84-5.679M692.079 196.714c-44.078 6.694 20.044 133.054-16.437 143.231"/>
+  <g fill="none" stroke="#8699A3" stroke-miterlimit="10">
+    <path d="M793.557 162.583c-3.115 0-4.672 2.331-4.672 6.993v15.733c0 2.443-.474 4.691-1.418 6.743-.946 2.054-2.253 3.608-3.921 4.662 3.559 2.498 5.339 6.216 5.339 11.155v15.818c0 4.661 1.557 6.992 4.672 6.992M783.546 196.714h10.083"/>
+  </g>
+  <g fill="none" stroke="#8699A3" stroke-miterlimit="10">
+    <path d="M726 491.69c-3.115 0-4.672 2.331-4.672 6.993v15.733c0 2.443-.474 4.691-1.418 6.743-.946 2.054-2.253 3.608-3.921 4.662 3.559 2.497 5.339 6.216 5.339 11.155v15.818c0 4.66 1.557 6.992 4.672 6.992M715.989 525.822h10.083"/>
+  </g>
+  <path fill="none" stroke="#8699A3" stroke-miterlimit="10" d="M860.118 138.592c-3.115 0-4.672 2.331-4.672 6.993v15.733c0 2.443-.474 4.691-1.418 6.743-.946 2.054-2.253 3.608-3.921 4.662 3.559 2.498 5.339 6.216 5.339 11.155v15.818c0 4.661 1.557 6.992 4.672 6.992"/>
+  <path fill="none" stroke="#DA5961" stroke-dasharray="6" stroke-miterlimit="10" d="M957.975 203.357c0 3.112-2.389 5.635-5.336 5.635h-83.453c-2.946 0-5.335-2.522-5.335-5.635v-64.266c0-3.112 2.389-5.635 5.335-5.635h83.453c2.947 0 5.336 2.522 5.336 5.635v64.266z"/>
+  <path fill="none" stroke="#8699A3" stroke-miterlimit="10" d="M845.833 202.949l5.861 13.248-12.913 11.382"/>
+  <path fill="none" stroke="#8699A3" d="M904.39 209.608c.132 3.469.949 6.132 2.454 7.989 1.505 1.855 3.483 3.027 5.937 3.51 2.453.484 6.641.746 12.561.787 5.923.04 10.175.484 12.759 1.332 2.583.848 4.627 2.542 6.133 5.084.478.807.879 1.767 1.205 2.878"/>
+  <path fill="#8699A3" d="M942.787 231.032l3.368 3.676 1.5-4.755z"/>
+  <path fill="none" stroke="#8699A3" d="M918.192 276.53a6.425 6.425 0 0 1 .993-1.798c.991-1.24 2.296-2.022 3.915-2.346 1.617-.324 4.381-.499 8.286-.526 3.907-.026 6.712-.323 8.417-.89 1.703-.566 3.051-1.699 4.045-3.399.609-1.044 1.031-2.47 1.268-4.276"/>
+  <path fill="#8699A3" d="M920.896 276.364l-3.331 3.709-1.547-4.74z"/>
+  <path fill="none" stroke="#8699A3" d="M907.562 276.54a6.76 6.76 0 0 0-1.288-2.159c-1.188-1.32-2.755-2.154-4.698-2.5-1.94-.345-5.256-.531-9.941-.561-4.689-.028-8.053-.345-10.1-.948-2.044-.604-3.66-1.812-4.853-3.622-.732-1.112-1.238-4.92-1.521-6.846"/>
+  <path fill="#8699A3" d="M909.709 275.315l-1.491 4.758-3.375-3.669z"/>
+  <path fill="none" stroke="#8699A3" d="M851.694 216.197c13.036 1.773 22.545 15.058 22.315 24.353"/>
+  <path fill="#8699A3" d="M871.555 239.432l1.806 4.647 3.122-3.887z"/>
+  <path fill="none" stroke="#8699A3" d="M897.581 300.562c-44.288 54.743-243.469 80.833-359.546 61.851"/>
+  <path fill="#8699A3" d="M539.152 360.025l-4.654 1.789 3.876 3.137z"/>
+  <path fill="none" stroke="#8699A3" d="M676.642 513.803C655.979 444.014 554.43 405.581 509.559 399.15"/>
+  <path fill="#8699A3" d="M510.64 396.862l-4.637 1.832 3.905 3.101z"/>
+  <path fill="none" d="M512.09 394.666c42.722 5.496 148.689 45.816 168.757 117.851"/>
+  <text transform="rotate(20.463 -846.025 1737.943)">
+    <tspan x="0" y="0" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762">调</tspan><tspan x="11.692" y="-.003" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" rotate="2.135">整</tspan><tspan x="23.368" y=".43" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" rotate="4.269">生</tspan><tspan x="35.011" y="1.298" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" rotate="6.468">产</tspan><tspan x="46.619" y="2.609" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" rotate="8.789">任</tspan><tspan x="58.168" y="4.388" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" rotate="11.285">务</tspan>
+  </text>
+  <text fill="#8699A3" font-family="'SourceHanSansCN-Bold-GBpc-EUC-H'" font-size="24" letter-spacing="12" transform="translate(253.71 43)">
+    裁封自动线自动排产
+  </text>
+  <path fill="none" d="M4.637 486.9h146.914v28.999H4.637z"/>
+  <text transform="translate(10.412 497.25)">
+    <tspan x="0" y="0" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762">机台、品种、班次、工艺、</tspan><tspan x="35.285" y="14.115" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762">大万数、有效开包量</tspan>
+  </text>
+  <path fill="none" d="M4.637 469.22h146.914v14.371H4.637z"/>
+  <text fill="#8699A3" font-family="'SourceHanSansCN-Bold-GBpc-EUC-H'" font-size="11.762" transform="translate(45.696 479.57)">
+    确认下一工作日任务
+  </text>
+  <g>
+    <g fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="17.461">
+      <text transform="translate(408.999 120.957)">
+        24
+      </text>
+      <text transform="rotate(106.338 170.22 432.654)">
+        7
+      </text>
+      <text transform="scale(-1) rotate(-45.231 -878.431 449.42)">
+        9
+      </text>
+      <text transform="rotate(180 215.295 279.998)">
+        12
+      </text>
+      <text transform="rotate(-120.411 250.114 162.356)">
+        16
+      </text>
+      <text transform="rotate(-105.438 261.55 123.761)">
+        17
+      </text>
+      <text transform="scale(-1) rotate(89.536 77.22 -277.702)">
+        18
+      </text>
+      <text transform="rotate(-45.539 359.635 -207.705)">
+        21
+      </text>
+      <text transform="rotate(90 153.357 487.923)">
+        6
+      </text>
+    </g>
+    <text fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="17.461" transform="scale(-1) rotate(44.615 476.602 -585.687)">
+      15
+    </text>
+    <circle cx="259.703" cy="598.229" r="7.257" fill="#3AB882" stroke="#FFF" stroke-miterlimit="10" stroke-width="4"/>
+    <text fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" transform="translate(269.06 601.758)">
+      中班自动排产
+    </text>
+    <path fill="none" stroke="#8699A3" stroke-miterlimit="10" d="M239.646 521.061c-24.2 9.406-8.885 60.037 11.688 74.553"/>
+    <circle cx="225.295" cy="489.963" r="7.257" fill="#DA5961" stroke="#FFF" stroke-miterlimit="10" stroke-width="4"/>
+    <text transform="translate(116.167 569.418)">
+      <tspan x="0" y="0" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762">中班机台领用</tspan><tspan x="0" y="14.114" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762">生产任务(15:30)</tspan>
+    </text>
+    <path fill="none" stroke="#8699A3" stroke-miterlimit="10" d="M219.037 498.221c-24.2 9.406-3.468 37.112-31.694 61.612"/>
+    <circle cx="102.214" cy="667.481" r="2.579" fill="#34495D" stroke="#FFF" stroke-miterlimit="10" stroke-width=".25"/>
+    <circle cx="102.214" cy="687.537" r="2.579" fill="#34495D" stroke="#FFF" stroke-miterlimit="10" stroke-width=".25"/>
+    <circle cx="102.214" cy="707.594" r="2.579" fill="#34495D" stroke="#FFF" stroke-miterlimit="10" stroke-width=".25"/>
+    <text fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762" transform="translate(108.09 649.673)">
+      异常情况说明：
+    </text>
+    <path fill="none" d="M108.09 660.5h401V738h-401z"/>
+    <text transform="translate(108.09 670.85)">
+      <tspan x="0" y="0" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762">提前一个工作日设置任务计划：第二日机台白班领用前需保证排活完成</tspan><tspan x="0" y="20.113" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762">每天06点及15点自动排产：立体库白名单车号数量不足一个工作日生产</tspan><tspan x="0" y="40.228" fill="#8699A3" font-family="'STHeitiSC-Light'" font-size="11.762">设备异常的处理：前一工作日未完工的产品，翌日自动生产进入排产计划</tspan>
+    </text>
+  </g>
+</svg>
