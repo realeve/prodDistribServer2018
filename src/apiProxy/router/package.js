@@ -77,11 +77,12 @@ const getProdList = async (manualMode = false) => {
     return false;
   }
   // 2.获取白名单
-  let { data } = await db.getVwWimWhitelist();
+  let whiteList = await db.getVwWimWhitelist();
 
+  let data = whiteList.data;
   // 记录当前白名单信息
   await db.addPrintCutWmsLog({
-    remark: JSON.stringify(data),
+    remark: JSON.stringify(whiteList),
     rec_time: lib.now()
   });
 
