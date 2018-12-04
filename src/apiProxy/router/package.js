@@ -57,7 +57,8 @@ const recordTasks = async (res) => {
   }
   let {
     data: [{ affected_rows }]
-  } = await db.setPrintCutTaskStatus(task_id);
+  } = await db.setPrintCutTask();
+  // await db.setPrintCutTaskStatus(task_id);
 
   if (affected_rows != task_id.length) {
     console.log('排产状态更新失败');
@@ -77,6 +78,12 @@ const getProdList = async (manualMode = false) => {
   }
   // 2.获取白名单
   let { data } = await db.getVwWimWhitelist();
+
+  // 记录当前白名单信息
+  await db.addPrintCutWmsLog({
+    remark: JSON.stringify(data),
+    rec_time: lib.now()
+  });
 
   // 3.获取开包量，筛选未完工或开包量异常的产品
   let verifiedCarts = await filterValidCarts(data);

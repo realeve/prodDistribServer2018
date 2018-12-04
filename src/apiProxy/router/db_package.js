@@ -155,6 +155,19 @@ module.exports.setPrintCutTaskStatus = (task_id) =>
 /** NodeJS服务端调用：
  *
  *   @database: { 质量信息系统 }
+ *   @desc:     { 更新当前班次排产状态 }
+ */
+module.exports.setPrintCutTask = (worktype = getTimeRange() + 1) =>
+  axios({
+    url: '/293/ac87697ca1.json',
+    params: {
+      worktype
+    }
+  });
+
+/** NodeJS服务端调用：
+ *
+ *   @database: { 质量信息系统 }
  *   @desc:     { 各品种开包量限额 }
  */
 module.exports.getProductdata = () =>
@@ -170,4 +183,20 @@ module.exports.getProductdata = () =>
 module.exports.setPrintCutProdLogCancel = () =>
   axios({
     url: '/280/a267292c67.json'
+  });
+
+/** NodeJS服务端调用：
+*
+*   @database: { 质量信息系统 }
+*   @desc:     { 检封排产-记录立体库白名单日志 } 
+    const { remark, rec_time } = params;
+*/
+module.exports.addPrintCutWmsLog = (params) =>
+  axios({
+    method: 'post',
+    data: {
+      ...params,
+      id: 292,
+      nonce: '24d9222347'
+    }
   });
