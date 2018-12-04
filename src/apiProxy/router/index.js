@@ -119,6 +119,12 @@ router.get('/api/multiweak', async (ctx) => {
   ctx.body = data;
 });
 
+// router.get('/api/autoproc_repaire', async (ctx) => {
+//   // 2018-11-28 码前分流处理
+//   let data = await dbAutoProc.repaire();
+//   ctx.body = data;
+// });
+
 // http://localhost:3000/api/autoproc?cart=1880F945&process=%E5%87%B9%E4%B8%80%E5%8D%B0
 router.get('/api/autoproc', async (ctx) => {
   let validInfo = util.validateParam(ctx, 'process,cart'.split(','));

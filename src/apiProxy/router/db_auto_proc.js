@@ -51,10 +51,28 @@ const getQaRectifyMaster = (cart) =>
 *   @desc:     { 码前自动分流-记录自动分流信息 } 
     const { cart, rec_time, fake_num, mahou, allcheck, auto_proc_name } = params;
 */
-const addPrintWmsAutoproc = (params) =>
-  axios({
+const addPrintWmsAutoproc = async (params) => {
+  // 如果已插入，放弃
+  let { rows } = await getPrintWmsAutoprocStatus(params.cart);
+  if (rows == 0) {
+    return false;
+  }
+  return axios({
     url: '/287/ec7940dc77.json',
     params
+  });
+};
+
+/**
+ *   @database: { 质量信息系统 }
+ *   @desc:     { 当前车号是否已处理过 }
+ */
+const getPrintWmsAutoprocStatus = (cart) =>
+  axios({
+    url: '/291/68875f126c.json',
+    params: {
+      cart
+    }
   });
 
 /**
@@ -109,8 +127,60 @@ const preHandle = async ({ cart, process }) => {
   return true;
 };
 
+/**
+ *   @database: { 质量信息系统 }
+ *   @desc:     { 车号列表工艺调整 }
+ */
+const getPrintWmsAutoproc = () =>
+  axios({
+    url: '/290/c27b6f038a.json'
+  });
+
+// 2018-12-04 部分车号因接口添加过程中指定了车号，原工艺重新调整
+
+module.exports.repaire = async () => {
+  return { status: 'finished' };
+
+  // http://10.8.2.133/qualitytable?tid=337,520&multi=cart&fixheader=0
+  // 截止至20181204，该组车号已确认全部未上印码机，尚在凹印工序。
+  // 1880F896,1880K196,1880G147,1880G143,1880K164,1880K259,1880K190,1880K234,1880K216,1880K172,1880G126,1880K242,1880K178,1880G148,1880G165,1880G132,1880K183,1880K197,1880G146,1880G135,1880F904,1880F838,1880G151,1880G159,1880G157,1880K173,1880G169,1880K188,1880K155,1880G182,1880G061,1880K199,1880K162,1880G121,1880G134,1880K157,1880F917,1880G152,1880F881,1880G140,1880G133,1880K147,1880K184,1880G175,1880G177,1880K180,1880G219,1880K236,1880G180,1880K224,1880G183,1880K232,1880G171,1880F876,1880G178,1880K280,1880G168,1880G136,1880G131,1880G181,1880G052,1880K171,1880K204,1880G026,1880F948,1880K267,1880F987,1880K287,1880G224
+  let { data } = await getPrintWmsAutoproc();
+  let carts = R.compose(
+    R.flatten,
+    R.map(R.prop('cart'))
+  )(data);
+
+  // 记录WMS转工艺日志
+  let logInfo = await addPrintWmsLog([
+    {
+      remark: JSON.stringify(carts),
+      rec_time: lib.now()
+    }
+  ]);
+
+  // 添加日志正常？
+  if (logInfo.rows < 1 || logInfo.data[0].affected_rows < 1) {
+    console.log('码前分流，wms记录失败', logInfo);
+    return false;
+  }
+  let log_id = logInfo.data[0].id;
+
+  // 重置为不分工艺
+  let result = await wms.setProcs({
+    carnos: carts,
+    checkType: '不分工艺',
+    log_id
+  });
+
+  // 根据情况重设工艺
+  for (let i = 0; i < carts.length; i++) {
+    await init({ cart: carts[i], process: '凹二印' });
+  }
+  return result;
+};
+
 // 码前分流
-module.exports.init = async ({ cart, process }, devMode = false) => {
+const init = async ({ cart, process }, devMode = false) => {
   if (!(await preHandle({ cart, process }))) {
     return false;
   }
@@ -136,21 +206,20 @@ module.exports.init = async ({ cart, process }, devMode = false) => {
   // 3.3 判废期望工艺；
 
   let checkType = '';
+  let errFlag = false;
   if (fake_num > mahou && fake_num < allcheck) {
+    errFlag = true;
+    checkType = '不分工艺';
     console.log(
       cart +
         `当前实废${fake_num}介于推荐值${mahou}和${allcheck}之间，不执行自动分流设置。`
     );
-    return false;
   } else if (fake_num <= mahou) {
     // 建议执行码后
     checkType = '码后核查';
   } else if (fake_num >= allcheck) {
     // 建议执行全检
     checkType = '全检品';
-  }
-  if (checkType == '') {
-    return;
   }
 
   let remark = {
@@ -166,8 +235,14 @@ module.exports.init = async ({ cart, process }, devMode = false) => {
     ...remark
   };
 
-  // 记录工艺自动分流信息
-  res = await addPrintWmsAutoproc(params);
+  // 记录工艺自动分流信息,不分流的产品也作记录
+  await addPrintWmsAutoproc(params);
+
+  // 不转工艺的仍记录信息
+  if (errFlag) {
+    return false;
+  }
+
   // 记录WMS转工艺日志
   let logInfo = await addPrintWmsLog([
     {
@@ -193,3 +268,5 @@ module.exports.init = async ({ cart, process }, devMode = false) => {
   await setPrintWmsLog({ return_info: JSON.stringify(result), _id: log_id });
   return result;
 };
+
+module.exports.init = init;
