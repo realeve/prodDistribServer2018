@@ -1,8 +1,9 @@
 const { axios, dev } = require('../../util/axios');
 const R = require('ramda');
+const moment = require('moment');
 
-const getTimeRange = () => {
-  let curHour = parseInt(moment().format('HHMM'), 10);
+const getTimeRange = (testHour) => {
+  let curHour = testHour || parseInt(moment().format('HHMM'), 10);
   let timeRange = 2;
   // 下午14点30排中班任务,持续到15点59
   if (curHour >= 1430 && curHour <= 1559) {
@@ -14,13 +15,13 @@ const getTimeRange = () => {
   return timeRange;
 };
 
-const getWorkTypes = () => {
-  let timeRange = getTimeRange();
+const getWorkTypes = (testHour = false) => {
+  let timeRange = getTimeRange(testHour);
   return ['白班', '中班', ''][timeRange];
 };
 
-const getWorkTypesManual = () => {
-  let curHour = parseInt(moment().format('HHMM'), 10);
+const getWorkTypesManual = (testHour = false) => {
+  let curHour = testHour || parseInt(moment().format('HHMM'), 10);
   let timeRange = 2;
   // 下午14点30排中班任务,持续到15点59
   if (curHour >= 1430 && curHour <= 2359) {
@@ -32,9 +33,10 @@ const getWorkTypesManual = () => {
   return ['白班', '中班', ''][timeRange];
 };
 
+module.exports.getWorkTypes = getWorkTypes;
 module.exports.getTimeRange = getTimeRange;
+module.exports.getWorkTypesManual = getWorkTypesManual;
 
-const moment = require('moment');
 /** NodeJS服务端调用：
  *
  *   @database: { 库管系统 }
@@ -57,9 +59,12 @@ module.exports.getVwWimWhitelist = (proc_type = '码后核查') =>
  */
 module.exports.getQfmWipJobs = (carts) =>
   axios({
-    url: '/250/b3d68925f6.array',
-    params: {
-      carts
+    method: 'post',
+    data: {
+      carts,
+      id: 250,
+      nonce: 'b3d68925f6',
+      mode: 'array'
     }
   }).then(({ data }) => R.uniq(R.flatten(data)));
 

@@ -28,12 +28,13 @@ const init = async (manualMode = false) => {
 
   let res = await getProdList(manualMode);
 
-  if (!res) {
+  if (!res || res.length === 0) {
     return {
       status: false
     };
   }
   res = flattenTasks(res);
+
   res.status = await recordTasks(res);
   return res;
 };
@@ -72,6 +73,7 @@ const getProdList = async (manualMode = false) => {
   let method = manualMode ? 'getPrintCutTaskListManual' : 'getPrintCutTaskList';
 
   let { data: settings } = await db[method]();
+
   if (settings.length === 0) {
     console.log('检封裁封自动线排产：当前时间段无排产任务或未到指定时间');
     return false;
@@ -88,6 +90,7 @@ const getProdList = async (manualMode = false) => {
 
   // 3.获取开包量，筛选未完工或开包量异常的产品
   let verifiedCarts = await filterValidCarts(data);
+
   if (verifiedCarts.length === 0) {
     return [];
   }
@@ -379,6 +382,7 @@ const filterValidCarts = async (data) => {
   )(unlockData);
 
   let cartList = getCartList(cartsFilterByOpennum);
+
   if (cartList.length === 0) {
     return [];
   }

@@ -56,7 +56,7 @@ let axios = async (option) => {
     headers: {
       Authorization: token
     },
-    method: option.method ? option.method : 'get'
+    method: option.method || 'get'
   });
 
   return await http
@@ -94,5 +94,6 @@ let axios = async (option) => {
 
 module.exports = {
   axios,
-  dev
+  dev,
+  getTokenFromUrl
 };
