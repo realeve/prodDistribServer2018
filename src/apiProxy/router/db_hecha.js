@@ -4,14 +4,20 @@ const { dev } = require('../../util/axios');
 
 module.exports.dev = dev;
 
+// 图核判废接口
+
 // 100条以内不重排
 let endNum = 50;
 const totalTryTimes = 50;
 
 // 过滤为全检及核查品
 const getTaskList = async ({ tstart, tend, prod }) => {
+  // 印码印完后判废
+  // let method = prod ? 'getViewCartfinderByProd' : 'getViewCartfinder';
 
-  let method = prod ? 'getViewCartfinderByProd' : 'getViewCartfinder';
+  // 丝印印完后判废
+  let method = prod ? 'getVCbpcCartlistByProd' : 'getVCbpcCartlist';
+
   let params = prod ? { tstart, tend, prod } : { tstart, tend };
   let { data } = await db[method](params);
 
@@ -276,22 +282,29 @@ const exchangeCarts = (task_list, try_times = 0) => {
   return exchangeCarts(users, try_times);
 };
 
-let convertResult = tasks => {
-  let res = []
+let convertResult = (tasks) => {
+  let res = [];
   tasks.forEach(({ user_name, user_no, data }) => {
-    data = data.map(item => {
+    data = data.map((item) => {
       item.user_name = user_name;
       item.user_no = user_no;
       return item;
-    })
+    });
     res = [...res, ...data];
   });
   return res;
-}
+};
 
 // 核查排活核心流程
-module.exports.handleHechaTask = async ({ tstart, tend, user_list, limit, precision, prod, need_convert }) => {
-
+module.exports.handleHechaTask = async ({
+  tstart,
+  tend,
+  user_list,
+  limit,
+  precision,
+  prod,
+  need_convert
+}) => {
   endNum = precision;
 
   // 获取车号列表
@@ -307,10 +320,10 @@ module.exports.handleHechaTask = async ({ tstart, tend, user_list, limit, precis
   let unupload_carts = getUnUploadCarts({ srcData, uploadData });
 
   // 超过一定条数不处理
-  let unhandle_carts = R.filter(item => item.pf_num > limit)(uploadData);
+  let unhandle_carts = R.filter((item) => item.pf_num > limit)(uploadData);
 
   // 过滤20000条以上的产品列表
-  uploadData = R.filter(item => item.pf_num <= limit)(uploadData);
+  uploadData = R.filter((item) => item.pf_num <= limit)(uploadData);
 
   if (dev) {
     user_list = require('../mock/userList');

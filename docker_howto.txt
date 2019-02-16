@@ -59,6 +59,8 @@ $ docker load --input ./dist/prod-distrib.tar
 $ docker cp ./docker-dist/src [containerID|containerName]:/usr/src/app/
 
 docker exec -it eager_wright /bin/bash
+docker ps -a
+
 docker cp ./docker-dist/src eager_wright:/usr/src/app/
 systemctl restart docker
 docker exec -it eager_wright /bin/bash
