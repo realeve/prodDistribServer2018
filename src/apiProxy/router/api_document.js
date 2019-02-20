@@ -216,7 +216,7 @@ module.exports = {
           work_long_time: 0.775
         }
       ],
-      need_convert: 1,
+      need_convert: 0,
       prod: '默认全部品种',
       limit: 2000,
       precision: 100

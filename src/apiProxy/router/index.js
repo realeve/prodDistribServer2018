@@ -242,7 +242,7 @@ router.get('/api/hecha/task', async (ctx) => {
         ],
         limit: 20000,
         prod: ['9607T', '9602A'],
-        need_convert: 1,
+        need_convert: 0,
         precision: 100
     };
     /** 
