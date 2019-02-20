@@ -21,15 +21,20 @@ const getTaskList = async ({ tstart, tend, prod }) => {
   let params = prod ? { tstart, tend, prod } : { tstart, tend };
   let { data } = await db[method](params);
 
+  // 产品列表
+  // console.log(data);
+
   let siyinCarts = [],
     codeCarts = [];
 
-  // 需要统计的丝印品
+  // 2019，从MES查询出的丝印还没有工艺信息，需要统计的丝印品
   siyinCarts = R.compose(
     R.uniq,
     R.pluck('cart_number'),
-    R.filter(R.propEq('proc_name', '全检品'))
+    R.filter(R.propEq('proc_name', '不分工艺'))
   )(data);
+  // 不分工艺: 全检品
+
   codeCarts = R.compose(
     R.uniq,
     R.pluck('cart_number'),
@@ -78,6 +83,7 @@ const getTaskBaseInfo = async ({ user_list, uploadData, tstart, tend }) => {
   let cartsPerWorker = uploadData.length / totalWorkLongTime;
 
   let users = R.clone(user_list);
+  console.log(users);
   return users.map((item) => {
     let userPfNum = R.filter(R.propEq('operator_name', item.user_name))(
       pfNumByMonth
@@ -316,6 +322,7 @@ module.exports.handleHechaTask = async ({
 
   // 获取判废条数
   let uploadData = await db.getWipJobs({ carts0, carts1 });
+  // console.log(uploadData);
   // 未上传车号列表：
   let unupload_carts = getUnUploadCarts({ srcData, uploadData });
 
@@ -328,6 +335,13 @@ module.exports.handleHechaTask = async ({
   if (dev) {
     user_list = require('../mock/userList');
   }
+
+  user_list = user_list.map((item) => {
+    if (typeof item.work_long_time == 'undefined') {
+      item.work_long_time = 1;
+    }
+    return item;
+  });
 
   // 计算任务基础信息
   let users = await getTaskBaseInfo({ user_list, uploadData, tstart, tend });

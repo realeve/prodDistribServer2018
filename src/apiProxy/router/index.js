@@ -203,10 +203,12 @@ router.get('/api/rtxlist/:proc', async (ctx) => {
 router.get('/api/hecha/task', async (ctx) => {
   const html = `
     // 因用户信息包含较多查询参数，不支持get请求，请按以下方式发起post调用:
-    var url = 'http://10.8.1.27:4000/api/hecha/task';
+    var url = 'http://${
+      !db3.dev ? 'localhost:3000' : '10.8.1.27:4000'
+    }/api/hecha/task';
     var data = {
-        tstart: 20181101,
-        tend: 20181101,
+        tstart: 20190219,
+        tend: 20190219,
         user_list: [{
                 user_no: '54002137',
                 user_name: '刘照英',
@@ -251,12 +253,43 @@ router.get('/api/hecha/task', async (ctx) => {
      * need_convert，默认做数据行列转换，不转换时将输出更详细的内容
      *  */
     
-    $.ajax({ method: 'POST', url:url, data:data }).done(res => {
+    $.ajax({ type: 'POST', url:url, data:data }).done(res => {
+        $('#result').html(JSON.stringify(res))
         console.log(res)
+    }).fail(e=>{
+      console.log(e)
     })
     
     `;
-  ctx.body = html;
+
+  const content = ` 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>demo</title>
+</head>
+
+<body>
+    <h2>调用代码</h2>
+    <div>
+    ${html}
+    </div>
+    <h2>输出结果在此：</h2>
+    <div id="result">
+        数据读取中...
+    </div>
+    <script src="http://10.8.2.133:92/jquery.min.js"></script> 
+    <script>
+        ${html}
+    </script>
+</body> 
+</html> 
+  `;
+  ctx.body = content;
 });
 
 router.post('/api/hecha/task', async (ctx) => {
@@ -275,7 +308,7 @@ router.post('/api/hecha/task', async (ctx) => {
 });
 
 const hechaTask = async (
-  ctx,
+  _,
   { tstart, tend, user_list, limit, precision, prod, need_convert }
 ) => {
   // 起始日期，用户列表，多少条以内，精度，品种,数据是否需要转换
@@ -286,15 +319,19 @@ const hechaTask = async (
   // 默认全品种
   prod = prod || false;
 
-  let data = await db3.handleHechaTask({
-    tstart,
-    tend,
-    user_list,
-    limit,
-    precision,
-    prod,
-    need_convert
-  });
+  let data = await db3
+    .handleHechaTask({
+      tstart,
+      tend,
+      user_list,
+      limit,
+      precision,
+      prod,
+      need_convert
+    })
+    .catch((e) => {
+      throw e;
+    });
   return db3.dev
     ? { tstart, tend, user_list, limit, precision, prod, need_convert, ...data }
     : data;

@@ -6,13 +6,13 @@ const { axios, dev } = require('../../util/axios');
 *   @desc:     { 图像判废每日待判车号列表 } 
     const { tstart, tend } = params;
 */
-module.exports.getViewCartfinder = async (params) =>
+module.exports.getViewCartfinder = (params) =>
   dev
     ? require('../mock/cartlist.json')
-    : await axios({
+    : axios({
         url: '/185/68f8afe278.json',
         params
-      }).then((res) => res);
+      });
 
 /**
 *   @database: { MES_MAIN }
@@ -82,10 +82,15 @@ module.exports.getWipJobs = async (params) =>
           id: 195,
           nonce: '544a395fd4'
         }
-      }).then(({ data }) =>
-        data.map((item) => {
+      }).then(({ data }) => {
+        // console.log(params.carts0.concat("','"));
+        // console.log(params.carts1.concat("','"));
+        return data.map((item) => {
           item.pf_num = parseInt(item.pf_num, 10);
           item.type = parseInt(item.type, 10);
           return item;
-        })
-      );
+        });
+      });
+// .catch((e) => {
+//   console.log(e);
+// });
