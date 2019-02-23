@@ -56,7 +56,7 @@ module.exports.getQfmWipProdLogs = async (params) =>
   dev
     ? require('../mock/pfnum_month.js')
     : await axios({
-        url: '/186/9a8e4c9d74.json',
+        url: '/186/9a8e4c9d74/5.json',
         params
       }).then(({ data }) =>
         data.map((item) => {

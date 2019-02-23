@@ -47,6 +47,7 @@ module.exports = {
   '/api/after_print': {
     desc:
       '下机产品，通知已生产完成状态以及当前工序。后台将分别对四新产品、异常品、机台通知作废产品的完成进度更新。',
+    url:'http://localhost:3000/api/after_print?cart=1880G470&status=1&process=%E6%8A%BD%E6%9F%A5',
     param: {
       process: 'varchar,当前生产工序',
       status:

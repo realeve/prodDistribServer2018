@@ -7,7 +7,13 @@ const imgVerify = require('./sync/imgVerify');
 const fakeAfterSinyin = require('./sync/fakeAfterSinyin');
 const openNum2Wms = require('./sync/openNum2Wms');
 
+const noteAnay = require('./sync/noteAnay');
+
 const mainThread = async () => {
+  await noteAnay.init().catch((e) => {
+    console.log(e);
+  });
+
   await openNum2Wms.init().catch((e) => {
     console.log(e);
   });

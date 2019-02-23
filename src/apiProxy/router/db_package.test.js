@@ -1,4 +1,5 @@
 const lib = require('./db_package');
+const moment = require('moment');
 
 test('班次自动确定', () => {
   expect(lib.getTimeRange(630)).toBe(0);
@@ -32,5 +33,7 @@ test('班次手动确定', () => {
   expect(lib.getWorkTypesManual(1429)).toBe('白班');
   expect(lib.getWorkTypesManual(1560)).toBe('中班');
 
-  expect(lib.getWorkTypesManual()).toBe('白班');
+  expect(lib.getWorkTypesManual()).toBe(
+    parseInt(moment().format('HHMM'), 10) >= 1430 ? '中班' : '白班'
+  );
 });
