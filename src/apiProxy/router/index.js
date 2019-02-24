@@ -77,13 +77,24 @@ router.get('/api/manual_status', async (ctx) => {
 
 // 下机产品，通知已生产完成状态以及当前工序。
 router.get('/api/after_print', async (ctx) => {
-  let validInfo = util.validateParam(ctx, 'process,status,cart'.split(','));
-  if (!validInfo.status) {
-    ctx.body = validInfo;
-    return;
+  let { process, status, cart, rec, pay } = ctx.query;
+  if (R.isNil(rec)) {
+    let validInfo = util.validateParam(ctx, 'process,status,cart'.split(','));
+    if (!validInfo.status) {
+      ctx.body = validInfo;
+      return;
+    }
+  } else {
+    let validInfo = util.validateParam(ctx, 'process,rec,pay,cart'.split(','));
+    if (!validInfo.status) {
+      ctx.body = validInfo;
+      return;
+    }
+
+    // 是清分机时，status=1
+    status = ['裁封', '裁切'].includes(process) ? 1 : 0;
   }
 
-  let { process, status, cart } = ctx.query;
   // step1:通知四新产品完工状态
   let dataNewProc = await db.setPrintWmsProclist({ process, status, cart });
   // step2:通知异常品完工状态
@@ -147,19 +158,30 @@ router.get('/api/autoproc', async (ctx) => {
 
 // 上机前通知接口
 router.get('/api/before_print', async (ctx) => {
-  let validInfo = util.validateParam(
-    ctx,
-    'process,machine_name,cart'.split(',')
-  );
-  if (!validInfo.status) {
-    ctx.body = validInfo;
-    return;
+  let { process, machine_name, cart, rec } = ctx.query;
+
+  if (R.isNil(rec)) {
+    let { status } = util.validateParam(
+      ctx,
+      'process,machine_name,cart'.split(',')
+    );
+    if (!status) {
+      ctx.body = validInfo;
+      return;
+    }
+  } else {
+    let { status } = util.validateParam(ctx, 'process,rec,cart'.split(','));
+    if (!status) {
+      ctx.body = validInfo;
+      return;
+    }
+    // 机台信息更新为rec字段
+    machine_name = rec;
   }
 
-  let { process, machine_name, cart } = ctx.query;
-
+  // 白纸、过数、胶一印、胶二印、胶印、凹一印、凹二印、凹印、印码、丝印、涂布、裁切、裁封
   // 检封工序上机需要更新wms车号调整列表中的领用情况
-  if (process == '检封') {
+  if (['检封', '裁切', '裁封'].includes(process)) {
     await db.setPrintWmsProclistStatus(cart);
   }
 
