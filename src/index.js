@@ -18,7 +18,11 @@ let multiWeak = require('./task/multiWeak');
 
 let package = require('./apiProxy/router/package');
 
+let autopush = require('./task/autoPush');
+
 const mainThread = async () => {
+  await autopush.init().catch((e) => console.log(e));
+
   // 调试完毕
   // await wms.init().catch(e => console.log(e));
 

@@ -6,6 +6,11 @@ let dev = false;
 
 let host = dev ? 'http://127.0.0.1:90/api/' : 'http://10.8.1.25:100/api/';
 
+const mock = (data, time = Math.random() * 2000) =>
+  new Promise((resolve) => {
+    setTimeout(() => resolve(data), time);
+  });
+
 // 程序主目录
 let getMainContent = () => {
   let PROGRAM_NAME = 'prodDistribServer2018';
@@ -95,5 +100,14 @@ let axios = async (option) => {
 module.exports = {
   axios,
   dev,
-  getTokenFromUrl
+  getTokenFromUrl,
+  mock,
+  DEV: dev,
+  _commonData: {
+    rows: 1,
+    data: [{ affected_rows: 1, id: Math.ceil(Math.random() * 100) }],
+    time: 20,
+    ip: '127.0.0.1',
+    title: '数据更新/插入/删除返回值'
+  }
 };
