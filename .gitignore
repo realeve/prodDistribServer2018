@@ -55,3 +55,4 @@ node_modules
 /coverage
 
 /src/mock
+src/util/token.json

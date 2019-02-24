@@ -20,27 +20,33 @@ const getWeekEnd = (weekDayName) => {
   return !['星期六', '星期日', 'Sunday', 'Saturday'].includes(weekDay);
 };
 
-const init = async () => {
+const prepare = async () => {
   console.log('开始任务：' + task_name);
   if (!isWorkTime()) {
     console.info(`${task_name}:不在指定时间段，暂不推送`);
-    return;
+    return false;
   }
   if (!getWeekEnd()) {
     console.info(`${task_name}:周末暂不推送`);
-    return;
+    return false;
   }
 
   let res = await getTblArticle();
   if (res.rows > 0) {
     console.info(`${task_name}:今日已发布`);
-    return;
+    return false;
+  }
+};
+const init = async () => {
+  let shouldPublish = await prepare();
+  if (!shouldPublish) {
+    return false;
   }
 
   // 生成文章
   let msg = await getHtml();
   // 发文章
-  res = await publishArticle(msg);
+  let res = await publishArticle(msg);
   if (!res.success) {
     console.error('文章发送失败');
     return;
@@ -70,6 +76,10 @@ const getUserList = (users) => {
 
 // 发文章
 const publishArticle = async (content) => {
+  let pubstatus = await prepare();
+  if (!pubstatus) {
+    return { success: false };
+  }
   let operator =
     '武明凯,张楠岚,赵立军,张宪,朱江,袁长虹,黄莉,徐东海,陈文革,钟鸣,舒粤,杨畅,李丹,周海兵,吕从飞,王晓,高阳阳,陈嘉骢';
   let cate_id = 20; //机台换修记录
@@ -112,10 +122,10 @@ const getHtml = async () => {
   let htmlRepair = await ananysisRepairRecord();
 
   const titleHtml = `<p>昨日(${moment()
-    .substract(1, 'days')
-    .format('YYYY-MM-DD')} ${moment().format(
-    'dddd'
-  )})机台关键生产作业信息如下：</p>`;
+    .subtract(1, 'days')
+    .format('YYYY-MM-DD')} ${moment()
+    .subtract(1, 'days')
+    .format('dddd')})机台关键生产作业信息如下：</p>`;
 
   let msg =
     titleHtml +
@@ -181,9 +191,9 @@ const ananysisChangeRecord = async () => {
     if (record.includes('色模')) {
       msgArr1 = [...msgArr1, item];
     } else if (record.includes('印版')) {
-      msgArr2 = [...msgArr1, item];
+      msgArr2 = [...msgArr2, item];
     } else {
-      msgArr3 = [...msgArr1, item];
+      msgArr3 = [...msgArr3, item];
     }
   });
 
@@ -213,9 +223,9 @@ const ananysisRepairRecord = async () => {
     if (record.includes('电工')) {
       msgArr1 = [...msgArr1, item];
     } else if (record.includes('钳工')) {
-      msgArr2 = [...msgArr1, item];
+      msgArr2 = [...msgArr2, item];
     } else {
-      msgArr3 = [...msgArr1, item];
+      msgArr3 = [...msgArr3, item];
     }
   });
 
