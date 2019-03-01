@@ -24,36 +24,36 @@ module.exports = [
     user_name: '李小平',
     work_long_time: 1
   },
-  // {
-  //   user_no: '54001664',
-  //   user_name: '李鹤玲',
-  //   work_long_time: 1
-  // },
-  // {
-  //   user_no: '54001804',
-  //   user_name: '邓丽',
-  //   work_long_time: 1
-  // },
-  // {
-  //   user_no: '54001692',
-  //   user_name: '蒙娅',
-  //   work_long_time: 1
-  // },
-  // {
-  //   user_no: '54001966',
-  //   user_name: '何莉',
-  //   work_long_time: 1
-  // },
-  // {
-  //   user_no: '54001585',
-  //   user_name: '何建英',
-  //   work_long_time: 1
-  // },
-  // {
-  //   user_no: '54001363',
-  //   user_name: '杨亚蓉',
-  //   work_long_time: 1
-  // },
+  {
+    user_no: '54001664',
+    user_name: '李鹤玲',
+    work_long_time: 1
+  },
+  {
+    user_no: '54001804',
+    user_name: '邓丽',
+    work_long_time: 1
+  },
+  {
+    user_no: '54001692',
+    user_name: '蒙娅',
+    work_long_time: 1
+  },
+  {
+    user_no: '54001966',
+    user_name: '何莉',
+    work_long_time: 1
+  },
+  {
+    user_no: '54001585',
+    user_name: '何建英',
+    work_long_time: 1
+  },
+  {
+    user_no: '54001363',
+    user_name: '杨亚蓉',
+    work_long_time: 1
+  },
   {
     user_no: '54001700',
     user_name: '张素珍',

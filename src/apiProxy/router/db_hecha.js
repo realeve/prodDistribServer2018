@@ -1,6 +1,7 @@
 const db = require('./db_image_judge');
 const R = require('ramda');
 const { dev } = require('../../util/axios');
+const moment = require('moment');
 
 module.exports.dev = dev;
 
@@ -68,8 +69,16 @@ const getTaskBaseInfo = async ({ user_list, uploadData, tstart, tend }) => {
   // 汇总缺陷总数
   let totalFakes = calcTotalData('pf_num', uploadData);
 
+  tstart = moment(tstart).startOf('month');
+  tend = moment(tend).endOf('month');
+
   // 月度判废量
-  let pfNumByMonth = await db.getQfmWipProdLogs({ tstart, tend });
+  let pfNumByMonth = await db.getQfmWipProdLogs({
+    tstart,
+    tend,
+    tstart2: tstart,
+    tend2: tend
+  });
 
   // 汇总工时总数
   let totalWorkLongTime = calcTotalData('work_long_time', user_list);
@@ -108,7 +117,8 @@ const getTaskBaseInfo = async ({ user_list, uploadData, tstart, tend }) => {
       },
       data: [],
       success: false,
-      user_no: item.user_no
+      user_no: item.user_no,
+      prod7: 0 //7T品大万数
     });
 
     return item;
@@ -176,6 +186,9 @@ const updateStatData = (user) => {
   // 汇总缺陷总数
   user.real_num = calcTotalData('pf_num', user.data);
   user.delta_num = user.real_num - user.expect_num;
+  user.prod7 = user.data.filter(
+    (item) => item.product_name == '9607T' && item.type == 0
+  ).length;
   return user;
 };
 
@@ -230,6 +243,7 @@ const exchangeCarts = (task_list, try_times = 0) => {
         for (let k = 0; k < userLength && nextIdx === -1; k++) {
           // 如果交换后两者均有降低的趋势，则交换；
           let nUser = nextUser.data[k];
+
           //如果交换本万，原任务中增加的缺陷条数加上之前与期望值的偏差，原期望值的偏差更小
           let curChange =
             Math.abs(nUser.pf_num - item.pf_num + user.delta_num) <
@@ -253,9 +267,16 @@ const exchangeCarts = (task_list, try_times = 0) => {
           //     nUser.pf_num +
           //     nextUser.delta_num},是否更换:${curChange && nextChange}`
           // );
-
           if (curChange && nextChange) {
             nextIdx = k;
+          }
+
+          // 7T码后不交换(20190301)，确保用户7T数量一致,此处的判断需要确保前后两个任务中都不对7T运算
+          if (
+            (item.product_name == '9607T' && item.type == 0) ||
+            (nUser.product_name == '9607T' && nUser.type == 0)
+          ) {
+            nextIdx = -1;
           }
         }
 
@@ -347,13 +368,48 @@ module.exports.handleHechaTask = async ({
   let users = await getTaskBaseInfo({ user_list, uploadData, tstart, tend });
 
   // 排活
-  let { users: task_list } = distribTasks({
+  // let { users: task_list } = distribTasks({
+  //   users,
+  //   uploadData,
+  //   ascend: false
+  // });
+
+  /** 20190301:确保7T品排产数一致 */
+
+  let specialCarts = uploadData.filter(
+    (item) => item.type == 0 && item.product_name == '9607T'
+  );
+  let otherCarts = uploadData.filter(
+    (item) => !(item.type == 0 && item.product_name == '9607T')
+  );
+
+  // console.log(specialCarts, otherCarts);
+
+  // 先排7T
+  let res = distribTasks({
     users,
-    uploadData,
+    uploadData: specialCarts,
     ascend: false
   });
 
+  // 更新7T条数
+  res.users = res.users.map(updateStatData);
+  console.log(res.users);
+
+  // 再排普通产品
+  let { users: task_list } = distribTasks({
+    users: res.users,
+    uploadData: otherCarts,
+    ascend: false
+  });
+  // return {
+  //   task_list,
+  //   unupload_carts,
+  //   unhandle_carts
+  // };
+
   let tasks = exchangeCarts(task_list);
+
   if (need_convert) {
     tasks = convertResult(tasks);
   }

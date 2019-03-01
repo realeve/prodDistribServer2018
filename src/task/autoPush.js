@@ -84,7 +84,7 @@ const publishArticle = async (content) => {
     return { success: false };
   }
   let operator =
-    '武明凯,张楠岚,赵立军,张宪,朱江,袁长虹,黄莉,徐东海,陈文革,钟鸣,舒粤,杨畅,李丹,周海兵,吕从飞,王晓,高阳阳,陈嘉骢';
+    '武明凯,张楠岚,赵立军,张宪,朱江,袁长虹,黄莉,徐东海,陈文革,钟鸣,舒粤,杨畅,李丹,周海兵,吕从飞,王晓,高阳阳,陈嘉骢,刘建佳';
   let cate_id = 20; //机台换修记录
   let uid = 248; //消息机器人
   let title = `${moment().format('MM月DD日')} 印刷材料更换及设备维修记录`;

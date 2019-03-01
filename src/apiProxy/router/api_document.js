@@ -47,7 +47,8 @@ module.exports = {
   '/api/after_print': {
     desc:
       '下机产品，通知已生产完成状态以及当前工序。后台将分别对四新产品、异常品、机台通知作废产品的完成进度更新。',
-    url:'http://localhost:3000/api/after_print?cart=1880G470&status=1&process=%E6%8A%BD%E6%9F%A5',
+    url:
+      'http://localhost:3000/api/after_print?cart=1880G470&status=1&process=%E6%8A%BD%E6%9F%A5',
     param: {
       process: 'varchar,当前生产工序',
       status:
@@ -193,13 +194,48 @@ module.exports = {
     url:
       '/api/hecha/task?tstart=20190219&tend=20190219&user_list=1&limit=20000&prod[]=9607T&prod[]=9602A',
     param: {
-      tstart: 20181019,
-      tend: 20181019,
+      tstart: 20190228,
+      tend: 20190301,
       user_list: [
         {
-          user_no: '54000957',
-          user_name: '邓玉红',
-          work_long_time: 0.875
+          user_no: '54001793',
+          user_name: '龚季敏',
+          work_long_time: 1
+        },
+        {
+          user_no: '54001789',
+          user_name: '李小平',
+          work_long_time: 1
+        },
+        {
+          user_no: '54001664',
+          user_name: '李鹤玲',
+          work_long_time: 1
+        },
+        {
+          user_no: '54001804',
+          user_name: '邓丽',
+          work_long_time: 1
+        },
+        {
+          user_no: '54001692',
+          user_name: '蒙娅',
+          work_long_time: 1
+        },
+        {
+          user_no: '54001966',
+          user_name: '何莉',
+          work_long_time: 1
+        },
+        {
+          user_no: '54001585',
+          user_name: '何建英',
+          work_long_time: 1
+        },
+        {
+          user_no: '54001363',
+          user_name: '杨亚蓉',
+          work_long_time: 1
         },
         {
           user_no: '54001700',
@@ -212,9 +248,29 @@ module.exports = {
           work_long_time: 0.5
         },
         {
+          user_no: '54001707',
+          user_name: '杜希',
+          work_long_time: 0.625
+        },
+        {
           user_no: '54001656',
           user_name: '夏志英',
           work_long_time: 0.775
+        },
+        {
+          user_no: '54002710',
+          user_name: '赵川',
+          work_long_time: 1
+        },
+        {
+          user_no: '54002159',
+          user_name: '何媛方',
+          work_long_time: 0.825
+        },
+        {
+          user_no: '54001576',
+          user_name: '李晓红',
+          work_long_time: 0.4
         }
       ],
       need_convert: 0,

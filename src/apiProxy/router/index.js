@@ -229,38 +229,83 @@ router.get('/api/hecha/task', async (ctx) => {
       !db3.dev ? 'localhost:3000' : '10.8.1.27:4000'
     }/api/hecha/task';
     var data = {
-        tstart: 20190219,
-        tend: 20190219,
+        tstart: 20190228,
+        tend: 20190228,
         user_list: [{
-                user_no: '54002137',
-                user_name: '刘照英',
-                work_long_time: 0.5
-            },
-            {
-                user_no: '54001707',
-                user_name: '杜希',
-                work_long_time: 0.625
-            },
-            {
-                user_no: '54001656',
-                user_name: '夏志英',
-                work_long_time: 0.775
-            },
-            {
-                user_no: '54002710',
-                user_name: '赵川',
-                work_long_time: 1
-            },
-            {
-                user_no: '54002159',
-                user_name: '何媛方',
-                work_long_time: 0.825
-            },
-            {
-                user_no: '54001576',
-                user_name: '李晓红',
-                work_long_time: 0.4
-            }
+          user_no: '54001793',
+          user_name: '龚季敏',
+          work_long_time: 1
+        },
+        {
+          user_no: '54001789',
+          user_name: '李小平',
+          work_long_time: 1
+        },
+        {
+          user_no: '54001664',
+          user_name: '李鹤玲',
+          work_long_time: 1
+        },
+        {
+          user_no: '54001804',
+          user_name: '邓丽',
+          work_long_time: 1
+        },
+        {
+          user_no: '54001692',
+          user_name: '蒙娅',
+          work_long_time: 1
+        },
+        {
+          user_no: '54001966',
+          user_name: '何莉',
+          work_long_time: 1
+        },
+        {
+          user_no: '54001585',
+          user_name: '何建英',
+          work_long_time: 1
+        },
+        {
+          user_no: '54001363',
+          user_name: '杨亚蓉',
+          work_long_time: 1
+        },
+        {
+          user_no: '54001700',
+          user_name: '张素珍',
+          work_long_time: 1
+        },
+        // {
+        //   user_no: '54002137',
+        //   user_name: '刘照英',
+        //   work_long_time: 0.5
+        // },
+        // {
+        //   user_no: '54001707',
+        //   user_name: '杜希',
+        //   work_long_time: 0.625
+        // },
+        // {
+        //   user_no: '54001656',
+        //   user_name: '夏志英',
+        //   work_long_time: 0.775
+        // },
+        {
+          user_no: '54002710',
+          user_name: '赵川',
+          work_long_time: 1
+        },
+        {
+          user_no: '54002159',
+          user_name: '何媛方',
+          work_long_time: 1
+        },
+        {
+          user_no: '54001576',
+          user_name: '李晓红',
+          work_long_time: 1
+        }
         ],
         limit: 20000,
         prod: ['9607T', '9602A'],
@@ -277,7 +322,8 @@ router.get('/api/hecha/task', async (ctx) => {
     
     $.ajax({ type: 'POST', url:url, data:data }).done(res => {
         $('#result').html(JSON.stringify(res))
-        console.log(res)
+        console.log(res);
+        console.log(res.task_list.forEach(item=>console.log(item.prod7)))
     }).fail(e=>{
       console.log(e)
     })
