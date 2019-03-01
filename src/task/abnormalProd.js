@@ -13,20 +13,20 @@ const procHandler = require('../util/procHandler');
  * 时间A，码后核查工艺；时间B，全检工艺。以上情况按全检工艺执行。
  * 3.依次对以上列表中的大万号处理。
  */
-const init = async() => {
-    let task_name = '异常品工艺处理';
-    await procHandler.recordHeartbeat(task_name);
+const init = async () => {
+  let task_name = '异常品工艺处理';
+  await procHandler.recordHeartbeat(task_name);
 
-    // 读取未处理的异常品车号，如果有多个工艺，按最后一次添加的为准
-    let { data } = await db.getPrintAbnormalProd();
-    console.log(data);
-    if (R.isNil(data) || data.length === 0) {
-        console.info('所有任务处理完毕，下个周期继续');
-        return;
-    }
+  // 读取未处理的异常品车号，如果有多个工艺，按最后一次添加的为准
+  let { data } = await db.getPrintAbnormalProd();
+  console.log(data);
+  if (R.isNil(data) || data.length === 0) {
+    console.info('所有任务处理完毕，下个周期继续');
+    return;
+  }
 
-    // 处理所有车号信息
-    data.forEach(handleAbnormalItem);
+  // 处理所有车号信息
+  data.forEach(handleAbnormalItem);
 };
 
 /**
@@ -37,51 +37,51 @@ const init = async() => {
  * 3.对该万产品向立体库提交工艺变更请求；
  * 4.如果工艺变更成功，更新该万产品在任务列表中的状态id，下个流程中该万不再处理。
  */
-const handleAbnormalItem = async({ cart_number, proc_stream, id }) => {
-    let check_type = '异常品处理',
-        reason_code = 'q_abnormalProd';
-    let cartList = [cart_number];
+const handleAbnormalItem = async ({ cart_number, proc_stream, id }) => {
+  let check_type = '异常品处理';
+  let reason_code = '0579'; //'q_abnormalProd';
+  let cartList = [cart_number];
 
-    // 已经插入的车号列表
-    let handledCartInfo = await db.getPrintWmsProclist({
-        check_type,
-        task_id: id
-    });
+  // 已经插入的车号列表
+  let handledCartInfo = await db.getPrintWmsProclist({
+    check_type,
+    task_id: id
+  });
 
-    console.log(handledCartInfo);
+  console.log(handledCartInfo);
 
-    let handledCarts = R.map(R.prop('cart_number'))(handledCartInfo.data);
-    // console.log('已处理的车号列表');
-    // console.log(handledCarts);
-    cartList = R.difference(cartList, handledCarts);
+  let handledCarts = R.map(R.prop('cart_number'))(handledCartInfo.data);
+  // console.log('已处理的车号列表');
+  // console.log(handledCarts);
+  cartList = R.difference(cartList, handledCarts);
 
-    if (cartList.length === 0) {
-        console.info('当前车号已处理');
-        await db.setPrintAbnormalProd(cart_number);
-        return;
+  if (cartList.length === 0) {
+    console.info('当前车号已处理');
+    await db.setPrintAbnormalProd(cart_number);
+    return;
+  }
+
+  if (R.isNil(proc_stream)) {
+    console.log(cart_number, id, 'proc_stream信息异常，该任务退出');
+  }
+  // 20181025
+  console.log('需要对此处异常状态处理：', proc_stream);
+
+  let res = await procHandler.handleProcStream({
+    carnos: cartList,
+    proc_stream,
+    check_type,
+    reason_code,
+    task_id: id
+  });
+  console.log('异常品工艺流程处理完毕');
+  if (res.status) {
+    // 异常品处理只会传入一万产品信息，如果返回的成功数据列表中只有一条，视为处理成功，更改后续的状态。
+    if (res.result.handledList.length) {
+      await db.setPrintAbnormalProd(cart_number);
     }
-
-    if (R.isNil(proc_stream)) {
-        console.log(cart_number, id, 'proc_stream信息异常，该任务退出');
-    }
-    // 20181025
-    console.log('需要对此处异常状态处理：', proc_stream);
-
-    let res = await procHandler.handleProcStream({
-        carnos: cartList,
-        proc_stream,
-        check_type,
-        reason_code,
-        task_id: id
-    });
-    console.log('异常品工艺流程处理完毕');
-    if (res.status) {
-        // 异常品处理只会传入一万产品信息，如果返回的成功数据列表中只有一条，视为处理成功，更改后续的状态。
-        if (res.result.handledList.length) {
-            await db.setPrintAbnormalProd(cart_number);
-        }
-    }
-    return res;
+  }
+  return res;
 };
 
 module.exports = { init };

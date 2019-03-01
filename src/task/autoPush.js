@@ -43,6 +43,9 @@ const init = async () => {
     return false;
   }
 
+  // 关闭最近一期文章状态
+  await setArticle();
+
   // 生成文章
   let msg = await getHtml();
   // 发文章
@@ -144,7 +147,8 @@ const haveSelectedWord = (word) => {
     if (
       word.includes(item) &&
       !word.includes('压印') &&
-      !word.includes('辊子')
+      !word.includes('辊子') &&
+      !word.includes('擦版辊')
     ) {
       flag = true;
     }
@@ -156,13 +160,15 @@ const splitWord = (str) => {
   let wordArr = str.split(
     /，|。| |；|！|\~|\,|\.|\;|\:|\"|\'|“|‘|”|’|、|\(|\)|（|）/
   );
+  let status = false;
   wordArr.forEach((item) => {
     // 关键词匹配
     if (haveSelectedWord(item)) {
+      status = true;
       str = str.replace(item, `<strong color="#e23;">${item}</strong>`);
     }
   });
-  return str;
+  return { record: str, status };
 };
 
 const concatMsg = (arr, html) => {
@@ -170,12 +176,16 @@ const concatMsg = (arr, html) => {
     html += '<p>今日无相关记录</p>';
   }
   arr.forEach((item, idx) => {
-    let record = splitWord(item['生产记录']);
-    html += `<p>(${idx + 1}).【${item['品种']}品 ${item['班次']}】 ${
-      item['工序']
-    } ${item['机台']}机 ${
-      item['机长']
-    } 机台：</p><blockquote style="background-color:#eee;font-size: 16px;border-left-color: rgba(255, 73, 73, 0.46);padding-left: 15px;max-width:900px;">${record}</blockquote>`;
+    let { record, status } = splitWord(item['生产记录']);
+
+    // 再次排除部分无意义的信息
+    if (status) {
+      html += `<p>(${idx + 1}).【${item['品种']}品 ${item['班次']}】 ${
+        item['工序']
+      } ${item['机台']}机 ${
+        item['机长']
+      } 机台：</p><blockquote style="background-color:#eee;font-size: 16px;border-left-color: rgba(255, 73, 73, 0.46);padding-left: 15px;max-width:900px;">${record}</blockquote>`;
+    }
   });
   return html;
 };
@@ -290,6 +300,16 @@ const addArticle = (params) =>
           id: 316,
           nonce: '523c5e087b'
         }
+      });
+/**
+ *   @database: { 工艺质量管理 }
+ *   @desc:     { 更新自动推送消息阅读状态 }
+ */
+const setArticle = () =>
+  DEV
+    ? mock(_commonData)
+    : axios({
+        url: '/372/ee25f02ee2.json'
       });
 
 module.exports = {

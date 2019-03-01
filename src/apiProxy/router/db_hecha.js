@@ -22,7 +22,7 @@ const getTaskList = async ({ tstart, tend, prod }) => {
   let { data } = await db[method](params);
 
   // 产品列表
-  // console.log(data);
+  // console.log(method, params, data.length);
 
   let siyinCarts = [],
     codeCarts = [];
