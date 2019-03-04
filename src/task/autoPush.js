@@ -12,7 +12,7 @@ let task_name = '机台作业日志自动分析消息推送';
 // 是否是白班
 const isWorkTime = (testHour) => {
   let curHour = testHour || parseInt(moment().format('HHMM'), 10);
-  return curHour >= 600 && curHour <= 930;
+  return curHour >= 600 && curHour <= 830;
 };
 
 const getWeekEnd = (weekDayName) => {
@@ -49,6 +49,8 @@ const init = async () => {
 
   // 生成文章
   let msg = await getHtml();
+  // console.log(msg);
+  // return;
   // 发文章
   let res = await publishArticle(msg);
   if (!res.success) {
@@ -85,7 +87,7 @@ const publishArticle = async (content) => {
     return { success: false };
   }
   let operator =
-    '武明凯,张楠岚,赵立军,张宪,朱江,袁长虹,黄莉,徐东海,陈文革,钟鸣,舒粤,杨畅,李丹,周海兵,吕从飞,王晓,高阳阳,陈嘉骢,刘建佳';
+    '武明凯,张楠岚,赵立军,张宪,王昌明,朱江,袁长虹,黄莉,徐东海,陈文革,钟鸣,舒粤,杨畅,李丹,周海兵,吕从飞,王晓,高阳阳,陈嘉骢,刘建佳';
   let cate_id = 20; //机台换修记录
   let uid = 248; //消息机器人
   let title = `${moment().format('MM月DD日')} 印刷材料更换及设备维修记录`;
@@ -157,14 +159,17 @@ const haveSelectedWord = (word) => {
   return flag;
 };
 
-const splitWord = (str) => {
+const splitWord = (str, mode = 1) => {
   let wordArr = str.split(
     /，|。| |；|！|\~|\,|\.|\;|\:|\"|\'|“|‘|”|’|、|\(|\)|（|）/
   );
   let status = false;
   wordArr.forEach((item) => {
     // 关键词匹配
-    if (haveSelectedWord(item)) {
+    if (mode == 1 && haveSelectedWord(item)) {
+      status = true;
+      str = str.replace(item, `<strong color="#e23;">${item}</strong>`);
+    } else if (mode == 2 && item.includes('中途') && item.includes('压印')) {
       status = true;
       str = str.replace(item, `<strong color="#e23;">${item}</strong>`);
     }
@@ -172,12 +177,12 @@ const splitWord = (str) => {
   return { record: str, status };
 };
 
-const concatMsg = (arr, html) => {
+const concatMsg = (arr, html, mode = 1) => {
   if (arr.length == 0) {
     html += '<p>今日无相关记录</p>';
   }
   arr.forEach((item, idx) => {
-    let { record, status } = splitWord(item['生产记录']);
+    let { record, status } = splitWord(item['生产记录'], mode);
 
     // 再次排除部分无意义的信息
     if (status) {
@@ -193,7 +198,7 @@ const concatMsg = (arr, html) => {
 
 // 更换记录
 const ananysisChangeRecord = async () => {
-  let { data } = await getVCbpcCartlist();
+  let { data } = await getVCbpcCartlist(moment().format('YYYY-MM-DD 06:00:00'));
   let msgArr1 = [],
     msgArr2 = [],
     msgArr3 = [];
@@ -209,6 +214,10 @@ const ananysisChangeRecord = async () => {
     }
   });
 
+  let { data: dataChange } = await getVCbpcCartlistChange(
+    moment().format('YYYY-MM-DD 06:00:00')
+  );
+
   // 色模
   let html = `<h3>一、印刷材料更换记录</h3><h4>1.色模</h4>`;
   html = concatMsg(msgArr1, html);
@@ -217,8 +226,11 @@ const ananysisChangeRecord = async () => {
   html += `<h4>2.印版</h4>`;
   html = concatMsg(msgArr2, html);
 
+  html += `<h4>3.中途换压印</h4>`;
+  html = concatMsg(dataChange, html, 2);
+
   // 其它
-  html += `<h4>3.其它</h4>`;
+  html += `<h4>4.其它</h4>`;
   html = concatMsg(msgArr3, html);
 
   return html;
@@ -226,7 +238,9 @@ const ananysisChangeRecord = async () => {
 
 // 维修记录
 const ananysisRepairRecord = async () => {
-  let { data } = await getVCbpcCartlistRepaire();
+  let { data } = await getVCbpcCartlistRepaire(
+    moment().format('YYYY-MM-DD 06:00:00')
+  );
   let msgArr1 = [],
     msgArr2 = [],
     msgArr3 = [];
@@ -260,18 +274,33 @@ const ananysisRepairRecord = async () => {
  *   @database: { MES_MAIN }
  *   @desc:     { 质量平台_物资更换记录 }
  */
-const getVCbpcCartlist = () =>
+const getVCbpcCartlist = (tstart) =>
   DEV
     ? mock(require('../mock/369_46711c29b7.json'))
     : axios({
-        url: '/369/46711c29b7.json'
+        url: '/369/46711c29b7.json',
+        params: {
+          tstart
+        }
       });
 
-const getVCbpcCartlistRepaire = () =>
+const getVCbpcCartlistRepaire = (tstart) =>
   DEV
     ? mock(require('../mock/371_aaa388f8fd.json'))
     : axios({
-        url: '/371/aaa388f8fd.json'
+        url: '/371/aaa388f8fd.json',
+        params: {
+          tstart
+        }
+      });
+const getVCbpcCartlistChange = (tstart) =>
+  DEV
+    ? mock(require('../mock/375_e08968b889.json'))
+    : axios({
+        url: '/375/e08968b889.json',
+        params: {
+          tstart
+        }
       });
 
 /** NodeJS服务端调用：
