@@ -12,7 +12,7 @@ let task_name = '机台作业日志自动分析消息推送';
 // 是否是白班
 const isWorkTime = (testHour) => {
   let curHour = testHour || parseInt(moment().format('HHMM'), 10);
-  return curHour >= 600 && curHour <= 730;
+  return curHour >= 600 && curHour <= 930;
 };
 
 const getWeekEnd = (weekDayName) => {
@@ -36,6 +36,7 @@ const prepare = async () => {
     console.info(`${task_name}:今日已发布`);
     return false;
   }
+  return res;
 };
 const init = async () => {
   let shouldPublish = await prepare();
@@ -57,7 +58,7 @@ const init = async () => {
 
   let { status } = await db.pushRTXInfo({
     title: '工艺质量交互平台',
-    msg: `今日机台生产作业信息分析记录已发布，请([点击此处|http://10.8.2.133:90/view/${
+    msg: `今日(${lib.now()})机台生产作业信息分析记录已发布，请([点击此处|http://10.8.2.133:90/view/${
       res.id
     }])阅读。`,
     receiver: res.receiver
@@ -196,6 +197,7 @@ const ananysisChangeRecord = async () => {
   let msgArr1 = [],
     msgArr2 = [],
     msgArr3 = [];
+
   data.forEach((item) => {
     let record = item['生产记录'];
     if (record.includes('色模')) {
