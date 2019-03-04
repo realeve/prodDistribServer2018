@@ -26,7 +26,8 @@ const getPrintNewprocPlan = async () =>
 */
 const getCartList = async (params) =>
   await axios({
-    url: '/106/f47aa951dd/array.json',
+    // url: '/106/f47aa951dd/array.json', // 机台作业
+    url: '/380/a84b055e1d/array.json',
     params
   }).then((res) => res);
 
@@ -37,7 +38,8 @@ const getCartList = async (params) =>
 */
 const getCartListWithDate = async (params) =>
   await axios({
-    url: '/107/4463f2c07c/array.json',
+    // url: '/107/4463f2c07c/array.json', // 机台作业
+    url: '/378/c2f10b024c/array.json',
     params
   }).then((res) => res);
 
@@ -48,7 +50,8 @@ const getCartListWithDate = async (params) =>
 */
 const getCartListWithGZ = async (params) =>
   await axios({
-    url: '/108/cf760bfe6d/array.json',
+    // url: '/108/cf760bfe6d/array.json',
+    url: '/379/0de38b7382/array.json',
     params
   }).then((res) => res);
 

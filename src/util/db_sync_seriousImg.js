@@ -40,10 +40,16 @@ module.exports.setSeriousImg = async (params) =>
   }).then((res) => res);
 
 /**
- *   @database: { 机台作业 }
+ *   @database: { MES_MAIN }
  *   @desc:     { 指定车号列表中全检品 }
  */
-module.exports.getViewCartfinder = db.getViewCartfinder;
+module.exports.getViewCartfinder = (carts) =>
+  axios({
+    url: '/343/16231d052e.json',
+    params: {
+      carts
+    }
+  });
 
 /** NodeJS服务端调用：
  *
