@@ -11,6 +11,9 @@ module.exports.dev = dev;
 let endNum = 50;
 const totalTryTimes = 50;
 
+// 数组随机排序，如果某次排产结果不佳，通过随机乱序可生成更佳结果
+const randomArr = (arr) => arr.sort(() => Math.random() - 0.5);
+
 // 过滤为全检及核查品
 const getTaskList = async ({ tstart, tend, prod }) => {
   // 印码印完后判废
@@ -92,7 +95,8 @@ const getTaskBaseInfo = async ({ user_list, uploadData, tstart, tend }) => {
   let cartsPerWorker = uploadData.length / totalWorkLongTime;
 
   let users = R.clone(user_list);
-  console.log(users);
+  users = randomArr(users);
+
   return users.map((item) => {
     let userPfNum = R.filter(R.propEq('operator_name', item.user_name))(
       pfNumByMonth
@@ -131,11 +135,14 @@ const distribTasks = ({ users, uploadData, ascend }) => {
     return { users, uploadData };
   }
   // 对uploadData排序
-  if (ascend) {
-    uploadData = R.sort(R.ascend(R.prop('pf_num')))(uploadData);
-  } else {
-    uploadData = R.sort(R.descend(R.prop('pf_num')))(uploadData);
-  }
+  // if (ascend) {
+  //   uploadData = R.sort(R.ascend(R.prop('pf_num')))(uploadData);
+  // } else {
+  //   uploadData = R.sort(R.descend(R.prop('pf_num')))(uploadData);
+  // }
+
+  // 随机排列，保证每次排产结果有差异
+  uploadData = randomArr(uploadData);
 
   // 用户信息更新
   users = R.map((curUser) => {
@@ -200,7 +207,10 @@ const exchangeCarts = (task_list, try_times = 0) => {
   }
   let changeFlag = false;
   // 根据与期望值的差值做排序
-  let users = R.sort(R.ascend(R.prop('delta_num')))(task_list);
+  // let users = R.sort(R.ascend(R.prop('delta_num')))(task_list);
+  // 用户随机排序
+  let users = randomArr(task_list);
+
   let len = users.length;
   for (let i = 0; i < len; i++) {
     let user = R.clone(users[i]);
@@ -379,6 +389,7 @@ module.exports.handleHechaTask = async ({
   let specialCarts = uploadData.filter(
     (item) => item.type == 0 && item.product_name == '9607T'
   );
+
   let otherCarts = uploadData.filter(
     (item) => !(item.type == 0 && item.product_name == '9607T')
   );

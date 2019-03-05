@@ -229,19 +229,19 @@ router.get('/api/hecha/task', async (ctx) => {
       !db3.dev ? 'localhost:3000' : '10.8.1.27:4000'
     }/api/hecha/task';
     var data = {
-        tstart: 20190228,
-        tend: 20190228,
+        tstart: 20190304,
+        tend: 20190304,
         user_list: [{
-          user_no: '54001793',
-          user_name: '龚季敏',
-          work_long_time: 1
-        },
-        {
-          user_no: '54001789',
-          user_name: '李小平',
-          work_long_time: 1
-        },
-        {
+        //   user_no: '54001793',
+        //   user_name: '龚季敏',
+        //   work_long_time: 1
+        // },
+        // {
+        //   user_no: '54001789',
+        //   user_name: '李小平',
+        //   work_long_time: 1
+        // },
+        // {
           user_no: '54001664',
           user_name: '李鹤玲',
           work_long_time: 1
@@ -276,21 +276,21 @@ router.get('/api/hecha/task', async (ctx) => {
           user_name: '张素珍',
           work_long_time: 1
         },
-        // {
-        //   user_no: '54002137',
-        //   user_name: '刘照英',
-        //   work_long_time: 0.5
-        // },
-        // {
-        //   user_no: '54001707',
-        //   user_name: '杜希',
-        //   work_long_time: 0.625
-        // },
-        // {
-        //   user_no: '54001656',
-        //   user_name: '夏志英',
-        //   work_long_time: 0.775
-        // },
+        {
+          user_no: '54002137',
+          user_name: '刘照英',
+          work_long_time: 1
+        },
+        {
+          user_no: '54001707',
+          user_name: '杜希',
+          work_long_time: 1
+        },
+        {
+          user_no: '54001656',
+          user_name: '夏志英',
+          work_long_time: 1
+        },
         {
           user_no: '54002710',
           user_name: '赵川',
@@ -350,7 +350,7 @@ router.get('/api/hecha/task', async (ctx) => {
     <div id="result">
         数据读取中...
     </div>
-    <script src="http://10.8.2.133:92/jquery.min.js"></script> 
+    <script src="http://10.8.2.133/assets/global/plugins/jquery.min.js"></script> 
     <script>
         ${html}
     </script>
