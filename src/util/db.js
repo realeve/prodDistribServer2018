@@ -130,6 +130,16 @@ const setPrintAbnormalProd = async (cart_number) =>
       cart_number
     }
   }).then((res) => res);
+/**
+*   @database: { 质量信息系统 }
+*   @desc:     { 异常品列表状态标记为完成 } 
+    const { cart_number, task_id } = params;
+*/
+const setPrintWmsProclist = (params) =>
+  axios({
+    url: '/381/1bde8d8f88.json',
+    params
+  });
 
 /**
 *   @database: { 质量信息系统 }
@@ -391,5 +401,6 @@ module.exports = {
   setPrintMachinecheckMultiweakStatus,
   getPrintWmsProclist,
   pushRTXInfo,
-  getPrintMachinecheckMultiweakByCart
+  getPrintMachinecheckMultiweakByCart,
+  setPrintWmsProclist
 };

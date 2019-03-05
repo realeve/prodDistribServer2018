@@ -58,6 +58,7 @@ const handleAbnormalItem = async ({ cart_number, proc_stream, id }) => {
   if (cartList.length === 0) {
     console.info('当前车号已处理');
     await db.setPrintAbnormalProd(cart_number);
+    db.setPrintWmsProclist({ cart_number, task_id: id });
     return;
   }
 
@@ -79,6 +80,7 @@ const handleAbnormalItem = async ({ cart_number, proc_stream, id }) => {
     // 异常品处理只会传入一万产品信息，如果返回的成功数据列表中只有一条，视为处理成功，更改后续的状态。
     if (res.result.handledList.length) {
       await db.setPrintAbnormalProd(cart_number);
+      db.setPrintWmsProclist({ cart_number, task_id: id });
     }
   }
   return res;

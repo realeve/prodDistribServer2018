@@ -72,16 +72,28 @@ const getTaskBaseInfo = async ({ user_list, uploadData, tstart, tend }) => {
   // 汇总缺陷总数
   let totalFakes = calcTotalData('pf_num', uploadData);
 
-  tstart = moment(tstart).startOf('month');
-  tend = moment(tend).endOf('month');
+  tstart = moment(tstart)
+    .startOf('month')
+    .format('YYYYMMDD');
+  tend = moment(tend)
+    .endOf('month')
+    .format('YYYYMMDD');
 
   // 月度判废量
-  let pfNumByMonth = await db.getQfmWipProdLogs({
-    tstart,
-    tend,
-    tstart2: tstart,
-    tend2: tend
-  });
+  let pfNumByMonth = await db
+    .getQfmWipProdLogs({
+      tstart,
+      tend,
+      tstart2: tstart,
+      tend2: tend,
+      tstart3: tstart,
+      tend3: tend,
+      tstart4: tstart,
+      tend4: tend
+    })
+    .catch((e) => {
+      console.log(e);
+    });
 
   // 汇总工时总数
   let totalWorkLongTime = calcTotalData('work_long_time', user_list);
@@ -405,7 +417,6 @@ module.exports.handleHechaTask = async ({
 
   // 更新7T条数
   res.users = res.users.map(updateStatData);
-  console.log(res.users);
 
   // 再排普通产品
   let { users: task_list } = distribTasks({
