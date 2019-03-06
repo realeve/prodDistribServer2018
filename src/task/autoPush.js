@@ -198,7 +198,7 @@ const concatMsg = (arr, html, mode = 1) => {
 
 // 更换记录
 const ananysisChangeRecord = async () => {
-  let { data } = await getVCbpcCartlist(moment().format('YYYY-MM-DD 06:00:00'));
+  let { data } = await getVCbpcCartlist(moment().format('YYYY-MM-DD 00:00:00'));
   let msgArr1 = [],
     msgArr2 = [],
     msgArr3 = [];
@@ -215,7 +215,7 @@ const ananysisChangeRecord = async () => {
   });
 
   let { data: dataChange } = await getVCbpcCartlistChange(
-    moment().format('YYYY-MM-DD 06:00:00')
+    moment().format('YYYY-MM-DD 00:00:00')
   );
 
   // 色模
@@ -239,7 +239,7 @@ const ananysisChangeRecord = async () => {
 // 维修记录
 const ananysisRepairRecord = async () => {
   let { data } = await getVCbpcCartlistRepaire(
-    moment().format('YYYY-MM-DD 06:00:00')
+    moment().format('YYYY-MM-DD 00:00:00')
   );
   let msgArr1 = [],
     msgArr2 = [],
