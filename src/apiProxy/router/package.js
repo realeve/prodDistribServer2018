@@ -49,9 +49,18 @@ const recordTasks = async (res) => {
     R.map(R.prop('task_id'))
   )(res);
 
+  res = R.clone(res).map((item) => {
+    item.expect_num = item.expect_num || '';
+    item.expect_carts = item.expect_carts || '';
+    item.task_id = item.task_id || '';
+    item.real_num = item.real_num || '';
+    return item;
+  });
+
   let {
     data: [dbStatus]
   } = await db.addPrintCutProdLog(res);
+
   if (dbStatus.affected_rows == 0) {
     console.log('排产数据记录失败');
     return false;

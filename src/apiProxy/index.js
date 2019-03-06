@@ -34,6 +34,8 @@ const whiteList = [
   'http://cognosdb.cdyc.cbpm:8001',
   'http://cognosdb.cdyc.cbpm:8080',
   'http://10.8.2.133:92',
+  'http://10.8.2.133:90',
+  'http://10.8.2.133',
   'http://10.9.3.1:7700'
 ];
 
