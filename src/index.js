@@ -22,7 +22,7 @@ let autopush = require('./task/autoPush');
 
 const mainThread = async () => {
   await autopush.init().catch((e) => console.log(e));
-
+  return;
   // 调试完毕
   // await wms.init().catch(e => console.log(e));
 

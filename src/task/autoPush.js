@@ -41,16 +41,16 @@ const prepare = async () => {
 const init = async () => {
   let shouldPublish = await prepare();
   if (!shouldPublish) {
-    return false;
+    // return false;
   }
 
   // 关闭最近一期文章状态
-  await setArticle();
+  // await setArticle();
 
   // 生成文章
   let msg = await getHtml();
-  // console.log(msg);
-  // return;
+  console.log(msg);
+  return;
   // 发文章
   let res = await publishArticle(msg);
   if (!res.success) {
@@ -131,7 +131,9 @@ const getHtml = async () => {
     .subtract(1, 'days')
     .format('YYYY-MM-DD')} ${moment()
     .subtract(1, 'days')
-    .format('dddd')})机台关键生产作业信息如下：</p>`;
+    .format(
+      'dddd'
+    )})机台关键生产作业信息如下,<a href="http://10.8.2.133/qualitytable?tid=209,210,211,212,419&daterange=1&fixheader=0" target="_blank">各工序详细记录点击此处访问</a>：</p>`;
 
   let msg =
     titleHtml +

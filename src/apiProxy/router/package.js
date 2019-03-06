@@ -51,7 +51,6 @@ const recordTasks = async (res) => {
 
   res = R.clone(res).map((item) => {
     item.expect_num = item.expect_num || '';
-    item.expect_carts = item.expect_carts || '';
     item.task_id = item.task_id || '';
     item.real_num = item.real_num || '';
     return item;
