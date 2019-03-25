@@ -71,9 +71,9 @@ let recordRealProc = async (
     let gz_num;
     if (!R.isNil(gz)) {
       gz_num = gz.gz_num;
-      if (R.isNil(gz_num)) {
-        gz_num = '';
-      }
+    }
+    if (R.isNil(gz_num)) {
+      gz_num = '';
     }
     return {
       cart_number,
@@ -198,12 +198,13 @@ let handleProcStream = async ({
       result.handledList.length
   );
 
-  if (result.handledList) {
+  if (result.handledList && result.handledList.length > 0) {
     if (R.type(result.handledList[0]) === 'Object') {
       // 处理成功的车号列表，[Object,Object] -> [String,String]
       // 测试环境测未部署
       result.handledList = R.map(R.prop('carno'))(result.handledList);
     }
+    console.log(result.handledList);
 
     // 记录实际工艺
     await recordRealProc(

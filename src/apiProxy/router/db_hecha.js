@@ -35,15 +35,16 @@ const getTaskList = async ({ tstart, tend, prod }) => {
   siyinCarts = R.compose(
     R.uniq,
     R.pluck('cart_number'),
-    R.filter(item=>['不分工艺','全检品'].includes(item.proc_name))//R.propEq('proc_name', '不分工艺')
+    R.filter((item) => ['不分工艺'].includes(item.proc_name)) //R.propEq('proc_name', '不分工艺')
   )(data);
   // 不分工艺: 全检品
 
   codeCarts = R.compose(
     R.uniq,
     R.pluck('cart_number'),
-    R.filter(R.propEq('proc_name', '码后核查'))
+    R.filter((item) => ['码后核查', '全检品'].includes(item.proc_name)) //R.propEq('proc_name', '码后核查'))
   )(data);
+  // console.log(data);
   // m97全检品，需要判丝印
   //   console.log('siyinCarts', siyinCarts);
   // 码后品，只判票面
@@ -362,7 +363,7 @@ module.exports.handleHechaTask = async ({
     codeCarts: carts0,
     data: srcData
   } = await getTaskList({ tstart, tend, prod });
-
+  // console.log(carts0);
   // 获取判废条数
   let uploadData = await db.getWipJobs({ carts0, carts1 });
   // console.log(uploadData);
