@@ -9,7 +9,13 @@ const openNum2Wms = require('./sync/openNum2Wms');
 
 const noteAnay = require('./sync/noteAnay');
 
+const wasterCompleteLog = require('./task/autoWasterComplete');
+
 const mainThread = async () => {
+  await wasterCompleteLog.init().catch((e) => {
+    console.log(e);
+  });
+
   await noteAnay.init().catch((e) => {
     console.log(e);
   });
