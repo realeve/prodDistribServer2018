@@ -35,7 +35,7 @@ const getTaskList = async ({ tstart, tend, prod }) => {
   siyinCarts = R.compose(
     R.uniq,
     R.pluck('cart_number'),
-    R.filter(R.propEq('proc_name', '不分工艺'))
+    R.filter(item=>['不分工艺','全检品'].includes(item.proc_name))//R.propEq('proc_name', '不分工艺')
   )(data);
   // 不分工艺: 全检品
 

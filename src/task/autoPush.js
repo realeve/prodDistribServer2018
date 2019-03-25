@@ -41,16 +41,16 @@ const prepare = async () => {
 const init = async () => {
   let shouldPublish = await prepare();
   if (!shouldPublish) {
-    // return false;
+    return false;
   }
 
   // 关闭最近一期文章状态
-  // await setArticle();
+  await setArticle();
 
   // 生成文章
   let msg = await getHtml();
-  console.log(msg);
-  return;
+  // console.log(msg);
+  // return;
   // 发文章
   let res = await publishArticle(msg);
   if (!res.success) {

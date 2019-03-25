@@ -126,3 +126,16 @@ module.exports.getViewPaperParaAbnormal = (params) =>
         url: '/396/c11cc0b430.json',
         params
       });
+
+/**
+*   @database: { 质量信息系统 }
+*   @desc:     { 质量推送_钞纸机检好品率 } 
+    const { tstart, tend } = params;
+*/
+export const getViewPaperQuality = (params) =>
+  DEV
+    ? mock(require('@/mock/397_03b33c423a.json'))
+    : axios({
+        url: '/397/03b33c423a.json',
+        params
+      });
