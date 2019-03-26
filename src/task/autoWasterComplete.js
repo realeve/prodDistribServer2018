@@ -66,7 +66,8 @@ module.exports.init = async () => {
   // 是否需要记录
   let curHour = parseInt(moment().format('HHMM'), 10);
   // 凌晨3点处理该任务
-  if (curHour > 659 || curHour < 200) {
+  console.log(curHour);
+  if (curHour > 1059 || curHour < 200) {
     console.log('无需处理判废记录');
     return;
   }
