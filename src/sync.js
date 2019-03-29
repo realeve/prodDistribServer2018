@@ -11,7 +11,14 @@ const noteAnay = require('./sync/noteAnay');
 
 const wasterCompleteLog = require('./task/autoWasterComplete');
 
+const box_package = require('./sync/box_package');
+
 const mainThread = async () => {
+  // 装箱二维码系统
+  await box_package.init().catch((e) => {
+    console.log(e);
+  });
+
   await wasterCompleteLog.init().catch((e) => {
     console.log(e);
   });
