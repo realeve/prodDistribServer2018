@@ -179,6 +179,7 @@ const unlockCart = async (carno) =>
 ]
 carnos:[carno1,carno2,carno3]*/
 let setProcs = async ({ checkType, carnos, log_id }) => {
+  console.log({ checkType, carnos, log_id });
   let data = await axios({
     method: 'post',
     url: host + '/carnoH',
@@ -187,8 +188,17 @@ let setProcs = async ({ checkType, carnos, log_id }) => {
       carnos,
       log_id
     }
-  }).then((res) => res.data);
-
+  }).then((res) => {
+    let data = res.data;
+    if (data.status) {
+      let { result } = data;
+      result.handledList = result.handledList.filter(
+        (item) => item.trim().length > 0
+      );
+      data.result = result;
+    }
+    return data;
+  });
   // 全检品单独处理,需取消人工拉号
   if (checkType == 0) {
     unlockCart(carnos);
