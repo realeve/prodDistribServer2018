@@ -71,6 +71,8 @@ module.exports.sync = async () => {
   let notExcellentProdLineCarts = R.map(R.prop('cart_number'))(handledList);
   // 合并1、2、3的车号列表，统一置为非精品,此处调用接口
 
+  // 将对应车号置为全检，原因为非精品异常信息
+
   // 精品线车号列表
   // 筛选凹二印
   let intagCarts = R.compose(
