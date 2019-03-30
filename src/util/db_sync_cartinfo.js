@@ -102,7 +102,7 @@ module.exports.addCartinfodataMahou = (values) =>
  */
 module.exports.setMahoudata = (_id) =>
   axios({
-    url: '/218/9267d0bd3e.json',
+    url: '/218/8a343942c8.json',
     params: {
       _id
     }

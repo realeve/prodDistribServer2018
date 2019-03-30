@@ -26,7 +26,7 @@ const getPrintNewprocPlan = () =>
 */
 const getCartList = (params) =>
   axios({
-    // url: '/106/f47aa951dd/array.json', // 机台作业
+    // url: '/106/934af4f8b4/array.json', // 机台作业
     url: '/380/a84b055e1d/array.json',
     params
   });
@@ -38,7 +38,7 @@ const getCartList = (params) =>
 */
 const getCartListWithDate = (params) =>
   axios({
-    // url: '/107/4463f2c07c/array.json', // 机台作业
+    // url: '/107/bf34cf0c07/array.json', // 机台作业
     url: '/378/d87d44951c/array',
     params
   });
@@ -50,7 +50,7 @@ const getCartListWithDate = (params) =>
 */
 const getCartListWithGZ = (params) =>
   axios({
-    // url: '/108/cf760bfe6d/array.json',
+    // url: '/108/ee7ddb80c4/array.json',
     url: '/379/f2de4b5faf/array',
     params
   });
@@ -148,7 +148,7 @@ const setPrintWmsProclist = (params) =>
 */
 const addPrintWmsHeartbeat = (params) =>
   axios({
-    url: '/95/eb4416dc92.json',
+    url: '/95/e04e4b3593.json',
     params
   });
 
@@ -177,7 +177,7 @@ const setPrintWmsHeartbeat = (params) =>
  */
 const getPrintSampleCartlist = () =>
   axios({
-    url: '/98/8832903756.json'
+    url: '/98/6fc36fa52a.json'
   });
 
 /**
@@ -197,7 +197,7 @@ const getPrintMachinecheckMultiweak = () =>
 */
 const getViewCartfinder = (params) =>
   axios({
-    url: '/100/97cfc715f4.json',
+    url: '/100/60d5ad27ec.json',
     params
   });
 
@@ -233,7 +233,7 @@ const setPrintMachinecheckMultiweak = (params) =>
       */
 const getPrintMachinecheckMultiweakById = (_id) =>
   axios({
-    url: '/102/66373f0467.json',
+    url: '/102/fe64360a81.json',
     params: {
       _id
     }
