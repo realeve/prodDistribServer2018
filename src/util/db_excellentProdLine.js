@@ -66,7 +66,7 @@ module.exports.getQaRectifyMaster = (cart) =>
  *   @database: { MES_MAIN }
  *   @desc:     { 精品线_昨日完工车号列表 }
  */
-module.exports.getVCbpcCartlist = () =>
+module.exports.getVCbpcCartlistLog = () =>
   DEV
     ? mock(require('@/mock/473_e39c6951e8.json'))
     : axios({
