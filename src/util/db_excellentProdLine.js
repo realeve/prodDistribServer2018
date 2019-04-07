@@ -6,12 +6,14 @@ let { axios, DEV, _commonData } = require('./axios');
 *   @desc:     { 精品线_9607T机台质量排名 } 
     const { tstart, tend } = params;
 */
-module.exports.getUdtPsExchange = (params) =>
+module.exports.getUdtPsExchange = (prod) =>
   DEV
     ? mock(require('@/mock/469_7e43522457.json'))
     : axios({
-        url: '/469/7e43522457/10.json',
-        params
+        url: '/469/7e43522457/60.json',
+        params: {
+          prod
+        }
       });
 
 /**
@@ -139,4 +141,19 @@ module.exports.getQaRectifyMasterByDate = (tstart) =>
         params: {
           tstart
         }
+      });
+
+/**
+ *   @database: { MES_MAIN }
+ *   @desc:     { 精品线_昨日生产产品精品线判定参考数据 }
+ */
+module.exports.getVCbpcCartlistYesterday = () =>
+  DEV
+    ? mock(require('../mock/484_cb719ac3ea.json'))
+    : axios({
+        url: '/484/cb719ac3ea.json'
+      }).then((res) => {
+        // 过滤产量为0的车号，服务端过滤无故很慢
+        res.data = res.data.filter((item) => item.product_num == 0);
+        return res;
       });

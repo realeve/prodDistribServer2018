@@ -11,7 +11,7 @@ const db2 = require('../../util/db');
 const db3 = require('./db_hecha');
 const dbJianFeng = require('./package');
 const dbAutoProc = require('./db_auto_proc');
-const dbExcellentProdLine = require('../../task/excellentProdLine');
+// const dbExcellentProdLine = require('../../task/excellentProdLine');
 
 router.get('/', (ctx) => {
   ctx.body = {
@@ -203,7 +203,9 @@ router.get('/api/before_print', async (ctx) => {
 
   // 2018-11-28 码前分流处理
   await dbAutoProc.init({ process, cart });
-  await dbExcellentProdLine.init({ process, cart, machine_name });
+
+  // 完工结算中处理产品精品逻辑
+  // await dbExcellentProdLine.init({ process, cart, machine_name });
   ctx.body = data;
 });
 
