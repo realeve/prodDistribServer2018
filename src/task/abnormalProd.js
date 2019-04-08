@@ -1,7 +1,7 @@
 let db = require('../util/db');
 let R = require('ramda');
-let wms = require('../util/wms');
-let lib = require('../util/lib');
+// let wms = require('../util/wms');
+// let lib = require('../util/lib');
 // const consola = require("consola");
 const procHandler = require('../util/procHandler');
 

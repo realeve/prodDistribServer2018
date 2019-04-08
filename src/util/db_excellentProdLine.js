@@ -76,58 +76,56 @@ module.exports.getVCbpcCartlistLog = () =>
       });
 
 /**
-*   @database: { 质量信息系统 }
-*   @desc:     { 精品线_记录胶印精品产品信息 } 
-    const { cart_number, offset_back, offset_front, rec_time } = params;
-*/
-module.exports.addPrintMesExcellentProdline = (params) =>
+ *   @database: { 质量信息系统 }
+ *   @desc:     { 精品线_当天是否已处理数据 }
+ */
+module.exports.getPrintMesExcellentProdline = () =>
   DEV
-    ? mock(_commonData)
+    ? mock(require('@/mock/474_a2af3bb7c2.json'))
     : axios({
-        url: '/474/a2af3bb7c2.json',
-        params
+        url: '/474/a2af3bb7c2.json'
       });
 
-/** NodeJS服务端调用：
-*
+/** 
 *   @database: { 质量信息系统 }
-*   @desc:     { 精品线_更新丝印标志 } 
-    const { silk, cart_number } = params;
+*   @desc:     { 精品线_记录当天已处理数据 } 
+    const { rec_time, remark } = params;
 */
-module.exports.setPrintMesExcellentProdlineSilk = (params) =>
+module.exports.addPrintMesExcellentProdline = (params) =>
   DEV
     ? mock(_commonData)
     : axios({
         url: '/475/c13d7125af.json',
         params
       });
-/** NodeJS服务端调用：
-*
-*   @database: { 质量信息系统 }
-*   @desc:     { 精品线_更新凹背标志 } 
-    const { intaglio_back, cart_number } = params;
-*/
-module.exports.setPrintMesExcellentProdlineIntagBack = (params) =>
-  DEV
-    ? mock(_commonData)
-    : axios({
-        url: '/476/99752f4c09.json',
-        params
-      });
 
-/** NodeJS服务端调用：
-*
-*   @database: { 质量信息系统 }
-*   @desc:     { 精品线_更新凹正标志 } 
-    const { intaglio_front, cart_number } = params;
-*/
-module.exports.setPrintMesExcellentProdlineIntagFront = (params) =>
-  DEV
-    ? mock(_commonData)
-    : axios({
-        url: '/477/fa76698355.json',
-        params
-      });
+// /** NodeJS服务端调用：
+// *
+// *   @database: { 质量信息系统 }
+// *   @desc:     { 精品线_更新凹背标志 }
+//     const { intaglio_back, cart_number } = params;
+// */
+// module.exports.setPrintMesExcellentProdlineIntagBack = (params) =>
+//   DEV
+//     ? mock(_commonData)
+//     : axios({
+//         url: '/476/99752f4c09.json',
+//         params
+//       });
+
+// /** NodeJS服务端调用：
+// *
+// *   @database: { 质量信息系统 }
+// *   @desc:     { 精品线_更新凹正标志 }
+//     const { intaglio_front, cart_number } = params;
+// */
+// module.exports.setPrintMesExcellentProdlineIntagFront = (params) =>
+//   DEV
+//     ? mock(_commonData)
+//     : axios({
+//         url: '/477/fa76698355.json',
+//         params
+//       });
 
 /**
  *   @database: { 小张核查 }
@@ -153,7 +151,76 @@ module.exports.getVCbpcCartlistYesterday = () =>
     : axios({
         url: '/484/cb719ac3ea.json'
       }).then((res) => {
-        // 过滤产量为0的车号，服务端过滤无故很慢
-        res.data = res.data.filter((item) => item.product_num == 0);
+        // 过滤产量为0的车号，服务端过滤无故很慢。筛选出非全检品的车号，全检品为丝印超阈值
+        res.data = res.data.filter(
+          (item) =>
+            item.product_num > 0 &&
+            ['码后核查', '不分工艺'].includes(item.proc_name)
+        );
         return res;
+      });
+
+/** NodeJS服务端调用：
+*
+*   @database: { MES_MAIN }
+*   @desc:     { 精品线_测试接口_指定日期精品线判定参考车号列表 } 
+    const { tstart, tend } = params;
+*/
+module.exports.getVCbpcCartlistByDates = (params) =>
+  DEV
+    ? mock(require('@/mock/485_9267fe397f.json'))
+    : axios({
+        url: '/485/9267fe397f.json',
+        params
+      }).then((res) => {
+        // 过滤产量为0的车号，服务端过滤无故很慢
+        res.data = res.data.filter(
+          (item) =>
+            item.product_num > 0 &&
+            ['码后核查', '不分工艺'].includes(item.proc_name)
+        );
+        return res;
+      });
+
+/**
+*   @database: { MES_MAIN }
+*   @desc:     { 置精品 } 
+    const { isremovebarrier, carno } = params;
+*/
+module.exports.setUdtTbWipinventory = (params) =>
+  DEV
+    ? mock(_commonData)
+    : axios({
+        url: '/486/79fe6a898d.json',
+        params
+      });
+
+/**
+*   @database: { MES系统_测试环境 }
+*   @desc:     { 置精品 } 
+    const { isremovebarrier, carno } = params;
+*/
+module.exports.Test_setUdtTbWipinventory = (params) =>
+  DEV
+    ? mock(_commonData)
+    : axios({
+        url: '/489/729114f286.json',
+        params
+      });
+
+/**
+*   @database: { 质量信息系统 }
+*   @desc:     { 批量精品线_转工艺日志记录 } 
+	以下参数在建立过程中与系统保留字段冲突，已自动替换:
+	@desc:批量插入数据时，约定使用二维数组values参数，格式为[{cart,rec_time,remark }]，数组的每一项表示一条数据*/
+module.exports.addPrintWmsAutoproc = (values) =>
+  DEV
+    ? mock(_commonData)
+    : axios({
+        method: 'post',
+        data: {
+          values,
+          id: 490,
+          nonce: 'c287255727'
+        }
       });
