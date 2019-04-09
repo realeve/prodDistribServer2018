@@ -324,7 +324,7 @@ const getCartsNeedPush = () =>
 // R.groupBy(item=>item.user_name,data)
 
 /**
-*   @database: { 库管系统 }
+*   @database: { MES系统_生产环境 }
 *   @desc:     { 查询批次状态 } 
     const { carnos1, carnos2, carnos3 } = params;
 */
