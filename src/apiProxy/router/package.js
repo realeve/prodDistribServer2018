@@ -68,11 +68,11 @@ const recordTasks = async (res) => {
     data: [{ affected_rows }]
   } = await db.setPrintCutTask();
   // await db.setPrintCutTaskStatus(task_id);
-
-  if (affected_rows != task_id.length) {
+  if (affected_rows < task_id.length) {
     console.log('排产状态更新失败');
     return false;
   }
+  console.log('排产状态更新完成');
   return true;
 };
 
@@ -241,19 +241,22 @@ const getCartsByProc = async (machineSetting, type = '全检品') => {
 
 const getDirectSetCarts = async (setting) => {
   let machineList = R.filter(R.propEq('type', '指定车号'))(setting);
-  let carts = [];
+  let carts = [],
+    directSetCart = [];
   machineList.forEach((machine) => {
     let cart = machine.remark.trim().split(',');
     carts = [...carts, ...cart];
   });
-  let { data } = await db.getVwWimWhitelistWithCarts(carts);
+  if (carts.length) {
+    let { data } = await db.getVwWimWhitelistWithCarts(carts);
 
-  let directSetCart = machineList.map((machine) => {
-    machine.data = R.filter((item) => machine.remark.includes(item.carno))(
-      data
-    );
-    return machine;
-  });
+    directSetCart = machineList.map((machine) => {
+      machine.data = R.filter((item) => machine.remark.includes(item.carno))(
+        data
+      );
+      return machine;
+    });
+  }
 
   // 直接指定车号的分配结果，不允许排活的车号列表
   return { directSetCart, notAllowedCarts: carts };

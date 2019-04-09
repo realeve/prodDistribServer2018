@@ -162,13 +162,15 @@ module.exports.setPrintCutTaskStatus = (task_id) =>
  *   @database: { 质量信息系统 }
  *   @desc:     { 更新当前班次排产状态 }
  */
-module.exports.setPrintCutTask = (worktype = getTimeRange() + 1) =>
-  axios({
-    url: '/293/ac87697ca1.json',
+module.exports.setPrintCutTask = (worktype = getTimeRange() + 1) => {
+  console.log(worktype);
+  return axios({
+    url: '/293/c59654cb92.json',
     params: {
       worktype
     }
   });
+};
 
 /** NodeJS服务端调用：
  *

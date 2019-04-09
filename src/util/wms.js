@@ -161,13 +161,13 @@ let setBlackList = async ({ carnos, reason_code, log_id }) => {
 };
 
 // 批量取消人工拉号状态
-const unlockCart = async (carno) =>
-  await axios({
+const unlockCart = (carno) =>
+  axios({
     url: 'http://10.8.1.27:4000/api/manual_status',
     params: {
       carno
     }
-  }).then((res) => res);
+  });
 
 // 2.批量车号设定质检工艺
 /*checkType:'全检品'||'码后核查'||'补品'

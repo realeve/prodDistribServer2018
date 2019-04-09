@@ -11,6 +11,7 @@ const db2 = require('../../util/db');
 const db3 = require('./db_hecha');
 const dbJianFeng = require('./package');
 const dbAutoProc = require('./db_auto_proc');
+const manualCheck = require('./manual_check');
 // const dbExcellentProdLine = require('../../task/excellentProdLine');
 
 router.get('/', (ctx) => {
@@ -79,21 +80,26 @@ router.get('/api/manual_status', async (ctx) => {
 // 下机产品，通知已生产完成状态以及当前工序。
 router.get('/api/after_print', async (ctx) => {
   let { process, status, cart, rec, pay } = ctx.query;
+  let validParams = '';
   if (R.isNil(rec)) {
-    let validInfo = util.validateParam(ctx, 'process,status,cart'.split(','));
-    if (!validInfo.status) {
-      ctx.body = validInfo;
-      return;
-    }
+    validParams = 'process,status,cart';
   } else {
-    let validInfo = util.validateParam(ctx, 'process,rec,pay,cart'.split(','));
-    if (!validInfo.status) {
-      ctx.body = validInfo;
-      return;
-    }
-
+    validParams = 'process,rec,pay,cart';
     // 是清分机时，status=1
     status = ['裁封', '裁切'].includes(process) ? 1 : 0;
+  }
+
+  let validInfo = util.validateParam(ctx, validParams.split(','));
+  if (!validInfo.status) {
+    ctx.body = validInfo;
+    return;
+  }
+
+  if (pay.includes('人工大张班')) {
+    // 人工大张班指定车号完工入库处理
+    let res = await manualCheck.init(cart);
+    ctx.body = res;
+    return;
   }
 
   // step1:通知四新产品完工状态
