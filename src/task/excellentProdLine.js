@@ -193,7 +193,7 @@ module.exports.sync = async () => {
       allCheckList.map((cart) => ({
         cart,
         rec_time: lib.now(),
-        remark: '智能精品线转全线'
+        remark: '智能精品线转全检品'
       }))
     );
   }
@@ -229,7 +229,7 @@ module.exports.sync = async () => {
       mahouCarts.map((cart) => ({
         cart,
         rec_time: lib.now(),
-        remark: '智能精品线转全线'
+        remark: '智能精品线转全检品'
       }))
     );
   }

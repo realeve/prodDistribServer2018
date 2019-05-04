@@ -43,7 +43,7 @@ const init = async () => {
   if (!shouldPublish) {
     return false;
   }
-
+  console.log('开始分析文章');
   // 关闭最近一期文章状态
   await setArticle();
 
@@ -113,12 +113,14 @@ const publishArticle = async (content) => {
     reward_status: '',
     reward_user: '',
     status_username: '',
-    sys_id: 0
+    sys_id: 0,
+    notice_id: 0
   };
   let {
     data: [{ id, affected_rows }]
-  } = await addArticle(params);
-  console.log(params);
+  } = await addArticle(params).catch((e) => {
+    console.log(e);
+  });
   return { id, success: affected_rows > 0, receiver };
 };
 
