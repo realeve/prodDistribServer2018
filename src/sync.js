@@ -17,9 +17,9 @@ const excellentProdLine = require('./task/excellentProdLine');
 
 const mainThread = async () => {
   // 精品线
-  await excellentProdLine.sync().catch((e) => {
-    console.log(e);
-  });
+  // await excellentProdLine.sync().catch((e) => {
+  //   console.log(e);
+  // });
 
   // 装箱二维码系统
   await box_package.init().catch((e) => {

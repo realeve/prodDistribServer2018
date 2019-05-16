@@ -57,7 +57,8 @@ const filterCartsByProc = (proc, carts) =>
     R.filter(R.propEq('process', proc))
   )(carts);
 
-// 同步，凌晨处理前一个工作日大张废超标，修停换异常，丝印实废过多三种场景。
+// 同步，凌晨处理前一个工作日大张废超标，
+// 修停换异常，丝印实废过多三种场景。
 module.exports.sync = async () => {
   // 是否需要记录
   let curHour = parseInt(moment().format('HHMM'), 10);
