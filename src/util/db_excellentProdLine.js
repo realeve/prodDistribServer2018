@@ -6,11 +6,12 @@ let { axios, DEV, _commonData } = require('./axios');
 *   @desc:     { 精品线_9607T机台质量排名 } 
     const { tstart, tend } = params;
 */
+// 469对立体库对外使用，本接口服务端使用
 module.exports.getUdtPsExchange = (prod) =>
   DEV
     ? mock(require('@/mock/469_7e43522457.json'))
     : axios({
-        url: '/469/7e43522457/60.json',
+        url: '/540/2890c18c9a/60.json',
         params: {
           prod
         }
@@ -182,17 +183,21 @@ module.exports.getVCbpcCartlistByDates = (params) =>
         return res;
       });
 
-/**
-*   @database: { MES_MAIN }
-*   @desc:     { 置精品 } 
-    const { isremovebarrier, carno } = params;
-*/
-module.exports.setUdtTbWipinventory = (params) =>
+/** 数据量较大时建议使用post模式：
+ *
+ *   @database: { MES系统_生产环境 }
+ *   @desc:     { 置精品 }
+ */
+module.exports.setUdtTbWipinventory = (carno) =>
   DEV
     ? mock(_commonData)
     : axios({
-        url: '/486/79fe6a898d.json',
-        params
+        method: 'post',
+        data: {
+          carno,
+          id: 486,
+          nonce: '79fe6a898d'
+        }
       });
 
 /**
