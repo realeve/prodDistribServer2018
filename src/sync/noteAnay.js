@@ -31,14 +31,15 @@ const handleTask = async ({ NoteAnayID, kilo, prod, code }) => {
   // });
 
   data = data.map((item) => ({ ...item, NoteAnayID }));
-
   // 记录生产信息
-  let res = await db.addCartinfodata(data);
-  // 更新车号
-  if (res.data[0].affected_rows > 0) {
-    let cart = data[0].CartNumber,
-      note_id = NoteAnayID;
-    res = await db.setNoteaysdata({ cart, note_id });
+  if (data.length > 0) {
+    let res = await db.addCartinfodata(data);
+    // 更新车号
+    if (res.data[0].affected_rows > 0) {
+      let cart = data[0].CartNumber,
+        note_id = NoteAnayID;
+      res = await db.setNoteaysdata({ cart, note_id });
+    }
   }
 };
 module.exports = { init };
