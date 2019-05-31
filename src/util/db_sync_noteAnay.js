@@ -6,6 +6,7 @@ module.exports.getCartInfoByGZ = async ({ prod, code, kilo }) => {
   const params = handleGZInfo({ code, prod });
   // http://10.8.1.25:100/api/359/dc3beb8ad3?prod=9607T&start=0000&end=0032&alpha=Q*J&start2=9997&end2=9999&alpha2=Q*I
   let resMes = await getVCbpcCartlist({ ...params, prod, code });
+
   let cart = '';
   // 如果有数据
   if (resMes.rows > 0) {
@@ -59,15 +60,20 @@ module.exports.getNoteaysdata = () =>
 *
 *   @database: { MES_MAIN }
 *   @desc:     { 单开仪_冠号查车号 } 
-    const { prod, start, end, alpha, start2, end2, alpha2 } = params;
+    const { prod, code, kilo } = params;
 */
-const getVCbpcCartlist = (params) =>
-  axios({
-    url: ['9602A', '9603A', '9602T', '9603T'].includes(params.prod)
-      ? '/360/62b90c9429.json'
-      : '/359/dc3beb8ad3.json',
+const getVCbpcCartlist = (params) => {
+  let quickSearch = ['9602A', '9603A', '9602T', '9603T'].includes(params.prod);
+  if (quickSearch) {
+    let code = Number(params.end);
+    code = code - (code % 40);
+    params.code = code;
+  }
+  return axios({
+    url: quickSearch ? '/360/62b90c9429.json' : '/359/dc3beb8ad3.json',
     params
   });
+};
 
 /** NodeJS服务端调用：
 *
