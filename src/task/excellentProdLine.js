@@ -18,7 +18,7 @@ module.exports.sync = async () => {
   let curHour = parseInt(moment().format('HHMM'), 10);
   // 凌晨2点处理该任务
   console.log(curHour);
-  if (curHour > 9059 || curHour < 200) {
+  if (curHour > 0959 || curHour < 200) {
     console.log('无需处理精品线记录');
     return;
   }
@@ -58,7 +58,7 @@ module.exports.sync = async () => {
     R.filter(R.propEq('all_check', '1'))
   )(cartList);
 
-  // console.log('置全检车号', allCheckList.length);
+  console.log('置全检车号', allCheckList.length);
 
   logInfo.print_time_length = allCheckList.length;
 
@@ -68,6 +68,8 @@ module.exports.sync = async () => {
   // 获取精品生产机台
   let { data: excellentProdLine } = await db.getUdtPsExchange(prod);
   let captainList = R.map(R.prop('erp_code'))(excellentProdLine);
+
+  // console.log('精品线机台', excellentProdLine);
 
   // 根据erpcode筛选机长
   let ExcellentList = R.compose(
@@ -81,7 +83,7 @@ module.exports.sync = async () => {
   )(ExcellentList);
   logInfo.excellent = ExcellentList.length;
   // console.log('置标记的车号', ExcellentList);
-  // console.log('可能符合条件的精品线车号列表', ExcellentList.length);
+  console.log('可能符合条件的精品线车号列表', ExcellentList.length);
 
   // 筛选凹二印
   let mahouCarts = filterCartsByProc('凹二印', ExcellentList);
@@ -163,12 +165,27 @@ module.exports.sync = async () => {
     );
   }
 
+  await db.addPrintWmsAutoproc(
+    ExcellentList.map(
+      ({ cart_number: cart, print_length, process, captain_name }) => ({
+        cart,
+        rec_time: lib.now(),
+        remark: `智能精品线设定标记(印刷时长:${print_length},工序:${process},机长:${captain_name})`
+      })
+    )
+  );
+
+  ExcellentList = R.pluck('cart_number')(ExcellentList);
+
+  // console.log(ExcellentList);
+
   // 3.置精品
   if (ExcellentList.length) {
-    db.setUdtTbWipinventory(ExcellentList);
+    await db.setUdtTbWipinventory(ExcellentList);
+    // console.log(res);
   }
 
-  console.log(JSON.stringify(logInfo));
+  // console.log(JSON.stringify(logInfo));
   // 4.记录日志
   db.addPrintMesExcellentProdline({
     rec_time: lib.now(),
