@@ -7,6 +7,7 @@ const getTimeRange = (testHour) => {
   let timeRange = 2;
   // 下午14点30排中班任务,持续到15点59
   if (curHour >= 1430 && curHour <= 1559) {
+    // 此处将2559 改为1559
     timeRange = 1;
   } else if (curHour >= 630 && curHour <= 730) {
     // 中上5点排白班任务，如果报错一直持续到6点。
@@ -51,6 +52,19 @@ module.exports.getVwWimWhitelist = (proc_type = '码后核查') =>
           proc_type
         }
       });
+
+/** NodeJS服务端调用：
+ *
+ *   @database: { MES系统_生产环境 }
+ *   @desc:     { 码后核查在库产品查询 }
+ */
+module.exports.getVCbpcWhitelist = (proc_type = '码后核查') =>
+  axios({
+    url: '/586/59bbb64465.json',
+    params: {
+      proc_type
+    }
+  });
 
 /** NodeJS服务端调用：
  *
@@ -165,7 +179,7 @@ module.exports.setPrintCutTaskStatus = (task_id) =>
 module.exports.setPrintCutTask = (worktype = getTimeRange() + 1) => {
   console.log(worktype);
   return axios({
-    url: '/293/c59654cb92.json',
+    url: '/293/ac87697ca1.json',
     params: {
       worktype
     }

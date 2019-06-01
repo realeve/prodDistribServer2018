@@ -15,7 +15,14 @@ const box_package = require('./sync/box_package');
 
 const excellentProdLine = require('./task/excellentProdLine');
 
+const packageOpennum = require('./sync/packageOpennum');
+
 const mainThread = async () => {
+  // 同步开包量信息用于精品线
+  await packageOpennum.init().catch((e) => {
+    console.log(e);
+  });
+
   // 精品线
   await excellentProdLine.sync().catch((e) => {
     console.log(e);

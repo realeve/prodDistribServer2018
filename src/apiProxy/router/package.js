@@ -9,12 +9,9 @@ const endNum = 5;
 // 参与计算的字段
 const calcKey = 'ex_opennum';
 
-const getCartList = R.compose(
-  R.flatten,
-  R.map(R.prop('carno'))
-);
+const getCartList = R.pluck('carno');
 
-// 手工模式提活，用于数据测试
+// 手工模式排活，用于数据测试
 const init = async (manualMode = false) => {
   if (!manualMode) {
     let needStart = db.getTimeRange();
@@ -87,9 +84,11 @@ const getProdList = async (manualMode = false) => {
     return false;
   }
   // 2.获取白名单
-  let whiteList = await db.getVwWimWhitelist();
+  let whiteList = await db.getVCbpcWhitelist();
 
   let data = whiteList.data;
+  console.log('1,', data.length);
+
   // 记录当前白名单信息
   await db.addPrintCutWmsLog({
     remark: JSON.stringify(whiteList),
@@ -98,16 +97,20 @@ const getProdList = async (manualMode = false) => {
 
   // 3.获取开包量，筛选未完工或开包量异常的产品
   let verifiedCarts = await filterValidCarts(data);
+  console.log('2,', verifiedCarts.length);
 
   if (verifiedCarts.length === 0) {
     return [];
   }
+
+  // console.log('2,', verifiedCarts.length, settings);
 
   // 4.根据任务设置划分出任务列表
   let { mahou: res, allCheck, exchangeCart, directSetCart } = await getTaskList(
     verifiedCarts,
     settings
   );
+  console.log('3,', res.length);
 
   console.log('排活完毕');
 
@@ -115,12 +118,15 @@ const getProdList = async (manualMode = false) => {
   // 合并码后与全检数据
   res = combineCarts(allCheck, res);
 
+  console.log('4,', res.length);
   // 追加补票信息
   res = combineCarts(exchangeCart, res);
+  console.log('5,', res.length);
 
   console.log('检封裁封自动线排产完成');
   // 指定车号数据处理
   res = conbineDirectCarts(directSetCart, res);
+  console.log('6,', res.length);
   return res;
 };
 
@@ -234,8 +240,10 @@ const combineCarts = (
 // 指定工艺产品白名单
 const getCartsByProc = async (machineSetting, type = '全检品') => {
   // 1.获取白名单
-  let { data } = await db.getVwWimWhitelist(type);
+  let { data } = await db.getVCbpcWhitelist(type);
+
   let allCheck = getUnlockData(data);
+
   return filterCartsByProc(allCheck, machineSetting, type);
 };
 
@@ -248,11 +256,11 @@ const getDirectSetCarts = async (setting) => {
     carts = [...carts, ...cart];
   });
   if (carts.length) {
-    let { data } = await db.getVwWimWhitelistWithCarts(carts);
+    // let { data } = await db.getVwWimWhitelistWithCarts(carts);
 
     directSetCart = machineList.map((machine) => {
       machine.data = R.filter((item) => machine.remark.includes(item.carno))(
-        data
+        carts
       );
       return machine;
     });
@@ -325,78 +333,90 @@ const getUnlockData = (data) => {
 };
 
 // 过滤无效车号，20181113以前
-const filterValidCartsBackup = async (data) => {
-  let unlockData = getUnlockData(data);
-  let cartList = getCartList(unlockData);
+// const filterValidCartsBackup = async (data) => {
+//   let unlockData = getUnlockData(data);
+//   let cartList = getCartList(unlockData);
 
-  // 2.过滤未完工产品
-  let completeCarts = dev ? cartList : await getVerifyStatus(cartList);
+//   // 2.过滤未完工产品
+//   let completeCarts = dev ? cartList : await getVerifyStatus(cartList);
 
-  // 读取当前已同步完成的开包量信息
-  let openNums = dev
-    ? completeCarts.map((cart) => {
-        let opennum = getRandomOpenNumByCart();
-        let prodname = cart[2] == 2 ? '9602A' : '9607T';
-        return {
-          cart,
-          prodname,
-          opennum,
-          ex_opennum: opennum,
-          ex_code_opennum: opennum,
-          ex_siyin_opennum: opennum
-        };
-      })
-    : await db.getManualverifydata(completeCarts);
+//   // 读取当前已同步完成的开包量信息
+//   let openNums = dev
+//     ? completeCarts.map((cart) => {
+//         let opennum = getRandomOpenNumByCart();
+//         let prodname = cart[2] == 2 ? '9602A' : '9607T';
+//         return {
+//           cart,
+//           prodname,
+//           opennum,
+//           ex_opennum: opennum,
+//           ex_code_opennum: opennum,
+//           ex_siyin_opennum: opennum
+//         };
+//       })
+//     : await db.getManualverifydata(completeCarts);
 
-  // 实际开包量大于一定值时，产品为异常品
-  let abnormalCarts = R.filter((item) => item.ex_opennum > item.limit)(
-    openNums
-  );
+//   // 实际开包量大于一定值时，产品为异常品
+//   let abnormalCarts = R.filter((item) => item.ex_opennum > item.limit)(
+//     openNums
+//   );
 
-  // 是否需要在此处转异常品
-  console.log('是否需要在此处转异常品', abnormalCarts);
-  let abnormalCartList = R.compose(
-    R.flatten,
-    R.map(R.prop('cart'))
-  )(abnormalCarts);
+//   // 是否需要在此处转异常品
+//   console.log('是否需要在此处转异常品', abnormalCarts);
+//   let abnormalCartList = R.compose(
+//     R.flatten,
+//     R.map(R.prop('cart'))
+//   )(abnormalCarts);
 
-  // 3.去除开包量大于指定值的产品
-  // completeCarts = R.reject((item) => abnormalCartList.includes(item))(completeCarts);
+//   // 3.去除开包量大于指定值的产品
+//   // completeCarts = R.reject((item) => abnormalCartList.includes(item))(completeCarts);
 
-  completeCarts = R.difference(completeCarts, abnormalCartList);
+//   completeCarts = R.difference(completeCarts, abnormalCartList);
 
-  // 3.去除判废未完工产品，保证判废完成的产品参与排活
-  let verifiedCarts = R.filter(({ carno }) => completeCarts.includes(carno))(
-    unlockData
-  );
+//   // 3.去除判废未完工产品，保证判废完成的产品参与排活
+//   let verifiedCarts = R.filter(({ carno }) => completeCarts.includes(carno))(
+//     unlockData
+//   );
 
-  return {
-    openNums,
-    verifiedCarts
-  };
-};
+//   return {
+//     openNums,
+//     verifiedCarts
+//   };
+// };
 
 // 过滤无效车号,20181113,使用立体库中更新的开包量数据展
 const filterValidCarts = async (data) => {
-  // 1.未锁车产品
-  let unlockData = getUnlockData(data);
+  // 1.未锁车产品(数据接口输出中自动过滤了锁车产品)
+  // let unlockData = getUnlockData(data);
+
   let { data: prodData } = await db.getProductdata();
-  unlockData = unlockData.map((item) => {
+
+  let unlockData = data.map((item) => {
     let res = R.find(R.propEq('prod_name', item.prodname))(prodData);
     item.limit = res.limit || 150;
     return item;
   });
 
+  console.log('1.1,', unlockData.length);
   // 2.选择开包量在一定数据量以内的产品
+  // unlockData.forEach((item, idx) => {
+  //   if (Number(item.ex_opennum) >= item.limit) {
+  //     console.log(item.ex_opennum, item.limit, idx, item.carno);
+  //   }
+  // });
+
   let cartsFilterByOpennum = R.filter(
-    (item) => item.ex_opennum && item.ex_opennum < item.limit
+    (item) => Number(item.ex_opennum) < Number(item.limit)
   )(unlockData);
+  console.log('1.2,', cartsFilterByOpennum.length);
 
   let cartList = getCartList(cartsFilterByOpennum);
 
+  console.log('1.3,', cartList.length);
   if (cartList.length === 0) {
     return [];
   }
+
   // 3.过滤未完工产品
   let completeCarts = dev ? cartList : await getVerifyStatus(cartList);
 
@@ -576,7 +596,7 @@ const distribCarts = ({ setting, carts, ascend }) => {
     carts = R.tail(carts);
     let { real_num, expect_num, carts_num, num: expect_carts } = curMachine;
     // 更新当前状态
-    real_num = real_num + head[calcKey];
+    real_num = Number(real_num) + Number(head[calcKey]);
     carts_num = carts_num + 1;
     let delta_num = real_num - expect_num;
     let data = [...curMachine.data, head];

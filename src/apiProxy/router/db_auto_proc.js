@@ -53,10 +53,11 @@ const getQaRectifyMaster = (cart) =>
 */
 const addPrintWmsAutoproc = async (params) => {
   // 如果已插入，放弃
-  let { rows } = await getPrintWmsAutoprocStatus(params.cart);
-  if (rows > 0) {
-    return false;
-  }
+  // let { rows } = await getPrintWmsAutoprocStatus(params.cart);
+  // if (rows > 0) {
+  //   return false;
+  // }
+
   return axios({
     url: '/287/ec7940dc77.json',
     params
