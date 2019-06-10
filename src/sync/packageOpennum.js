@@ -65,7 +65,10 @@ const handleMahouTask = async (cart) => {
   let { ex_opennum: opennum } = await handleOpenNum(cart);
 
   // 如果7T开包量大于200，直接转全检工艺;
-  if (opennum > 200 && cart[2] === '8') {
+  // if (opennum > 200 && cart[2] === '8') {
+
+  // 经检封沟通，开包量180包以上自动转全检，针对所有工艺
+  if (opennum >= 180) {
     await db2
       .addPrintWmsAutoproc([
         {
