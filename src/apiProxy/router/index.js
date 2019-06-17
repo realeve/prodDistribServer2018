@@ -238,8 +238,8 @@ router.get('/api/hecha/task', async (ctx) => {
       !db3.dev ? 'localhost:3000' : '10.8.1.27:4000'
     }/api/hecha/task';
     var data = {
-        tstart: 20190322,
-        tend: 20190325,
+        tstart: 20190614,
+        tend: 20190614,
         user_list: [{
         //   user_no: '54001793',
         //   user_name: '龚季敏',

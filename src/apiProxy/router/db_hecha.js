@@ -46,9 +46,9 @@ const getTaskList = async ({ tstart, tend, prod }) => {
   )(data);
   // console.log(data);
   // m97全检品，需要判丝印
-  //   console.log('siyinCarts', siyinCarts);
+  // console.log('siyinCarts', siyinCarts);
   // 码后品，只判票面
-  //   console.log('codeCarts', codeCarts);
+  // console.log('codeCarts', codeCarts);
   return { siyinCarts, codeCarts, data };
 };
 
@@ -363,7 +363,13 @@ module.exports.handleHechaTask = async ({
     codeCarts: carts0,
     data: srcData
   } = await getTaskList({ tstart, tend, prod });
-  // console.log(carts0);
+  if (carts0.length === 0) {
+    carts0 = [''];
+  }
+  if (carts1.length === 0) {
+    carts1 = [''];
+  }
+
   // 获取判废条数
   let uploadData = await db.getWipJobs({ carts0, carts1 });
   // console.log(uploadData);
