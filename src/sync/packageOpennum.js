@@ -8,6 +8,9 @@ const lib = require('../util/lib');
 
 let task_name = '同步人工判废开包量信息至立体库';
 
+// 是否打开开包量分流功能
+let CHANGE_PROC_BY_OPENNUM = false;
+
 // 是否需要记录
 const needRecord = async (api) => {
   let curHour = parseInt(moment().format('HHMM'), 10);
@@ -68,7 +71,7 @@ const handleMahouTask = async (cart) => {
   // if (opennum > 200 && cart[2] === '8') {
 
   // 经检封沟通，开包量180包以上自动转全检，针对所有工艺
-  if (opennum >= 180) {
+  if (CHANGE_PROC_BY_OPENNUM && opennum >= 180) {
     await db2
       .addPrintWmsAutoproc([
         {
