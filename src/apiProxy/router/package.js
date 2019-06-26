@@ -6,6 +6,8 @@ const lib = require('../../util/lib');
 // 每包开包量小于5时，分配完毕
 const endNum = 5;
 
+// 检封均衡生产
+
 // 参与计算的字段
 const calcKey = 'ex_opennum';
 
@@ -69,6 +71,22 @@ const recordTasks = async (res) => {
     console.log('排产状态更新失败');
     return false;
   }
+
+  // 向MES系统记录结果;
+
+  // res
+  let params = res.map((item) => ({
+    carno: item.carno,
+    biztype: 'JHSC',
+    excutetime: lib.now()
+  }));
+
+  // 清理当班数据
+  await db.delUdtDiQualityInterface();
+
+  // 写入数据
+  await db.addUdtDiQualityInterface(params);
+
   console.log('排产状态更新完成');
   return true;
 };

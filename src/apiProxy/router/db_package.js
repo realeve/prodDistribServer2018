@@ -221,3 +221,24 @@ module.exports.addPrintCutWmsLog = (params) =>
       nonce: '24d9222347'
     }
   });
+
+/**
+ *   @database: { MES系统_生产环境 }
+ *   @desc:     { 清空当前班次均衡生产黑名单产品 }
+ */
+module.exports.delUdtDiQualityInterface = () =>
+  axios({
+    url: '/594/4e607123a7.json'
+  });
+
+/** NodeJS服务端调用：
+*
+*   @database: { MES系统_生产环境 }
+*   @desc:     { 写入检封均衡生产黑名单产品列表 } 
+    const { carno, biztype, excutetime } = params;
+*/
+module.exports.addUdtDiQualityInterface = (params) =>
+  axios({
+    url: '/595/ae34ce8c72.json',
+    params
+  });
