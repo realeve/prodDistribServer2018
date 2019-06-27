@@ -7,6 +7,7 @@ const lib = require('../../util/lib');
 const endNum = 5;
 
 // 检封均衡生产
+const DEBUG_MODE = true;
 
 // 参与计算的字段
 const calcKey = 'ex_opennum';
@@ -15,7 +16,7 @@ const getCartList = R.pluck('carno');
 
 // 手工模式排活，用于数据测试
 const init = async (manualMode = false) => {
-  if (!manualMode) {
+  if (!DEBUG_MODE && !manualMode) {
     let needStart = db.getTimeRange();
     if (needStart == 2) {
       console.log('当前时间无需排活');
@@ -25,7 +26,7 @@ const init = async (manualMode = false) => {
     }
   }
 
-  let res = await getProdList(manualMode);
+  let res = await getProdList(DEBUG_MODE || manualMode);
 
   if (!res || res.length === 0) {
     return {
@@ -40,36 +41,38 @@ const init = async (manualMode = false) => {
 
 const recordTasks = async (res) => {
   // 将当日未生产完毕的产品置为取消。
-  await db.setPrintCutProdLogCancel();
+  if (!DEBUG_MODE) {
+    await db.setPrintCutProdLogCancel();
 
-  let task_id = R.compose(
-    R.uniq,
-    R.flatten,
-    R.map(R.prop('task_id'))
-  )(res);
+    let task_id = R.compose(
+      R.uniq,
+      R.flatten,
+      R.map(R.prop('task_id'))
+    )(res);
 
-  res = R.clone(res).map((item) => {
-    item.expect_num = item.expect_num || '';
-    item.task_id = item.task_id || '';
-    item.real_num = item.real_num || '';
-    return item;
-  });
+    res = R.clone(res).map((item) => {
+      item.expect_num = item.expect_num || '';
+      item.task_id = item.task_id || '';
+      item.real_num = item.real_num || '';
+      return item;
+    });
 
-  let {
-    data: [dbStatus]
-  } = await db.addPrintCutProdLog(res);
+    let {
+      data: [dbStatus]
+    } = await db.addPrintCutProdLog(res);
 
-  if (dbStatus.affected_rows == 0) {
-    console.log('排产数据记录失败');
-    return false;
-  }
-  let {
-    data: [{ affected_rows }]
-  } = await db.setPrintCutTask();
-  // await db.setPrintCutTaskStatus(task_id);
-  if (affected_rows < task_id.length) {
-    console.log('排产状态更新失败');
-    return false;
+    if (dbStatus.affected_rows == 0) {
+      console.log('排产数据记录失败');
+      return false;
+    }
+    let {
+      data: [{ affected_rows }]
+    } = await db.setPrintCutTask();
+    // await db.setPrintCutTaskStatus(task_id);
+    if (affected_rows < task_id.length) {
+      console.log('排产状态更新失败');
+      return false;
+    }
   }
 
   // 向MES系统记录结果;
@@ -80,6 +83,7 @@ const recordTasks = async (res) => {
     biztype: 'JHSC',
     excutetime: lib.now()
   }));
+  // console.log(params);
 
   // 清理当班数据
   await db.delUdtDiQualityInterface();

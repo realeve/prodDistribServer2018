@@ -234,11 +234,15 @@ module.exports.delUdtDiQualityInterface = () =>
 /** NodeJS服务端调用：
 *
 *   @database: { MES系统_生产环境 }
-*   @desc:     { 写入检封均衡生产黑名单产品列表 } 
-    const { carno, biztype, excutetime } = params;
-*/
-module.exports.addUdtDiQualityInterface = (params) =>
+*   @desc:     { 批量写入检封均衡生产黑名单产品列表 } 
+	以下参数在建立过程中与系统保留字段冲突，已自动替换:
+	@desc:批量插入数据时，约定使用二维数组values参数，格式为[{carno,biztype,excutetime }]，数组的每一项表示一条数据*/
+module.exports.addUdtDiQualityInterface = (values) =>
   axios({
-    url: '/595/ae34ce8c72.json',
-    params
+    method: 'post',
+    data: {
+      values,
+      id: 595,
+      nonce: 'ae34ce8c72'
+    }
   });
