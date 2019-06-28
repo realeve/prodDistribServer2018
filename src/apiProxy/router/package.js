@@ -7,7 +7,7 @@ const lib = require('../../util/lib');
 const endNum = 5;
 
 // 检封均衡生产
-const DEBUG_MODE = true;
+const DEBUG_MODE = false;
 
 // 参与计算的字段
 const calcKey = 'ex_opennum';
