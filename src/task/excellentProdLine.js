@@ -72,6 +72,7 @@ module.exports.sync = async () => {
   // console.log('精品线机台', excellentProdLine);
 
   // 根据erpcode筛选机长
+  // 丝印不设置，不打标记，只以总生产时长以及条数来判断丝印转全检规则，此时胶印18，丝印下工序凹一印按18来判断。
   let ExcellentList = R.compose(
     R.filter((item) => captainList.includes(item.erp_code)), // 精品机台生产的产品
     R.reject((item) => allCheckList.includes(item.cart_number)) // 去除全检车号(置异常)

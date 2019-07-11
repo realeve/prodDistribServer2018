@@ -60,7 +60,7 @@ const asyncExOpennum = async () => {
 
 const handleExOpennum = async ({ recid, cart }) => {
   let { data } = await db.getOcrContrastResult(cart);
-  if (data.length === 0) {
+  if (data.length === 0 || data[0].ex_opennum == 0) {
     return;
   }
   await db.setCbpcBatchOpennum({ ...data[0], recid }).catch((e) => {
