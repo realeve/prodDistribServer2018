@@ -23,6 +23,11 @@ const mainThread = async () => {
     console.log(e);
   });
 
+  // 同步实际开包量
+  await packageOpennum.asyncExOpennum().catch((e) => {
+    console.log(e);
+  });
+
   // 精品线
   await excellentProdLine.sync().catch((e) => {
     console.log(e);
@@ -78,8 +83,8 @@ const mainThread = async () => {
 };
 
 const init = async () => {
-  // 间隔时间 500 分钟。
-  let timeInterval = 5 * 60 * 1000;
+  // 间隔时间 10 分钟。
+  let timeInterval = 10 * 60 * 1000;
   let times = 1;
 
   console.info('启动数据同步服务');

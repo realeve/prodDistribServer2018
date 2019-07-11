@@ -4,11 +4,12 @@ let { axios } = require('./axios');
 module.exports.getCartInfoByGZ = async ({ prod, code, kilo }) => {
   // 先查MES车号
   const params = handleGZInfo({ code, prod });
+  // console.log(params);
   // http://10.8.1.25:100/api/359/dc3beb8ad3?prod=9607T&start=0000&end=0032&alpha=Q*J&start2=9997&end2=9999&alpha2=Q*I
   let resMes = await getVCbpcCartlist({ ...params, prod, code });
-
   let cart = '';
   // 如果有数据
+
   if (resMes.rows > 0) {
     cart = resMes.data[0].CartNumber;
     let resJTZY = await getTbjtProduceDetail({ cart, kilo });

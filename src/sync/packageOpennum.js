@@ -18,7 +18,7 @@ const needRecord = async (api) => {
   console.log(curHour);
   if (curHour > 0959 || curHour < 200) {
     console.log('当前时间无需处理精品线记录');
-    // return false;
+    return false;
   }
 
   // 当天是否已记录
@@ -44,6 +44,28 @@ const handleCarts = async (taskList) => {
     console.log(`开包量：${i + 1}/${taskList.length} 同步完成`);
   }
   console.log(task_name + '任务完成');
+};
+
+const asyncExOpennum = async () => {
+  let syncData = await db.getCbpcBatchOpennumEx();
+  if (syncData.rows === 0) {
+    console.log('全部数据已同步');
+    return;
+  }
+  for (let i = 0; i < syncData.rows; i++) {
+    await handleExOpennum(syncData.data[i]);
+    console.log(`完成第${i + 1}/${syncData.rows}条实际开包量信息同步`);
+  }
+};
+
+const handleExOpennum = async ({ recid, cart }) => {
+  let { data } = await db.getOcrContrastResult(cart);
+  if (data.length === 0) {
+    return;
+  }
+  await db.setCbpcBatchOpennum({ ...data[0], recid }).catch((e) => {
+    console.log(e);
+  });
 };
 
 const init = async () => {
@@ -93,4 +115,4 @@ const handleMahouTask = async (cart) => {
   await db.addCbpcBatchOpennum(params);
 };
 
-module.exports = { init };
+module.exports = { init, asyncExOpennum };
