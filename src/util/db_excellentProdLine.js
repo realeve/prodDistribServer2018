@@ -229,3 +229,13 @@ module.exports.addPrintWmsAutoproc = (values) =>
           nonce: 'c287255727'
         }
       });
+
+/** NodeJS服务端调用：
+ *
+ *   @database: { MES系统_生产环境 }
+ *   @desc:     { MES兑换品自动转全检 }
+ */
+module.exports.getUdtTbWipinventory = () =>
+  axios({
+    url: '/607/0c6677a9a2.json'
+  });

@@ -135,7 +135,7 @@ const getHtml = async () => {
     .subtract(1, 'days')
     .format(
       'dddd'
-    )})机台关键生产作业信息如下,<a href="http://10.8.2.133/qualitytable?tid=209,210,211,212,419&daterange=1&fixheader=0" target="_blank">各工序详细记录点击此处访问</a>：</p>`;
+    )})机台关键生产作业信息如下,<a href="http://10.8.2.133:8000/table#id=494/71f0b4f57c&id=495/396c53a4d8&id=604/560029dccc&id=605/e11c753ca6&id=606/18eebf296c" target="_blank">各工序详细记录点击此处访问</a>：</p>`;
 
   let msg =
     titleHtml +

@@ -11,6 +11,37 @@ const filterCartsByProc = (proc, carts) =>
     R.filter(R.propEq('process', proc))
   )(carts);
 
+// 兑换品自动转全检
+const handleChangeCarts = async () => {
+  let { data } = await db.getUdtTbWipinventory();
+  if (data.length === 0) {
+    return false;
+  }
+
+  // 如果当前有兑换品，自动转全检
+  let cartList = R.map(R.prop(['cart']))(data); // 获取车号列表
+  let logInfo = await addPrintWmsLog([
+    {
+      remark: JSON.stringify(cartList),
+      rec_time: lib.now()
+    }
+  ]);
+
+  // 添加日志正常？
+  if (logInfo.rows < 1 || logInfo.data[0].affected_rows < 1) {
+    console.log('wms记录失败', logInfo);
+    return false;
+  }
+
+  let log_id = logInfo.data[0].id;
+  result = await wms.setProcs({
+    carnos: cartList,
+    checkType: '全检品',
+    log_id
+  });
+  await setPrintWmsLog({ return_info: JSON.stringify(result), _id: log_id });
+};
+
 // 同步，凌晨处理前一个工作日大张废超标，
 // 修停换异常，丝印实废过多三种场景。
 module.exports.sync = async () => {
@@ -29,6 +60,8 @@ module.exports.sync = async () => {
     console.log('无需处理，当天已记录');
     return;
   }
+
+  await handleChangeCarts();
 
   //
   let logInfo = {
