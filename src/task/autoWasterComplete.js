@@ -4,6 +4,8 @@ let R = require('ramda');
 
 const moment = require('moment');
 
+// 更新图像判废状态回写至MES，作为产品是否判废完工的标志
+
 /**
 *   @database: { 全幅面 }
 *   @desc:     { 指定日期判废完工产品列表 } 
