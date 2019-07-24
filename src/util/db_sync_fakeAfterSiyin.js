@@ -1,5 +1,6 @@
 let { axios } = require('./axios');
 const lib = require('./lib');
+const R = require('ramda');
 /** NodeJS服务端调用：
  *
  *   @database: { 质量信息系统 }
@@ -107,14 +108,16 @@ const getVCbpcCartlistAllCheck = (carts) =>
  *   @desc:     { 批量更新不需要处理的任务 }
  */
 module.exports.setManualverifydataAllcheck = (carts) =>
-  axios({
-    method: 'post',
-    data: {
-      carts,
-      id: 244,
-      nonce: 'd68e782730'
-    }
-  });
+  carts.length > 0 && !R.isNil(carts[0])
+    ? axios({
+        method: 'post',
+        data: {
+          carts,
+          id: 244,
+          nonce: 'd68e782730'
+        }
+      })
+    : false;
 
 /** NodeJS服务端调用：
  *

@@ -198,6 +198,7 @@ const init = async ({ cart, process }, devMode = false) => {
 
   // 3.2 读取推荐码后、全检丝印实废阈值；
   // 2018-11-29 从丝印判废中实时读取近400车数据
+  // 2019-07-24 调整为：25%以下转码后，80%以上转全检
   let {
     data: [{ mahou, allcheck }]
   } = await getCartThread();
