@@ -123,8 +123,10 @@ router.get("/api/after_print", async ctx => {
   });
 
   // step4:精品线当万下机转换状态
-  let excellent = await dbExcellent.handleExcellentByCart(cart);
-  let data = { dataNewProc, dataAbnormal, dataMultiweak, excellent };
+  // 2019-08-15 关闭精品线下机转换
+  // let excellent = await dbExcellent.handleExcellentByCart(cart);
+
+  let data = { dataNewProc, dataAbnormal, dataMultiweak };
 
   data.status = true;
 
