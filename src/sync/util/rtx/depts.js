@@ -1,0 +1,31 @@
+let depts = [
+  { dept_id: 2, dept_name: '公司领导' },
+  { dept_id: 3, dept_name: '办公室' },
+  { dept_id: 1, dept_name: '企划信息部' },
+  { dept_id: 4, dept_name: '计划财务部' },
+  { dept_id: 7, dept_name: '安全保卫部' },
+  { dept_id: 22, dept_name: '设备管理部' },
+  { dept_id: 10, dept_name: '物资管理部' },
+  { dept_id: 24, dept_name: '技术中心' },
+  { dept_id: 20, dept_name: '能源环保部' },
+  { dept_id: 26, dept_name: '基建与行政事务部' },
+  { dept_id: 8, dept_name: '市场开发部' },
+  { dept_id: 9, dept_name: '采购管理部' },
+  { dept_id: 11, dept_name: '党委组织部' },
+  { dept_id: 12, dept_name: '党委宣传部' },
+  { dept_id: 13, dept_name: '纪检监察内审部' },
+  { dept_id: 14, dept_name: '群工部' },
+  { dept_id: 15, dept_name: '离退休工作部' },
+  { dept_id: 29, dept_name: '印钞管理部' },
+  { dept_id: 30, dept_name: '钞纸管理部' },
+  { dept_id: 25, dept_name: '印钞数管部' },
+  { dept_id: 23, dept_name: '胶凹制作部' },
+  { dept_id: 16, dept_name: '印码制作部' },
+  { dept_id: 17, dept_name: '检封制作部' },
+  { dept_id: 18, dept_name: '钞纸制作部' },
+  { dept_id: 19, dept_name: '钞纸成品制作部' },
+  { dept_id: 28, dept_name: '外协部门' },
+  { dept_id: 27, dept_name: 'MES项目组' }
+];
+
+module.exports = depts
