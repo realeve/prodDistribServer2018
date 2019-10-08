@@ -1,5 +1,5 @@
-const lib = require('./lib');
-let { axios } = require('./axios');
+const lib = require("./lib");
+let { axios } = require("./axios");
 
 module.exports.getCartInfoByGZ = async ({ prod, code, kilo }) => {
   // 先查MES车号
@@ -7,15 +7,18 @@ module.exports.getCartInfoByGZ = async ({ prod, code, kilo }) => {
   // console.log(params);
   // http://10.8.1.25:100/api/359/dc3beb8ad3?prod=9607T&start=0000&end=0032&alpha=Q*J&start2=9997&end2=9999&alpha2=Q*I
   let resMes = await getVCbpcCartlist({ ...params, prod, code });
-  let cart = '';
-  // 如果有数据
 
-  if (resMes.rows > 0) {
-    cart = resMes.data[0].CartNumber;
-    let resJTZY = await getTbjtProduceDetail({ cart, kilo });
-    return lib.concatMesAndJtzy(resJTZY, resMes);
-  }
-  return await getTbjtProduceDetailByGZ({ ...params, prod, kilo });
+  // let cart = '';
+  // // 如果有数据
+
+  // if (resMes.rows > 0) {
+  //   cart = resMes.data[0].CartNumber;
+  //   let resJTZY = await getTbjtProduceDetail({ cart, kilo });
+  //   return lib.concatMesAndJtzy(resJTZY, resMes);
+  // }
+  // return await getTbjtProduceDetailByGZ({ ...params, prod, kilo });
+
+  return resMes;
   // 如果MES中没有数据，表示为原机台作业系统数据，只查机台作业系统即可
 };
 
@@ -24,9 +27,9 @@ module.exports.getCartInfoByGZ = async ({ prod, code, kilo }) => {
 *   @desc:     { 单开仪_更新车号同步状态 } 
     const { cart, note_id } = params;
 */
-module.exports.setNoteaysdata = (params) =>
+module.exports.setNoteaysdata = params =>
   axios({
-    url: '/364/2f106006f5.json',
+    url: "/364/2f106006f5.json",
     params
   });
 
@@ -37,13 +40,13 @@ module.exports.setNoteaysdata = (params) =>
      格式为[{noteanayid,techtypename,cartnumber,carnumber,gznumber,procname,workclassname,machinename,captainname,teamname,monitorname,printnum,startdate,enddate,productname,cutoperatorname }]，数组的每一项表示一条数据
      */
 
-module.exports.addCartinfodata = (values) =>
+module.exports.addCartinfodata = values =>
   axios({
-    method: 'post',
+    method: "post",
     data: {
       values,
       id: 363,
-      nonce: 'c94c80c446'
+      nonce: "c94c80c446"
     }
   });
 
@@ -54,7 +57,7 @@ module.exports.addCartinfodata = (values) =>
  */
 module.exports.getNoteaysdata = () =>
   axios({
-    url: '/358/cbe3358deb.json'
+    url: "/358/cbe3358deb.json"
   });
 
 /** NodeJS服务端调用：
@@ -63,15 +66,15 @@ module.exports.getNoteaysdata = () =>
 *   @desc:     { 单开仪_冠号查车号 } 
     const { prod, code, kilo } = params;
 */
-const getVCbpcCartlist = (params) => {
-  let quickSearch = ['9602A', '9603A', '9602T', '9603T'].includes(params.prod);
+const getVCbpcCartlist = params => {
+  let quickSearch = ["9602A", "9603A", "9602T", "9603T"].includes(params.prod);
   if (quickSearch) {
     let code = Number(params.end);
     code = code - (code % 40);
     params.code = code;
   }
   return axios({
-    url: quickSearch ? '/360/62b90c9429.json' : '/359/dc3beb8ad3.json',
+    url: quickSearch ? "/360/62b90c9429.json" : "/359/dc3beb8ad3.json",
     params
   });
 };
@@ -93,9 +96,9 @@ const getVCbpcCartlist = (params) => {
 *   @desc:     { 单开仪_车号查生产记录 } 
     const { cart, kilo } = params;
 */
-const getTbjtProduceDetail = (params) =>
+const getTbjtProduceDetail = params =>
   axios({
-    url: '/361/7385a4281a.json',
+    url: "/361/7385a4281a.json",
     params
   });
 
@@ -105,15 +108,15 @@ const getTbjtProduceDetail = (params) =>
 *   @desc:     { 单开仪_冠号查生产记录 } 
     const { prod, alpha, start, end, alpha2, start2, end2, kilo } = params;
 */
-const getTbjtProduceDetailByGZ = (params) =>
+const getTbjtProduceDetailByGZ = params =>
   axios({
-    url: '/362/f008e16b48.json',
+    url: "/362/f008e16b48.json",
     params
   });
 
-const getLastAlpha = (str) => {
-  if (str === 'A') {
-    return 'Z';
+const getLastAlpha = str => {
+  if (str === "A") {
+    return "Z";
   }
   let c = str.charCodeAt(0);
   return String.fromCharCode(c - 1);
@@ -126,18 +129,18 @@ const handleGZInfo = ({ code, prod }) => {
   code = code.toUpperCase();
 
   let kInfo = 35;
-  if (prod.includes('9602') || prod.includes('9603')) {
+  if (prod.includes("9602") || prod.includes("9603")) {
     kInfo = 40;
   }
 
   let alphaInfo = code.match(/[A-Z]/g);
-  let numInfo = code.match(/\d/g).join('');
+  let numInfo = code.match(/\d/g).join("");
   let starNum = code.slice(1, 6).indexOf(alphaInfo[1]) + 1;
   let starInfo = code
     .slice(1, starNum)
-    .split('')
-    .fill('*')
-    .join('');
+    .split("")
+    .fill("*")
+    .join("");
   let start = parseInt(numInfo, 10) - kInfo;
 
   let end = numInfo;
@@ -150,12 +153,12 @@ const handleGZInfo = ({ code, prod }) => {
 
   if (needConvert) {
     start = 10000 + start;
-    end = '9999';
-    start2 = '0000';
+    end = "9999";
+    start2 = "0000";
     end2 = numInfo;
     // 字母进位
     let [a1, a2] = alphaInfo;
-    if (a2 === 'A') {
+    if (a2 === "A") {
       a1 = getLastAlpha(a1);
       a2 = getLastAlpha(a2);
     } else {
@@ -167,7 +170,7 @@ const handleGZInfo = ({ code, prod }) => {
 
   // start = '000' + start;
   // start = start.slice(start.length - 4, start.length);
-  const startStr = String(start).padStart(4, '0');
+  const startStr = String(start).padStart(4, "0");
 
   return {
     start: startStr,
