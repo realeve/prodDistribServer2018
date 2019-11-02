@@ -5,6 +5,9 @@ let moment = require("moment");
 let wms = require("../util/wms");
 let { addPrintWmsLog, setPrintWmsLog } = require("../util/db");
 
+// 部署到线上必备关闭
+const DEBUG_MODE = false;
+
 const filterCartsByProc = (proc, carts) =>
   R.compose(
     R.map(R.prop("cart_number")),
@@ -57,22 +60,157 @@ module.exports.sync = async () => {
   console.log(curHour);
   if (curHour > 0959 || curHour < 200) {
     console.log("无需处理精品线记录");
-    return;
+    if (!DEBUG_MODE) {
+      return;
+    }
   }
 
   // 当天是否已记录
   let { rows } = await db.getPrintMesExcellentProdline();
   if (rows > 0) {
     console.log("无需处理，当天已记录");
-    return;
+    if (!DEBUG_MODE) {
+      return;
+    }
   }
 
-  // 处理兑换票
+  // 处理兑换票自动转全检
   await handleChangeCarts();
 
   // 昨日生产车号列表,确认是否有工序名称(当前精品标志，是否超时生产，需要设置的目标字段)
   let { data } = await db.getVCbpcCartlistYesterday();
-  return await handleExcellentCarts(data);
+  await handleExcellentCarts(data);
+  return handleIntaglioCompleteCarts();
+
+  /* 2019-11 调整转换逻辑如下:
+ 
+  1.读取凹二印完成品车号列表A；
+  2.列表A中任意工序生产超时则转全检；
+  3.列表A中丝印质量有问题转全检,好品转码后；
+  4.精品线无问题的产品转码后，其余不处理.
+  
+  干胶印:18
+  丝凸印丝印:19
+  凹一印:13
+  凹二印:22
+  
+  */
+};
+
+const getProcLog = async data => {
+  let logInfo = await addPrintWmsLog([
+    {
+      remark: JSON.stringify(data),
+      rec_time: lib.now()
+    }
+  ]);
+
+  // 日志添加成功，处理转全检逻辑
+  if (logInfo.rows == 0 || logInfo.data[0].affected_rows < 1) {
+    return 0;
+  }
+  return logInfo.data[0].id;
+};
+
+// 处理凹二印完成品状态
+const handleIntaglioCompleteCarts = async () => {
+  // 1.读取凹二印完成品车号列表A；
+  let { data } = await db.getVCbpcCartlistTasks();
+  let cartList = R.pluck("cart", data);
+  if (cartList.length === 0) {
+    return;
+  }
+  let result = false;
+
+  // 2.列表A中丝印质量有问题转全检,好品转码后；
+  let { data: allcheck2 } = await db.getAllcheckOrMahou(cartList);
+
+  if (allcheck2.length) {
+    let mahou = R.filter(item => item.proc == 0)(allcheck2);
+    let mahoulist = R.pluck("cart", mahou);
+    if (mahoulist.length) {
+      // 丝印正常品转码后
+
+      let log_id = await getProcLog({
+        data: mahoulist,
+        proc: "精品线丝印转码后"
+      });
+      // 添加日志正常？
+      if (log_id) {
+        result = await wms.setProcs({
+          carnos: mahoulist,
+          checkType: "码后核查",
+          log_id
+        });
+
+        await setPrintWmsLog({
+          return_info: JSON.stringify(result),
+          _id: log_id
+        });
+        await db.addPrintWmsAutoproc(
+          mahoulist.map(cart => ({
+            cart,
+            rec_time: lib.now(),
+            remark: "丝印品转码后"
+          }))
+        );
+      }
+    }
+
+    // 转全检
+
+    let allcheck3 = R.filter(item => item.proc == 1)(allcheck2);
+    let allchecklist3 = R.pluck("cart", allcheck3);
+    if (allchecklist3.length) {
+      // 丝印正常品转码后
+
+      let log_id = await getProcLog({
+        data: allchecklist3,
+        proc: "精品线丝印转全检"
+      });
+      // 添加日志正常？
+      if (log_id) {
+        result = await wms.setProcs({
+          carnos: allchecklist3,
+          checkType: "码后核查",
+          log_id
+        });
+
+        await setPrintWmsLog({
+          return_info: JSON.stringify(result),
+          _id: log_id
+        });
+        await db.addPrintWmsAutoproc(
+          allchecklist3.map(cart => ({
+            cart,
+            rec_time: lib.now(),
+            remark: "丝印品转码后"
+          }))
+        );
+      }
+    }
+  }
+
+  // 3.列表A中任意工序生产超时则转全检；
+  let { data: allcheck1 } = await db.getVCbpcCartlistAllcheck();
+  if (allcheck1.length) {
+    let log_id = await getProcLog(allcheck1);
+
+    // 日志添加成功，处理转全检逻辑
+    if (log_id > 0) {
+      let allcheckList1 = R.pluck("cart_number", allcheck1);
+      result = await wms.setProcs({
+        carnos: allcheckList1,
+        checkType: "全检品",
+        log_id
+      });
+      await setPrintWmsLog({
+        return_info: JSON.stringify(result),
+        _id: log_id
+      });
+    }
+  }
+  return true;
 };
 
 const handleExcellentCarts = async cartList => {
@@ -137,61 +275,58 @@ const handleExcellentCarts = async cartList => {
   // 精品置为码后核查工艺;
 
   // 后续处理
-  // 1.转全检
+  // 1.转全检不做处理，处理凹二印产品
   let result = false;
-  if (allCheckList.length) {
-    let logInfo = await addPrintWmsLog([
-      {
-        remark: JSON.stringify(allCheckList),
-        rec_time: lib.now()
-      }
-    ]);
+  // if (allCheckList.length) {
+  //   let logInfo = await addPrintWmsLog([
+  //     {
+  //       remark: JSON.stringify(allCheckList),
+  //       rec_time: lib.now()
+  //     }
+  //   ]);
 
-    // 添加日志正常？
-    if (logInfo.rows < 1 || logInfo.data[0].affected_rows < 1) {
-      console.log("wms记录失败", logInfo);
-      return false;
-    }
+  //   // 添加日志正常？
+  //   if (logInfo.rows < 1 || logInfo.data[0].affected_rows < 1) {
+  //     console.log("wms记录失败", logInfo);
+  //     return false;
+  //   }
 
-    let log_id = logInfo.data[0].id;
-    result = await wms.setProcs({
-      carnos: allCheckList,
-      checkType: "全检品",
-      log_id
-    });
-    await setPrintWmsLog({ return_info: JSON.stringify(result), _id: log_id });
+  //   let log_id = logInfo.data[0].id;
+  //   result = await wms.setProcs({
+  //     carnos: allCheckList,
+  //     checkType: "全检品",
+  //     log_id
+  //   });
+  //   await setPrintWmsLog({ return_info: JSON.stringify(result), _id: log_id });
 
-    let allCheckCartInfo = R.filter(R.propEq("all_check", "1"))(cartList);
-    let getPrintLength = cart => {
-      let res = R.find(R.propEq("cart_number", cart))(allCheckCartInfo);
-      return res.print_length || "";
-    };
-    await db.addPrintWmsAutoproc(
-      allCheckList.map(cart => ({
-        cart,
-        rec_time: lib.now(),
-        remark: `智能精品线转全检品(印刷时长:${getPrintLength(cart)})`
-      }))
-    );
-  }
+  //   let allCheckCartInfo = R.filter(R.propEq("all_check", "1"))(cartList);
+  //   let getPrintLength = cart => {
+  //     let res = R.find(R.propEq("cart_number", cart))(allCheckCartInfo);
+  //     return res.print_length || "";
+  //   };
+  //   await db.addPrintWmsAutoproc(
+  //     allCheckList.map(cart => ({
+  //       cart,
+  //       rec_time: lib.now(),
+  //       remark: `智能精品线转全检品(印刷时长:${getPrintLength(cart)})`
+  //     }))
+  //   );
+  // }
 
   // Test_setUdtTbWipinventory 使用测试环境
   // setUdtTbWipinventory 使用线上正式环境
 
-  // 2.转码后
+  // 2.凹二印产品转码后，不影响MES出库
   if (mahouCarts.length) {
     // 置精品
     db.setUdtTbWipinventory(mahouCarts);
 
-    let logInfo = await addPrintWmsLog([
-      {
-        remark: JSON.stringify(mahouCarts),
-        rec_time: lib.now()
-      }
-    ]);
-
+    let log_id = await getProcLog({
+      data: mahouCarts,
+      proc: "凹二印精品产品转码后"
+    });
     // 添加日志正常？
-    if (logInfo.rows < 1 || logInfo.data[0].affected_rows < 1) {
+    if (log_id === 0) {
       console.log("wms记录失败", logInfo);
       return false;
     }
@@ -201,6 +336,7 @@ const handleExcellentCarts = async cartList => {
       checkType: "码后核查",
       log_id
     });
+
     await setPrintWmsLog({ return_info: JSON.stringify(result), _id: log_id });
     await db.addPrintWmsAutoproc(
       mahouCarts.map(cart => ({

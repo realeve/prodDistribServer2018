@@ -218,7 +218,8 @@ router.get("/api/before_print", async ctx => {
   await db.setPrintCutProdLog([cart]);
 
   // 2018-11-28 码前分流处理
-  await dbAutoProc.init({ process, cart });
+  // 2019-11-02 该部分逻辑转移至精品线处理
+  // await dbAutoProc.init({ process, cart });
 
   // 完工结算中处理产品精品逻辑
   // await dbExcellentProdLine.init({ process, cart, machine_name });

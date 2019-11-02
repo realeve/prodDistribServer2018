@@ -252,3 +252,46 @@ module.exports.getVCbpcCartlistByCart = cart =>
       cart
     }
   });
+
+// -------
+// 精品线处理逻辑：调整产品工艺调整操作至凹二印完成品。2019-11
+
+/**
+ *   @database: { MES系统_生产环境 }
+ *   @desc:     { 精品线_昨日凹二印完成车号列表 }
+ */
+module.exports.getVCbpcCartlistTasks = () =>
+  axios({
+    url: "/682/a25d70d0e9.json"
+  });
+
+/**
+ *   @database: { MES系统_生产环境 }
+ *   @desc:     { 精品线_生产超时转全检车号 }
+ */
+module.exports.getVCbpcCartlistAllcheck = () =>
+  axios({
+    url: "/683/6335d2a4b0.json"
+  });
+
+/** NodeJS服务端调用：
+ *
+ *   @database: { MES系统_生产环境 }
+ *   @desc:     { 精品线_指定车号列表丝印转全检或码后 }
+ */
+module.exports.getAllcheckOrMahou = carts =>
+  axios({
+    url: "/684/ae19384c02.json",
+    params: {
+      carts
+    }
+  });
+
+/**
+ *   @database: { 小张核查 }
+ *   @desc:     { 实时获取丝印近400车产品建议走码后及全检品实废数 }
+ */
+// module.exports.getCartThread = () =>
+//   axios({
+//     url: "/288/951314319e.json"
+//   });
