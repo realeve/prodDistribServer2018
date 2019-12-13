@@ -8,6 +8,9 @@ let { addPrintWmsLog, setPrintWmsLog } = require("../util/db");
 // 部署到线上必备关闭
 const DEBUG_MODE = false;
 
+// 2020年起，全检量较少，全部关闭
+const CLOSE_ALLCHECK = true;
+
 const filterCartsByProc = (proc, carts) =>
   R.compose(
     R.map(R.prop("cart_number")),
@@ -158,58 +161,62 @@ const handleIntaglioCompleteCarts = async () => {
     }
 
     // 转全检
+    if (!CLOSE_ALLCHECK) {
+      let allcheck3 = R.filter(item => item.proc == 1)(allcheck2);
+      let allchecklist3 = R.pluck("cart", allcheck3);
+      if (allchecklist3.length) {
+        // 丝印正常品转码后
 
-    let allcheck3 = R.filter(item => item.proc == 1)(allcheck2);
-    let allchecklist3 = R.pluck("cart", allcheck3);
-    if (allchecklist3.length) {
-      // 丝印正常品转码后
-
-      let log_id = await getProcLog({
-        data: allchecklist3,
-        proc: "精品线丝印转全检"
-      });
-      // 添加日志正常？
-      if (log_id) {
-        result = await wms.setProcs({
-          carnos: allchecklist3,
-          checkType: "码后核查",
-          log_id
+        let log_id = await getProcLog({
+          data: allchecklist3,
+          proc: "精品线丝印转全检"
         });
+        // 添加日志正常？
+        if (log_id) {
+          result = await wms.setProcs({
+            carnos: allchecklist3,
+            checkType: "码后核查",
+            log_id
+          });
 
-        await setPrintWmsLog({
-          return_info: JSON.stringify(result),
-          _id: log_id
-        });
-        await db.addPrintWmsAutoproc(
-          allchecklist3.map(cart => ({
-            cart,
-            rec_time: lib.now(),
-            remark: "丝印品转码后"
-          }))
-        );
+          await setPrintWmsLog({
+            return_info: JSON.stringify(result),
+            _id: log_id
+          });
+          await db.addPrintWmsAutoproc(
+            allchecklist3.map(cart => ({
+              cart,
+              rec_time: lib.now(),
+              remark: "丝印品转码后"
+            }))
+          );
+        }
       }
     }
   }
 
-  // 3.列表A中任意工序生产超时则转全检；
-  let { data: allcheck1 } = await db.getVCbpcCartlistAllcheck();
-  if (allcheck1.length) {
-    let log_id = await getProcLog(allcheck1);
+  if (!CLOSE_ALLCHECK) {
+    // 3.列表A中任意工序生产超时则转全检；
+    let { data: allcheck1 } = await db.getVCbpcCartlistAllcheck();
+    if (allcheck1.length) {
+      let log_id = await getProcLog(allcheck1);
 
-    // 日志添加成功，处理转全检逻辑
-    if (log_id > 0) {
-      let allcheckList1 = R.pluck("cart_number", allcheck1);
-      result = await wms.setProcs({
-        carnos: allcheckList1,
-        checkType: "全检品",
-        log_id
-      });
-      await setPrintWmsLog({
-        return_info: JSON.stringify(result),
-        _id: log_id
-      });
+      // 日志添加成功，处理转全检逻辑
+      if (log_id > 0) {
+        let allcheckList1 = R.pluck("cart_number", allcheck1);
+        result = await wms.setProcs({
+          carnos: allcheckList1,
+          checkType: "全检品",
+          log_id
+        });
+        await setPrintWmsLog({
+          return_info: JSON.stringify(result),
+          _id: log_id
+        });
+      }
     }
   }
+
   return true;
 };
 
