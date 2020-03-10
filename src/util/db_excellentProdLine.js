@@ -287,11 +287,12 @@ module.exports.getAllcheckOrMahou = carts =>
     }
   });
 
-/**
- *   @database: { 小张核查 }
- *   @desc:     { 实时获取丝印近400车产品建议走码后及全检品实废数 }
+/** NodeJS服务端调用：
+ *
+ *   @database: { MES系统_生产环境 }
+ *   @desc:     { 转全检业务_昨日完工6T凹正产品 }
  */
-// module.exports.getCartThread = () =>
-//   axios({
-//     url: "/288/951314319e.json"
-//   });
+module.exports.getVCbpcCartlist6T = () =>
+  axios({
+    url: "/864/d489c19ecd.json"
+  });

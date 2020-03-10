@@ -19,16 +19,24 @@ const filterCartsByProc = (proc, carts) =>
 
 // 兑换品自动转全检
 const handleChangeCarts = async () => {
-  let { data } = await db.getUdtTbWipinventory();
+  let { data } = await db.getUdtTbWipinventory(); 
+  handleCarts(data,'兑换品自动转全检');
+};
+
+const handleIntaglioProd = async()=>{
+  let  { data }  = await db.getVCbpcCartlist6T();
+  handleCarts(data,'6T凹印转全检');
+}
+
+const handleCarts = (data,remark)=>{ 
   if (data.length === 0) {
     return false;
   }
-
   // 如果当前有兑换品，自动转全检
-  let cartList = R.map(R.prop(["cart"]))(data); // 获取车号列表
+  let cartList = R.pluck(['cart'],data); // 获取车号列表
   let logInfo = await addPrintWmsLog([
     {
-      remark: JSON.stringify(cartList),
+      remark: remark+JSON.stringify(cartList),
       rec_time: lib.now()
     }
   ]);
@@ -46,7 +54,8 @@ const handleChangeCarts = async () => {
     log_id
   });
   await setPrintWmsLog({ return_info: JSON.stringify(result), _id: log_id });
-};
+}
+
 
 // 处理单车的精品线状态
 module.exports.handleExcellentByCart = async cart => {
@@ -79,6 +88,9 @@ module.exports.sync = async () => {
 
   // 处理兑换票自动转全检
   await handleChangeCarts();
+  
+  // 6T品自动转全检
+  await handleIntaglioProd();
 
   // 昨日生产车号列表,确认是否有工序名称(当前精品标志，是否超时生产，需要设置的目标字段)
   let { data } = await db.getVCbpcCartlistYesterday();
