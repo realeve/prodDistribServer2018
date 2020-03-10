@@ -58,11 +58,21 @@ $ docker save -o ~/dist/prod-distrib.tar prod-distrib
 $ docker load --input ./dist/prod-distrib.tar
 $ docker cp ./docker-dist/src [containerID|containerName]:/usr/src/app/
 
-docker exec -it eager_wright /bin/bash
+docker exec -it prod-distrib /bin/bash
 docker ps -a
 
-docker cp ./docker-dist/src eager_wright:/usr/src/app/
+
+
+
+
+
+业务代码更新:
+docker cp ./docker-dist/src prod-distrib:/usr/src/app/
 systemctl restart docker
-docker exec -it eager_wright /bin/bash
+docker exec -it prod-distrib /bin/bash
 pm2 flush
 pm2 logs 0
+
+
+3xia5chu2
+代码在/root/mesapi/src目录里面
