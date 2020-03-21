@@ -25,6 +25,16 @@ module.exports.getVCbpcCartlist = (params) =>
     url: '/344/a8ea958d2b.json',
     params
   });
+  /**
+  *   @database: { MES_MAIN }
+  *   @desc:     { 图核指定品种每日待判车号列表(丝印印刷后判废) } 
+      const { tstart, tend, prod } = params;
+  */
+  module.exports.getVCbpcCartlistByProd = (params) =>
+    axios({
+      url: '/345/b78e6ce4d7.json',
+      params
+    });
 
 /** NodeJS服务端调用：
 *
@@ -35,16 +45,6 @@ module.exports.getVCbpcCartlist = (params) =>
 module.exports.getViewCartfinderByProd = (params) =>
   axios({
     url: '/234/651c80b3b9.json',
-    params
-  });
-/**
-*   @database: { MES_MAIN }
-*   @desc:     { 图核指定品种每日待判车号列表(丝印印刷后判废) } 
-    const { tstart, tend, prod } = params;
-*/
-module.exports.getVCbpcCartlistByProd = (params) =>
-  axios({
-    url: '/345/b78e6ce4d7.json',
     params
   });
 

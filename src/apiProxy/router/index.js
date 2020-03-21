@@ -249,8 +249,8 @@ router.get("/api/hecha/task", async ctx => {
       !db3.dev ? "localhost:3000" : "10.8.1.27:4000"
     }/api/hecha/task';
     var data = {
-        tstart: 20190614,
-        tend: 20190614,
+        tstart: 20200313,
+        tend: 20200320,
         user_list: [{
         //   user_no: '54001793',
         //   user_name: '龚季敏',
@@ -324,13 +324,14 @@ router.get("/api/hecha/task", async ctx => {
         {
           user_no: '54001576',
           user_name: '李晓红',
-          work_long_time: 1
+          work_long_time: 0.9
         }
         ],
         limit: 20000,
         // prod: ['9607T', '9602A','9606T'],
         need_convert: 0,
-        precision: 100
+        precision: 100,
+        totalNum: 20000
     };
     /** 
      * 参数说明：limit,prod,need_convert,precision四个参数可以不传。
@@ -395,9 +396,10 @@ router.post("/api/hecha/task", async ctx => {
   }
 });
 
+// totalNum 人均缺陷条数，默认2W
 const hechaTask = async (
   _,
-  { tstart, tend, user_list, limit, precision, prod, need_convert }
+  { tstart, tend, user_list, limit, precision, prod, need_convert,totalnum = 20000 }
 ) => {
   // 起始日期，用户列表，多少条以内，精度，品种,数据是否需要转换
   limit = limit || 20000;
@@ -406,7 +408,7 @@ const hechaTask = async (
 
   // 默认全品种
   prod = prod || false;
-
+ 
   let data = await db3
     .handleHechaTask({
       tstart,
@@ -415,7 +417,8 @@ const hechaTask = async (
       limit,
       precision,
       prod,
-      need_convert
+      need_convert,
+      totalnum
     })
     .catch(e => {
       throw e;

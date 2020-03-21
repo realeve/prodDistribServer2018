@@ -1,7 +1,7 @@
-const db = require('./db_image_judge');
-const R = require('ramda');
-const { dev } = require('../../util/axios');
-const moment = require('moment');
+const db = require("./db_image_judge");
+const R = require("ramda");
+const { dev } = require("../../util/axios");
+const moment = require("moment");
 
 module.exports.dev = dev;
 
@@ -12,7 +12,7 @@ let endNum = 50;
 const totalTryTimes = 50;
 
 // 数组随机排序，如果某次排产结果不佳，通过随机乱序可生成更佳结果
-const randomArr = (arr) => arr.sort(() => Math.random() - 0.5);
+const randomArr = arr => arr.sort(() => Math.random() - 0.5);
 
 // 过滤为全检及核查品
 const getTaskList = async ({ tstart, tend, prod }) => {
@@ -20,7 +20,7 @@ const getTaskList = async ({ tstart, tend, prod }) => {
   // let method = prod ? 'getViewCartfinderByProd' : 'getViewCartfinder';
 
   // 丝印印完后判废
-  let method = prod ? 'getVCbpcCartlistByProd' : 'getVCbpcCartlist';
+  let method = prod ? "getVCbpcCartlistByProd" : "getVCbpcCartlist";
 
   let params = prod ? { tstart, tend, prod } : { tstart, tend };
   let { data } = await db[method](params);
@@ -34,15 +34,15 @@ const getTaskList = async ({ tstart, tend, prod }) => {
   // 2019，从MES查询出的丝印还没有工艺信息，需要统计的丝印品
   siyinCarts = R.compose(
     R.uniq,
-    R.pluck('cart_number'),
-    R.filter((item) => ['不分工艺'].includes(item.proc_name)) //R.propEq('proc_name', '不分工艺')
+    R.pluck("cart_number"),
+    R.filter(item => ["不分工艺"].includes(item.proc_name)) //R.propEq('proc_name', '不分工艺')
   )(data);
   // 不分工艺: 全检品
 
   codeCarts = R.compose(
     R.uniq,
-    R.pluck('cart_number'),
-    R.filter((item) => ['码后核查', '全检品'].includes(item.proc_name)) //R.propEq('proc_name', '码后核查'))
+    R.pluck("cart_number"),
+    R.filter(item => ["码后核查", "全检品"].includes(item.proc_name)) //R.propEq('proc_name', '码后核查'))
   )(data);
   // console.log(data);
   // m97全检品，需要判丝印
@@ -54,7 +54,7 @@ const getTaskList = async ({ tstart, tend, prod }) => {
 
 // 过滤未上传车号
 const getUnUploadCarts = ({ srcData, uploadData }) => {
-  let uploadCarts = R.map(R.prop('cart_number'))(uploadData);
+  let uploadCarts = R.map(R.prop("cart_number"))(uploadData);
   let unUploadCarts = R.reject(({ cart_number }) =>
     uploadCarts.includes(cart_number)
   )(srcData);
@@ -63,22 +63,19 @@ const getUnUploadCarts = ({ srcData, uploadData }) => {
 
 // 汇总列数据
 const calcTotalData = (key, data) =>
-  R.compose(
-    R.reduce(R.add, 0),
-    R.map(R.prop(key))
-  )(data);
+  R.compose(R.reduce(R.add, 0), R.map(R.prop(key)))(data);
 
 // 汇总任务数汇总
 const getTaskBaseInfo = async ({ user_list, uploadData, tstart, tend }) => {
   // 汇总缺陷总数
-  let totalFakes = calcTotalData('pf_num', uploadData);
+  let totalFakes = calcTotalData("pf_num", uploadData);
 
   tstart = moment(tstart)
-    .startOf('month')
-    .format('YYYYMMDD');
+    .startOf("month")
+    .format("YYYYMMDD");
   tend = moment(tend)
-    .endOf('month')
-    .format('YYYYMMDD');
+    .endOf("month")
+    .format("YYYYMMDD");
 
   // 月度判废量
   let pfNumByMonth = await db
@@ -92,12 +89,12 @@ const getTaskBaseInfo = async ({ user_list, uploadData, tstart, tend }) => {
       tstart4: tstart,
       tend4: tend
     })
-    .catch((e) => {
+    .catch(e => {
       console.log(e);
     });
 
   // 汇总工时总数
-  let totalWorkLongTime = calcTotalData('work_long_time', user_list);
+  let totalWorkLongTime = calcTotalData("work_long_time", user_list);
   if (totalWorkLongTime == 0) {
     return [];
   }
@@ -110,8 +107,8 @@ const getTaskBaseInfo = async ({ user_list, uploadData, tstart, tend }) => {
   let users = R.clone(user_list);
   users = randomArr(users);
 
-  return users.map((item) => {
-    let userPfNum = R.filter(R.propEq('operator_name', item.user_name))(
+  return users.map(item => {
+    let userPfNum = R.filter(R.propEq("operator_name", item.user_name))(
       pfNumByMonth
     );
     let cart_nums = 0,
@@ -158,7 +155,7 @@ const distribTasks = ({ users, uploadData, ascend }) => {
   uploadData = randomArr(uploadData);
 
   // 用户信息更新
-  users = R.map((curUser) => {
+  users = R.map(curUser => {
     // 如果完成了，继续
     if (curUser.success || uploadData.length == 0) {
       return curUser;
@@ -196,18 +193,18 @@ const distribTasks = ({ users, uploadData, ascend }) => {
 };
 
 // 更优方案中各大万的判废量情况；
-const getExpectedPFNum = (user) =>
-  R.map((item) => {
+const getExpectedPFNum = user =>
+  R.map(item => {
     item.pf_num = item.pf_num - user.delta_num;
     return item;
   })(user.data);
 
-const updateStatData = (user) => {
+const updateStatData = user => {
   // 汇总缺陷总数
-  user.real_num = calcTotalData('pf_num', user.data);
+  user.real_num = calcTotalData("pf_num", user.data);
   user.delta_num = user.real_num - user.expect_num;
   user.prod7 = user.data.filter(
-    (item) => item.product_name == '9607T' && item.type == 0
+    item => item.product_name == "9607T" && item.type == 0
   ).length;
   return user;
 };
@@ -296,8 +293,8 @@ const exchangeCarts = (task_list, try_times = 0) => {
 
           // 7T码后不交换(20190301)，确保用户7T数量一致,此处的判断需要确保前后两个任务中都不对7T运算
           if (
-            (item.product_name == '9607T' && item.type == 0) ||
-            (nUser.product_name == '9607T' && nUser.type == 0)
+            (item.product_name == "9607T" && item.type == 0) ||
+            (nUser.product_name == "9607T" && nUser.type == 0)
           ) {
             nextIdx = -1;
           }
@@ -332,10 +329,10 @@ const exchangeCarts = (task_list, try_times = 0) => {
   return exchangeCarts(users, try_times);
 };
 
-let convertResult = (tasks) => {
+let convertResult = tasks => {
   let res = [];
   tasks.forEach(({ user_name, user_no, data }) => {
-    data = data.map((item) => {
+    data = data.map(item => {
       item.user_name = user_name;
       item.user_no = user_no;
       return item;
@@ -353,7 +350,8 @@ module.exports.handleHechaTask = async ({
   limit,
   precision,
   prod,
-  need_convert
+  need_convert,
+  totalnum
 }) => {
   endNum = precision;
 
@@ -364,10 +362,10 @@ module.exports.handleHechaTask = async ({
     data: srcData
   } = await getTaskList({ tstart, tend, prod });
   if (carts0.length === 0) {
-    carts0 = [''];
+    carts0 = [""];
   }
   if (carts1.length === 0) {
-    carts1 = [''];
+    carts1 = [""];
   }
 
   // 获取判废条数
@@ -377,22 +375,31 @@ module.exports.handleHechaTask = async ({
   let unupload_carts = getUnUploadCarts({ srcData, uploadData });
 
   // 超过一定条数不处理
-  let unhandle_carts = R.filter((item) => item.pf_num > limit)(uploadData);
+  let unhandle_carts = R.filter(item => item.pf_num > limit)(uploadData);
 
   // 过滤20000条以上的产品列表
-  uploadData = R.filter((item) => item.pf_num <= limit)(uploadData);
+  uploadData = R.filter(item => item.pf_num <= limit)(uploadData);
+
+  // 得到有效的车号列表
 
   if (dev) {
-    user_list = require('../mock/userList');
+    user_list = require("../mock/userList");
   }
 
-  user_list = user_list.map((item) => {
-    if (typeof item.work_long_time == 'undefined') {
+  user_list = user_list.map(item => {
+    if (typeof item.work_long_time == "undefined") {
       item.work_long_time = 1;
     }
     return item;
   });
 
+  // 处理当天的判废总量
+  let workHour = user_list.reduce((a, b) => a + Number(b.work_long_time), 0);
+  let maxNum = totalnum * workHour;
+
+  // console.log("maxNum", maxNum, uploadData.length);
+  uploadData = handleLimitTask(R.clone(uploadData), maxNum);
+  // console.log(uploadData.length);
   // 计算任务基础信息
   let users = await getTaskBaseInfo({ user_list, uploadData, tstart, tend });
 
@@ -406,11 +413,11 @@ module.exports.handleHechaTask = async ({
   /** 20190301:确保7T品排产数一致 */
 
   let specialCarts = uploadData.filter(
-    (item) => item.type == 0 && item.product_name == '9607T'
+    item => item.type == 0 && item.product_name == "9607T"
   );
 
   let otherCarts = uploadData.filter(
-    (item) => !(item.type == 0 && item.product_name == '9607T')
+    item => !(item.type == 0 && item.product_name == "9607T")
   );
 
   // console.log(specialCarts, otherCarts);
@@ -447,4 +454,45 @@ module.exports.handleHechaTask = async ({
     unupload_carts,
     unhandle_carts
   };
+};
+
+/**
+ * 找出当前车号列表中，指定缺陷总条数的车号列表
+ * @param {*} data 当前车号列表
+ * @param {*} maxNum 最大缺陷数
+ */
+const handleLimitTask = (data, maxNum) => {
+  let totalNum = data.reduce((a, b) => a + b.pf_num, 0);
+  if (totalNum <= maxNum) {
+    return data;
+  }
+
+  let sum = 0,
+    i = 0;
+  while (sum < maxNum && i < data.length) {
+    sum += data[i].pf_num;
+    i++;
+  }
+
+  // 一共找出i车产品，第i-1车产品不是最佳选择，先汇总前i-1车产品总缺陷数，将后续产品排序，
+  // 找出离相差数据最接近的一项参与排序。
+
+  // 寻找一车最佳产品
+  let sumFun = a => a.reduce((a, b) => a + b.pf_num, 0);
+
+  let bestIdx = Math.max(i - 1, 0);
+  let distArr = data.slice(0, bestIdx);
+  let _sum = sumFun(distArr);
+  let deltaNum = maxNum - _sum;
+
+  let newArr = data.slice(bestIdx, data.length);
+  newArr = newArr.sort((a, b) => a.pf_num - b.pf_num);
+
+  for (let i = 0; i < newArr.length; i++) {
+    if (newArr[i].pf_num >= deltaNum) {
+      distArr.push(newArr[i]);
+      break;
+    }
+  }
+  return distArr;
 };
