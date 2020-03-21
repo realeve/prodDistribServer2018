@@ -281,46 +281,46 @@ router.get("/api/hecha/task", async ctx => {
           user_name: '何莉',
           work_long_time: 1
         },
-        {
-          user_no: '54001585',
-          user_name: '何建英',
-          work_long_time: 1
-        },
-        {
-          user_no: '54001363',
-          user_name: '杨亚蓉',
-          work_long_time: 1
-        },
-        {
-          user_no: '54001700',
-          user_name: '张素珍',
-          work_long_time: 1
-        },
-        {
-          user_no: '54002137',
-          user_name: '刘照英',
-          work_long_time: 1
-        },
-        {
-          user_no: '54001707',
-          user_name: '杜希',
-          work_long_time: 1
-        },
-        {
-          user_no: '54001656',
-          user_name: '夏志英',
-          work_long_time: 1
-        },
-        {
-          user_no: '54002710',
-          user_name: '赵川',
-          work_long_time: 1
-        },
-        {
-          user_no: '54002159',
-          user_name: '何媛方',
-          work_long_time: 1
-        },
+        // {
+        //   user_no: '54001585',
+        //   user_name: '何建英',
+        //   work_long_time: 1
+        // },
+        // {
+        //   user_no: '54001363',
+        //   user_name: '杨亚蓉',
+        //   work_long_time: 1
+        // },
+        // {
+        //   user_no: '54001700',
+        //   user_name: '张素珍',
+        //   work_long_time: 1
+        // },
+        // {
+        //   user_no: '54002137',
+        //   user_name: '刘照英',
+        //   work_long_time: 1
+        // },
+        // {
+        //   user_no: '54001707',
+        //   user_name: '杜希',
+        //   work_long_time: 1
+        // },
+        // {
+        //   user_no: '54001656',
+        //   user_name: '夏志英',
+        //   work_long_time: 1
+        // },
+        // {
+        //   user_no: '54002710',
+        //   user_name: '赵川',
+        //   work_long_time: 1
+        // },
+        // {
+        //   user_no: '54002159',
+        //   user_name: '何媛方',
+        //   work_long_time: 1
+        // },
         {
           user_no: '54001576',
           user_name: '李晓红',
