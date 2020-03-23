@@ -32,23 +32,25 @@ const getTaskList = async ({ tstart, tend, prod }) => {
     codeCarts = [];
 
   // 2019，从MES查询出的丝印还没有工艺信息，需要统计的丝印品
+  // 0 为不分工艺，丝印品此时不分工艺
   siyinCarts = R.compose(
     R.uniq,
     R.pluck("cart_number"),
-    R.filter(item => ["不分工艺"].includes(item.proc_name)) //R.propEq('proc_name', '不分工艺')
+    R.filter(item => ["0"].includes(item.proc_name)) //R.propEq('proc_name', '不分工艺')
   )(data);
   // 不分工艺: 全检品
 
+  // 1,2 为分工艺，印码品
   codeCarts = R.compose(
     R.uniq,
     R.pluck("cart_number"),
-    R.filter(item => ["码后核查", "全检品"].includes(item.proc_name)) //R.propEq('proc_name', '码后核查'))
+    R.filter(item => ["2", "1"].includes(item.proc_name)) //R.propEq('proc_name', '码后核查'))
   )(data);
   // console.log(data);
   // m97全检品，需要判丝印
-  // console.log('siyinCarts', siyinCarts);
+  // console.log("siyinCarts", siyinCarts.slice(0, 20));
   // 码后品，只判票面
-  // console.log('codeCarts', codeCarts);
+  // console.log("codeCarts", codeCarts.slice(0, 20));
   return { siyinCarts, codeCarts, data };
 };
 
@@ -370,7 +372,7 @@ module.exports.handleHechaTask = async ({
 
   // 获取判废条数
   let uploadData = await db.getWipJobs({ carts0, carts1 });
-  // console.log(uploadData);
+
   // 未上传车号列表：
   let unupload_carts = getUnUploadCarts({ srcData, uploadData });
 
