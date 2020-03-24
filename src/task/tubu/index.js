@@ -9,52 +9,94 @@ const moment = require("moment");
 // 2020-03-23 李宾
 // 9604T品，印码下机产品全部置为已判废，涂布下机置为未判废，图核完工后置为已判废
 
-const getQfmWipJobs = params =>
+const getVCbpcCartlist = prod =>
   axios({
-    url: "/445/cfb8828229.array",
-    params
+    url: "/892/1c5169d5c1.json",
+    params: {
+      prod: prodList
+    }
   });
 
-const getPrintMesAutoWasterComplete = () =>
+const getPrintMesTubuProc = type =>
   axios({
-    url: "/444/6078facd84.json"
+    url: "/891/314daf37f1.json",
+    params: {
+      type
+    }
   });
 
-const addPrintMesAutoWasterComplete = params =>
+/**
+*   @database: { 质量信息系统 }
+*   @desc:     { 批量涂后核查判废状态记录 } 
+	以下参数在建立过程中与系统保留字段冲突，已自动替换:
+	@desc:批量插入数据时，约定使用二维数组values参数，格式为[{carts,type }]，数组的每一项表示一条数据*/
+
+const addPrintMesTubuProc = values =>
+  axios({
+    method: "post",
+    data: {
+      values,
+      id: 893,
+      nonce: "809ed94180"
+    }
+  });
+
+/** 数据量较大时建议使用post模式：
+*
+*   @database: { MES系统_生产环境 }
+*   @desc:     { 调整在库产品判废状态 } 
+    const { wastestatus, carno } = params;
+*/
+const setUdtTbWipinventory = params =>
   axios({
     method: "post",
     data: {
       ...params,
-      id: 446,
-      nonce: "aa7e9a1779"
+      id: 894,
+      nonce: "d9dc8ac483"
     }
   });
 
-const addUdtDiWasterlog = params =>
-  axios({
-    method: "post",
-    data: {
-      ...params,
-      id: 447,
-      nonce: "f204c36e17"
-    }
-  });
+const getCarts = proc =>
+  R.compose(R.pluck("cart_number"), R.filter(R.propEq("proc_name", proc)));
+
+/**
+ * @param NOT_JUDGE 不判废
+ * @param WAITING 待判废
+ * @param COMPLETE 已判废
+ */
+const WASTE_STATUS = {
+  NOT_JUDGE: 0, //不判废
+  WAITING: 1, //待判废
+  COMPLETE: 2 //已判废
+};
 
 module.exports.init = async () => {
   // 是否需要记录
   let curHour = parseInt(moment().format("HHMM"), 10);
   // 凌晨1点40处理该任务
-  console.log(curHour);
+  // console.log(curHour);
   if (curHour > 1059 || curHour < 140) {
-    console.log("无需处理判废记录");
+    console.log(curHour, "无需处理判废记录");
     return;
   }
 
   // TODO 当天已经处理?(此处需要与图核完工品处理逻辑做区分，否则需要单独在10.9.5.133的数据库中做记录，或者在MES中新建表记录涂布的处理状态;)
+  let task = {
+    code: false,
+    tubu: false
+  };
 
-  let res = await getPrintMesAutoWasterComplete();
+  let res = await getPrintMesTubuProc("印码下机");
   if (res.rows > 0) {
-    console.log("今日已完成");
+    task.code = true;
+  }
+  res = await getPrintMesTubuProc("涂布下机");
+  if (res.rows > 0) {
+    task.tubu = true;
+  }
+  if (task.code && task.tubu) {
+    console.log("当日涂布下机前后产品状态处理完毕");
     return;
   }
 
@@ -65,31 +107,55 @@ module.exports.init = async () => {
   //  TODO 获取印码生产列表、获取涂布生产列表（04T品）
   // TODO 分离涂布以及印码产品(分别处理完工以及未完工)
 
-  let { data, rows } = await getQfmWipJobs({ tstart, tend: tstart });
-  let rec_date = lib.now();
-  // 当天没有判废记录
+  let { data, rows } = await getVCbpcCartlist();
+
   if (rows == 0) {
-    await addPrintMesAutoWasterComplete({
-      rec_date,
-      carts: "当日无判废记录",
-      mes_id: 0
-    });
+    await addPrintMesTubuProc([
+      { carts: "当日无判废记录", type: "印码下机" },
+      { carts: "当日无判废记录", type: "涂布下机" }
+    ]);
     return;
   }
 
-  let strcarno = R.flatten(data).join(",");
-  let excutetime = rec_date;
+  let tubuList = getCarts("涂布")(data);
+  let codeList = getCarts("印码")(data);
+  // console.log(tubuList, codeList);
 
-  // 记录状态
-  let {
-    data: [{ id: mes_id }]
-  } = await addUdtDiWasterlog({ excutetime, strcarno });
-  if (mes_id) {
-    await addPrintMesAutoWasterComplete({
-      rec_date,
-      carts: strcarno,
-      mes_id
+  //   WasteStatus 字典说明
+  // 0 不
+  // 1 待
+  // 2 已判废
+  if (tubuList.length > 0) {
+    // 涂布置为待判废
+    let {
+      data: [{ affected_rows: mes_id }]
+    } = await setUdtTbWipinventory({
+      wastestatus: WASTE_STATUS.WAITING,
+      carno: tubuList
     });
+
+    if (mes_id) {
+      await addPrintMesTubuProc([
+        { carts: tubuList.join(","), type: "涂布下机" }
+      ]);
+    }
   }
-  console.log(tstart, "判废结果同步完毕");
+
+  if (codeList.length > 0) {
+    // 记录状态
+    let {
+      data: [{ affected_rows: mes_id2 }]
+    } = await setUdtTbWipinventory({
+      wastestatus: WASTE_STATUS.NOT_JUDGE,
+      carno: codeList
+    });
+
+    if (mes_id2) {
+      await addPrintMesTubuProc([
+        { carts: codeList.join(","), type: "印码下机" }
+      ]);
+    }
+  }
+
+  console.log(tstart, "涂布前后车号同步完毕");
 };
