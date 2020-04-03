@@ -296,3 +296,22 @@ module.exports.getVCbpcCartlist6T = () =>
   axios({
     url: "/864/d489c19ecd.json"
   });
+
+/**
+ *   @database: { 质量信息系统 }
+ *   @desc:     { 6T凹印转全检是否执行 }
+ */
+module.exports.getPrintWmsLog = () =>
+  axios({
+    url: "/934/fbcaf6c4c6.json"
+  });
+
+/** NodeJS服务端调用：
+ *
+ *   @database: { 质量信息系统 }
+ *   @desc:     { 兑换品转全检 }
+ */
+module.exports.getPrintWmsLogExchange = () =>
+  axios({
+    url: "/935/db5eca5400.json"
+  });

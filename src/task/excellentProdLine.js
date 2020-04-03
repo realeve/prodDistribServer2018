@@ -19,11 +19,21 @@ const filterCartsByProc = (proc, carts) =>
 
 // 兑换品自动转全检
 const handleChangeCarts = async () => {
+  let { rows } = await db.getPrintWmsLogExchange();
+  if (rows > 0) {
+    return;
+  }
   let { data } = await db.getUdtTbWipinventory();
   handleCarts(data, "兑换品自动转全检");
 };
 
 const handleIntaglioProd = async () => {
+  let { rows } = await db.getPrintWmsLog();
+
+  if (rows > 0) {
+    return;
+  }
+
   let { data } = await db.getVCbpcCartlist6T();
   handleCarts(data, "6T凹印转全检");
 };
