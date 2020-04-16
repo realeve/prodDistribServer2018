@@ -47,12 +47,13 @@ const handlePackage = async () => {
   }
 
   let { data } = await db.getVInventory();
-  let res = data.data;
+
   // 记录数据
-  await db.addCbpcPackageUncomplete(res);
+  await db.addCbpcPackageUncomplete(data);
+
   addPrintWmsLog([
     {
-      remark: "号票2号库装箱零头汇总",
+      remark: "号票2号库装箱零头汇总:" + JSON.stringify(data),
       rec_time: lib.now(),
     },
   ]);
