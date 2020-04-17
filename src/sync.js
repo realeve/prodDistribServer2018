@@ -19,72 +19,79 @@ const packageOpennum = require("./sync/packageOpennum");
 
 const tubu = require("./task/tubu");
 
+const tubuManualCheck = require("./sync/tubuManualCheck");
+
 const mainThread = async () => {
+  // 涂布人工判废结果回写
+  await tubuManualCheck.init().catch((e) => {
+    console.log(e);
+  });
+
   // 涂布产品置完工状态
-  await tubu.init().catch(e => {
+  await tubu.init().catch((e) => {
     console.log(e);
   });
 
   // 同步开包量信息用于精品线
-  await packageOpennum.init().catch(e => {
+  await packageOpennum.init().catch((e) => {
     console.log(e);
   });
 
   // 同步实际开包量
-  await packageOpennum.asyncExOpennum().catch(e => {
+  await packageOpennum.asyncExOpennum().catch((e) => {
     console.log(e);
   });
 
   // 精品线
-  await excellentProdLine.sync().catch(e => {
+  await excellentProdLine.sync().catch((e) => {
     console.log(e);
   });
 
   // 装箱二维码系统
-  await box_package.init().catch(e => {
+  await box_package.init().catch((e) => {
     console.log(e);
   });
 
-  await wasterCompleteLog.init().catch(e => {
+  await wasterCompleteLog.init().catch((e) => {
     console.log(e);
   });
 
-  await noteAnay.init().catch(e => {
+  await noteAnay.init().catch((e) => {
     console.log(e);
   });
 
-  await openNum2Wms.init().catch(e => {
+  await openNum2Wms.init().catch((e) => {
     console.log(e);
   });
 
   // 丝印后由凹印产生的作废信息
-  await fakeAfterSinyin.init().catch(e => {
+  await fakeAfterSinyin.init().catch((e) => {
     console.log(e);
   });
 
   // 同步人工判废黑图数据
   // 20181031 已完成
-  await manualCheck.updateHisData().catch(e => {
+  await manualCheck.updateHisData().catch((e) => {
     console.log(e);
   });
 
   // 特征图像判废结果同步
-  await imgVerify.init().catch(e => {
+  await imgVerify.init().catch((e) => {
     console.log(e);
   });
 
   // 生产信息同步
-  await cartInfo.init().catch(e => {
+  await cartInfo.init().catch((e) => {
     console.log(e);
   });
 
   // 人工判废结果同步
-  await manualCheck.init().catch(e => {
+  await manualCheck.init().catch((e) => {
     console.log(e);
   });
 
   // 严重废锁图同步
-  await syncSeriousImg.init().catch(e => {
+  await syncSeriousImg.init().catch((e) => {
     console.log(e);
   });
 };
