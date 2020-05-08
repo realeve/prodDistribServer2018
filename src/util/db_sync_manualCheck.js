@@ -38,6 +38,17 @@ module.exports.getQfmQaTempQatbl = (params) =>
     params,
   });
 
+/**
+*   @database: { 全幅面 }
+*   @desc:     { 涂布判废结果统计 } 
+    const { cart, cart2 } = params;
+*/
+module.exports.getQfmWipJobsTubu = (params) =>
+  axios({
+    url: "/975/54dd1f2049.json",
+    params,
+  });
+
 /** NodeJS服务端调用：
  *
  *   @database: { 号码三合一 }

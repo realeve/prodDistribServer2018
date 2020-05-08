@@ -20,7 +20,7 @@ const handleMahouTask = async ({ id, cart_number: cart, date_diff }) => {
   // 判废结果
   let {
     data: [verify],
-  } = await db.getQfmQaTempQatbl({ cart, cart2: cart });
+  } = await db.getQfmWipJobsTubu({ cart, cart2: cart });
 
   if (R.isNil(verify)) {
     console.log(cart + "读取判废信息失败.");
@@ -60,6 +60,7 @@ const handleMahouTask = async ({ id, cart_number: cart, date_diff }) => {
     real_pic_num: vrealtotalcount,
     pm_opennum: opennum,
     black_img_print,
+    verify_count: verify_num, // 实际判废条数
   } = verify;
 
   let appendData = {
@@ -70,6 +71,7 @@ const handleMahouTask = async ({ id, cart_number: cart, date_diff }) => {
     black_img_code: code.black_img_code || 0,
     black_img_siyin_check: siyin.check_black_img || 0,
     black_img_siyin_machine: siyin.machine_black_img || 0,
+    verify_num,
   };
 
   // 获取涂布折纸数据;
