@@ -1,5 +1,5 @@
-const { axios, dev } = require('../../util/axios');
-const R = require('ramda');
+const { axios, dev } = require("../../util/axios");
+const R = require("ramda");
 
 /** NodeJS服务端调用：
 *
@@ -9,10 +9,10 @@ const R = require('ramda');
 */
 module.exports.getViewCartfinder = (params) =>
   dev
-    ? require('../mock/cartlist.json')
+    ? require("../mock/cartlist.json")
     : axios({
-        url: '/185/68f8afe278.json',
-        params
+        url: "/185/68f8afe278.json",
+        params,
       });
 
 /**
@@ -22,19 +22,19 @@ module.exports.getViewCartfinder = (params) =>
 */
 module.exports.getVCbpcCartlist = (params) =>
   axios({
-    url: '/344/a8ea958d2b.json',
-    params
+    url: "/344/a8ea958d2b.json",
+    params,
   });
-  /**
+/**
   *   @database: { MES_MAIN }
   *   @desc:     { 图核指定品种每日待判车号列表(丝印印刷后判废) } 
       const { tstart, tend, prod } = params;
   */
-  module.exports.getVCbpcCartlistByProd = (params) =>
-    axios({
-      url: '/345/b78e6ce4d7.json',
-      params
-    });
+module.exports.getVCbpcCartlistByProd = (params) =>
+  axios({
+    url: "/345/b78e6ce4d7.json",
+    params,
+  });
 
 /** NodeJS服务端调用：
 *
@@ -44,8 +44,8 @@ module.exports.getVCbpcCartlist = (params) =>
 */
 module.exports.getViewCartfinderByProd = (params) =>
   axios({
-    url: '/234/651c80b3b9.json',
-    params
+    url: "/234/651c80b3b9.json",
+    params,
   });
 
 /**
@@ -68,10 +68,10 @@ module.exports.getQfmWipProdLogs = async (
   params //{
 ) =>
   dev
-    ? require('../mock/pfnum_month.js')
+    ? require("../mock/pfnum_month.js")
     : await axios({
-        url: '/186/9a8e4c9d74/5.json',
-        params
+        url: "/186/9a8e4c9d74/5.json",
+        params,
       }).then(({ data }) =>
         data.map((item) => {
           item.cart_nums = parseInt(item.cart_nums, 10);
@@ -122,20 +122,21 @@ module.exports.getQfmWipProdLogs = async (
 */
 module.exports.getWipJobs = async (params) =>
   dev
-    ? require('../mock/pfnum.json')
+    ? require("../mock/pfnum.json")
     : await axios({
-        method: 'post',
+        method: "post",
         data: {
           ...params,
           id: 195,
-          nonce: '544a395fd4'
-        }
+          nonce: "544a395fd4",
+        },
       }).then(({ data }) => {
         // console.log(params.carts0.concat("','"));
         // console.log(params.carts1.concat("','"));
         return data.map((item) => {
           item.pf_num = parseInt(item.pf_num, 10);
           item.type = parseInt(item.type, 10);
+          item.finished_flag = parseInt(item.finished_flag, 10);
           return item;
         });
       });
