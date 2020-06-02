@@ -22,17 +22,10 @@ const tubu = require("./task/tubu");
 const tubuManualCheck = require("./sync/tubuManualCheck");
 
 const mainThread = async () => {
-  // 人工判废结果同步
-  await manualCheck.init().catch((e) => {
-    console.log(e);
-  });
-
   // 生产信息同步
-  cartInfo.init().catch((e) => {
+  await cartInfo.init().catch((e) => {
     console.log(e);
   });
-
-  return;
 
   // 涂布人工判废结果回写
   await tubuManualCheck.init().catch((e) => {
@@ -84,6 +77,10 @@ const mainThread = async () => {
   // 同步人工判废黑图数据
   // 20181031 已完成
   await manualCheck.updateHisData().catch((e) => {
+    console.log(e);
+  });
+  // 人工判废结果同步
+  await manualCheck.init().catch((e) => {
     console.log(e);
   });
 
