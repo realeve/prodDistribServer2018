@@ -1,4 +1,4 @@
-let { axios } = require('../../util/axios');
+let { axios } = require("../../util/axios");
 
 /**
  *   @database: { 质量信息系统 }
@@ -6,11 +6,11 @@ let { axios } = require('../../util/axios');
  */
 const setPrintSampleCartlist = async (cart_number) =>
   await axios({
-    url: '/56/fe353b42f0.json',
+    url: "/56/fe353b42f0.json",
     params: {
-      cart_number
-    }
-  }).then((res) => res);
+      cart_number,
+    },
+  });
 
 /**
 *   @database: { 质量信息系统 }
@@ -19,9 +19,9 @@ const setPrintSampleCartlist = async (cart_number) =>
 */
 const setPrintWmsProclist = async (params) =>
   await axios({
-    url: '/115/296ec53c58.json',
-    params
-  }).then((res) => res);
+    url: "/115/296ec53c58.json",
+    params,
+  });
 
 /**
  *   @database: { 质量信息系统 }
@@ -29,11 +29,11 @@ const setPrintWmsProclist = async (params) =>
  */
 const getPrintMachinecheckMultiweak = async (cart) =>
   await axios({
-    url: '/116/c96d2b8975.json',
+    url: "/116/c96d2b8975.json",
     params: {
-      cart
-    }
-  }).then((res) => res);
+      cart,
+    },
+  });
 
 /**
  *   @database: { 质量信息系统 }
@@ -41,11 +41,11 @@ const getPrintMachinecheckMultiweak = async (cart) =>
  */
 const setPrintSampleMachine = async (cart) =>
   await axios({
-    url: '/117/3b263894ae.json',
+    url: "/117/3b263894ae.json",
     params: {
-      cart
-    }
-  }).then((res) => res);
+      cart,
+    },
+  });
 
 /**
 *   @database: { 质量信息系统 }
@@ -54,9 +54,9 @@ const setPrintSampleMachine = async (cart) =>
 */
 const setPrintAbnormalProd = async (params) =>
   await axios({
-    url: '/118/5877893b72.json',
-    params
-  }).then((res) => res);
+    url: "/118/5877893b72.json",
+    params,
+  });
 /**
 *   @database: { 质量信息系统 }
 *   @desc:     { 机台生产异常信息完工状态跟踪 } 
@@ -64,9 +64,9 @@ const setPrintAbnormalProd = async (params) =>
 */
 const setPrintMachinecheckMultiweak = async (params) =>
   await axios({
-    url: '/119/fc4fd73e9e.json',
-    params
-  }).then((res) => res);
+    url: "/119/fc4fd73e9e.json",
+    params,
+  });
 
 /**
  *   @database: { 质量信息系统 }
@@ -74,11 +74,11 @@ const setPrintMachinecheckMultiweak = async (params) =>
  */
 const setPrintWmsProclistStatus = async (cart) =>
   await axios({
-    url: '/122/9343c77d3b.json',
+    url: "/122/9343c77d3b.json",
     params: {
-      cart
-    }
-  }).then((res) => res);
+      cart,
+    },
+  });
 
 /**
 *   @database: { 质量信息系统 }
@@ -87,9 +87,9 @@ const setPrintWmsProclistStatus = async (cart) =>
 */
 const getPrintWmsProclist = async (params) =>
   await axios({
-    url: '/134/dc12ffbbae.json',
-    params
-  }).then((res) => res);
+    url: "/134/dc12ffbbae.json",
+    params,
+  });
 
 /** NodeJS服务端调用：
  *
@@ -98,22 +98,23 @@ const getPrintWmsProclist = async (params) =>
  */
 const setPrintCutProdLog = (carts) =>
   axios({
-    url: '/276/84a244aae0.json',
+    url: "/276/84a244aae0.json",
     params: {
-      carts
-    }
+      carts,
+    },
   });
 /** NodeJS服务端调用：
-*
+ *
  *   @database: { 质量信息系统 }
- *   @desc:     { 中班排产前将未完成产品置为取消领用 } 
+ *   @desc:     { 中班排产前将未完成产品置为取消领用 }
  */
-const setPrintCutProdLogCancel = carts => axios({
-  url: '/278/6c31ebce6b.json',
-  params: {
-    carts
-  },
-});
+const setPrintCutProdLogCancel = (carts) =>
+  axios({
+    url: "/278/6c31ebce6b.json",
+    params: {
+      carts,
+    },
+  });
 
 module.exports = {
   setPrintSampleCartlist,
@@ -125,5 +126,5 @@ module.exports = {
   setPrintMachinecheckMultiweak,
   getPrintWmsProclist,
   setPrintCutProdLog,
-  setPrintCutProdLogCancel
+  setPrintCutProdLogCancel,
 };

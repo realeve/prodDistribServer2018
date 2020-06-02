@@ -1,10 +1,11 @@
-let db = require('../util/db_sync_cartinfo');
-let R = require('ramda');
+let db = require("../util/db_sync_cartinfo");
+let R = require("ramda");
 
-let task_name = '同步机台生产信息';
+let task_name = "同步机台生产信息";
 const init = async () => {
   await siyin();
   await mahou();
+  await tubu();
 };
 
 // 丝印生产信息同步
@@ -32,14 +33,14 @@ const handleSiyinTask = async ({ id, cart_number: cart }) => {
   })(data);
 
   let {
-    data: [{ affected_rows }]
+    data: [{ affected_rows }],
   } = await db.addCartinfodataSiyin(carts);
 
   if (affected_rows == 0) {
-    console.log(cart + '生产信息写入失败.');
+    console.log(cart + "生产信息写入失败.");
     return;
   }
-  console.log(id, '更新完成');
+  console.log(id, "更新完成");
 
   // 更新任务状态
   await db.setSiyindata(id);
@@ -67,24 +68,66 @@ const handleMahouTask = async ({ id, cart_number: cart }) => {
   // console.log(data);
   let carts = R.map((item) => {
     item.mahouid = id;
-    item.workinfo = item.workinfo.replace(/ /g, '').replace(/\r\n/g, '');
+    item.workinfo = item.workinfo.replace(/ /g, "").replace(/\r\n/g, "");
     return item;
   })(data);
 
   //   console.log(carts);
   //   return;
   let {
-    data: [{ affected_rows }]
+    data: [{ affected_rows }],
   } = await db.addCartinfodataMahou(carts);
 
   if (affected_rows == 0) {
-    console.log(cart + '生产信息写入失败.');
+    console.log(cart + "生产信息写入失败.");
     return;
   }
-  console.log(id, '更新完成');
+  console.log(id, "更新完成");
 
   // 更新任务状态
   await db.setMahoudata(id);
+};
+
+// 码后生产信息同步
+const tubu = async () => {
+  let { data: taskList } = await db.getPrintTubuData();
+
+  for (let i = 0; i < taskList.length; i++) {
+    console.log(`${task_name}:${i + 1}/${taskList.length}`);
+    await handleTubuTask(taskList[i]);
+    console.log(`涂布：${i + 1}/${taskList.length} 同步完成`);
+  }
+  return true;
+};
+
+const handleTubuTask = async ({ id, cart_number: cart }) => {
+  // 生产信息
+  let { data } = await db.getTbjtProduceDetail(cart);
+  if (data.length === 0) {
+    console.log(`${cart}无生产信息`);
+    return;
+  }
+  // console.log(data);
+  let carts = R.map((item) => {
+    item.tubu_id = id;
+    item.workinfo = item.workinfo.replace(/ /g, "").replace(/\r\n/g, "");
+    return item;
+  })(data);
+
+  //   console.log(carts);
+  //   return;
+  let {
+    data: [{ affected_rows }],
+  } = await db.addCartinfodataTubu(carts);
+
+  if (affected_rows == 0) {
+    console.log(cart + "生产信息写入失败.");
+    return;
+  }
+  console.log(id, "更新完成");
+
+  // 更新任务状态
+  await db.setPrintTubuData(id);
 };
 
 module.exports = { init };

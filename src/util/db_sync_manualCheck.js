@@ -10,7 +10,7 @@ module.exports.getMahoudata = async () =>
     ? require("../sync/mock/synclist.json")
     : await axios({
         url: "/199/7b801561d1.json",
-      }).then((res) => res);
+      });
 
 /** NodeJS服务端调用：
  *
@@ -25,7 +25,7 @@ module.exports.getMahoudata = async () =>
 //         params: {
 //             cart
 //         }
-//     }).then((res) => res);
+//     })
 
 /**
 *   @database: { 全幅面 }
@@ -62,7 +62,7 @@ module.exports.getWipJobs = async (cart) =>
         params: {
           cart,
         },
-      }).then((res) => res);
+      });
 
 /** NodeJS服务端调用：
  *
@@ -77,7 +77,7 @@ module.exports.getQaTempQatbl = async (cart) =>
         params: {
           cart,
         },
-      }).then((res) => res);
+      });
 
 /**
 *   @database: { 小张核查 }
@@ -121,13 +121,14 @@ module.exports.addManualverifyTubudata = (params) =>
 	以下参数在建立过程中与系统保留字段冲突，已自动替换:
 	@id:_id. 参数说明：api 索引序号
       */
-module.exports.setMahoudata = async (_id, status = 1) =>
-  await axios({
+module.exports.setMahoudata = (_id, status = 1) =>
+  axios({
     url: "/205/18449cf95f.json",
     params: {
       _id,
+      status,
     },
-  }).then((res) => res);
+  });
 
 /** NodeJS服务端调用：
 *
@@ -167,7 +168,7 @@ module.exports.setManualverifydata = async (params) =>
   await axios({
     url: "/207/23e7277115.json",
     params,
-  }).then((res) => res);
+  });
 
 /** NodeJS服务端调用：
  *
@@ -177,7 +178,7 @@ module.exports.setManualverifydata = async (params) =>
 module.exports.getSiyindata = async () =>
   await axios({
     url: "/209/44f8264646.json",
-  }).then((res) => res);
+  });
 
 /** NodeJS服务端调用：
  *

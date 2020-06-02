@@ -22,6 +22,18 @@ const tubu = require("./task/tubu");
 const tubuManualCheck = require("./sync/tubuManualCheck");
 
 const mainThread = async () => {
+  // 人工判废结果同步
+  await manualCheck.init().catch((e) => {
+    console.log(e);
+  });
+
+  // 生产信息同步
+  cartInfo.init().catch((e) => {
+    console.log(e);
+  });
+
+  return;
+
   // 涂布人工判废结果回写
   await tubuManualCheck.init().catch((e) => {
     console.log(e);
@@ -80,16 +92,6 @@ const mainThread = async () => {
     console.log(e);
   });
 
-  // 生产信息同步
-  await cartInfo.init().catch((e) => {
-    console.log(e);
-  });
-
-  // 人工判废结果同步
-  await manualCheck.init().catch((e) => {
-    console.log(e);
-  });
-
   // 严重废锁图同步
   await syncSeriousImg.init().catch((e) => {
     console.log(e);
@@ -98,7 +100,7 @@ const mainThread = async () => {
 
 const init = async () => {
   // 间隔时间 10 分钟。
-  let timeInterval = 10 * 60 * 1000;
+  let timeInterval = 20 * 60 * 1000;
   let times = 1;
 
   console.info("启动数据同步服务");

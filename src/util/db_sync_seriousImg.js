@@ -1,6 +1,6 @@
-let { axios } = require('./axios');
-const lib = require('./lib');
-let db = require('./db_sync_seriousImg');
+let { axios } = require("./axios");
+const lib = require("./lib");
+let db = require("./db_sync_seriousImg");
 /** NodeJS服务端调用：
  *
  *   @database: { 质量信息系统_图像库 }
@@ -8,8 +8,8 @@ let db = require('./db_sync_seriousImg');
  */
 module.exports.getSeriousImg = async () =>
   await axios({
-    url: '/176/ceb0dc2230/array.json'
-  }).then((res) => res);
+    url: "/176/ceb0dc2230/array.json",
+  });
 
 /** NodeJS服务端调用：
 *
@@ -19,9 +19,9 @@ module.exports.getSeriousImg = async () =>
 */
 module.exports.getQfmWipJobs = async (params) =>
   await axios({
-    url: '/175/e30c188fbd.json',
-    params
-  }).then((res) => res);
+    url: "/175/e30c188fbd.json",
+    params,
+  });
 
 /** NodeJS服务端调用：
 *
@@ -31,13 +31,13 @@ module.exports.getQfmWipJobs = async (params) =>
 */
 module.exports.setSeriousImg = async (params) =>
   await axios({
-    method: 'post',
+    method: "post",
     data: {
       ...params,
       id: 177,
-      nonce: 'd08b605030'
-    }
-  }).then((res) => res);
+      nonce: "d08b605030",
+    },
+  });
 
 /**
  *   @database: { MES_MAIN }
@@ -45,10 +45,10 @@ module.exports.setSeriousImg = async (params) =>
  */
 module.exports.getViewCartfinder = (carts) =>
   axios({
-    url: '/343/16231d052e.json',
+    url: "/343/16231d052e.json",
     params: {
-      carts
-    }
+      carts,
+    },
   });
 
 /** NodeJS服务端调用：
@@ -58,8 +58,8 @@ module.exports.getViewCartfinder = (carts) =>
  */
 module.exports.setSeriousImgNotSync = async (carts) =>
   await axios({
-    url: '/211/a415d9e135.json',
+    url: "/211/a415d9e135.json",
     params: {
-      carts
-    }
-  }).then((res) => res);
+      carts,
+    },
+  });
