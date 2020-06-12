@@ -21,7 +21,14 @@ const tubu = require("./task/tubu");
 
 const tubuManualCheck = require("./sync/tubuManualCheck");
 
+// 3T自动锁实废
+const autoLock3T = require("./sync/autoLock");
+
 const mainThread = async () => {
+  await autoLock3T.init().catch((e) => {
+    console.log(e);
+  });
+
   // 生产信息同步
   await cartInfo.init().catch((e) => {
     console.log(e);
