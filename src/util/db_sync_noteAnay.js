@@ -27,10 +27,10 @@ module.exports.getCartInfoByGZ = async ({ prod, code, kilo }) => {
 *   @desc:     { 单开仪_更新车号同步状态 } 
     const { cart, note_id } = params;
 */
-module.exports.setNoteaysdata = params =>
+module.exports.setNoteaysdata = (params) =>
   axios({
     url: "/364/2f106006f5.json",
-    params
+    params,
   });
 
 /**
@@ -40,14 +40,14 @@ module.exports.setNoteaysdata = params =>
      格式为[{noteanayid,techtypename,cartnumber,carnumber,gznumber,procname,workclassname,machinename,captainname,teamname,monitorname,printnum,startdate,enddate,productname,cutoperatorname }]，数组的每一项表示一条数据
      */
 
-module.exports.addCartinfodata = values =>
+module.exports.addCartinfodata = (values) =>
   axios({
     method: "post",
     data: {
       values,
       id: 363,
-      nonce: "c94c80c446"
-    }
+      nonce: "c94c80c446",
+    },
   });
 
 /** NodeJS服务端调用：
@@ -57,7 +57,7 @@ module.exports.addCartinfodata = values =>
  */
 module.exports.getNoteaysdata = () =>
   axios({
-    url: "/358/cbe3358deb.json"
+    url: "/358/cbe3358deb.json",
   });
 
 /** NodeJS服务端调用：
@@ -66,16 +66,17 @@ module.exports.getNoteaysdata = () =>
 *   @desc:     { 单开仪_冠号查车号 } 
     const { prod, code, kilo } = params;
 */
-const getVCbpcCartlist = params => {
+const getVCbpcCartlist = (params) => {
   let quickSearch = ["9602A", "9603A", "9602T", "9603T"].includes(params.prod);
   if (quickSearch) {
-    let code = Number(params.end);
-    code = code - (code % 40);
-    params.code = code;
+    let code = Number(params.end2);
+    code = Math.floor(code / 40) * 40;
+    params.code = String(code).padStart(4, 0);
+    params.alpha = params.alpha2;
   }
   return axios({
     url: quickSearch ? "/360/62b90c9429.json" : "/359/dc3beb8ad3.json",
-    params
+    params,
   });
 };
 
@@ -96,10 +97,10 @@ const getVCbpcCartlist = params => {
 *   @desc:     { 单开仪_车号查生产记录 } 
     const { cart, kilo } = params;
 */
-const getTbjtProduceDetail = params =>
+const getTbjtProduceDetail = (params) =>
   axios({
     url: "/361/7385a4281a.json",
-    params
+    params,
   });
 
 /** NodeJS服务端调用：
@@ -108,13 +109,13 @@ const getTbjtProduceDetail = params =>
 *   @desc:     { 单开仪_冠号查生产记录 } 
     const { prod, alpha, start, end, alpha2, start2, end2, kilo } = params;
 */
-const getTbjtProduceDetailByGZ = params =>
+const getTbjtProduceDetailByGZ = (params) =>
   axios({
     url: "/362/f008e16b48.json",
-    params
+    params,
   });
 
-const getLastAlpha = str => {
+const getLastAlpha = (str) => {
   if (str === "A") {
     return "Z";
   }
@@ -136,11 +137,7 @@ const handleGZInfo = ({ code, prod }) => {
   let alphaInfo = code.match(/[A-Z]/g);
   let numInfo = code.match(/\d/g).join("");
   let starNum = code.slice(1, 6).indexOf(alphaInfo[1]) + 1;
-  let starInfo = code
-    .slice(1, starNum)
-    .split("")
-    .fill("*")
-    .join("");
+  let starInfo = code.slice(1, starNum).split("").fill("*").join("");
   let start = parseInt(numInfo, 10) - kInfo;
 
   let end = numInfo;
@@ -178,6 +175,6 @@ const handleGZInfo = ({ code, prod }) => {
     start2,
     end2,
     alpha,
-    alpha2
+    alpha2,
   };
 };

@@ -1,6 +1,6 @@
-let db = require('../util/db_sync_noteAnay');
+let db = require("../util/db_sync_noteAnay");
 
-let task_name = '同步单开仪生产信息';
+let task_name = "同步单开仪生产信息";
 const init = async () => {
   await noteanay();
 };
@@ -10,7 +10,7 @@ const noteanay = async () => {
   // console.log(data);
   let { data: taskList } = await db.getNoteaysdata();
   if (taskList.length == 0) {
-    console.log('当前无' + task_name + '产品信息同步');
+    console.log("当前无" + task_name + "产品信息同步");
     return true;
   }
   let len = taskList.length;
@@ -29,7 +29,6 @@ const handleTask = async ({ NoteAnayID, kilo, prod, code }) => {
   //   Reflect.deleteProperty(item, 'WorkInfo');
   //   return { ...item, NoteAnayID };
   // });
-
   data = data.map((item) => ({ ...item, NoteAnayID }));
   // 记录生产信息
   if (data.length > 0) {
