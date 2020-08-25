@@ -49,8 +49,9 @@ const setEWMInfo = (info) => {
     url: "/1133/2a03bea680.json",
     params: info,
   }).then((res) => {
-    if (res.data && res.data[0].success == 0) {
-      return false;
+    console.log(res);
+    if (res.data && res.data[0].success == "0") {
+      return res.data[0].message == "箱签重复生成";
     }
     return true;
   });
@@ -70,7 +71,7 @@ const handleCaseNo = async (data, event_id) => {
   let case1 = R.slice(0, idx)(data),
     case2 = R.slice(idx, 7)(data);
 
-  await printCaseNos(case1);
+  await printCaseNos(case1, event_id);
   return await printCaseNos(case2, event_id);
 };
 
@@ -97,7 +98,13 @@ const printCaseNos = async (data, event_id) => {
         description: "二维码数据写入失败,请联系系统管理员.",
       });
     })
-    .then((success) => success && setUdtPpMachineprocess(event_id));
+    .then(
+      (success) =>
+        success &&
+        setUdtPpMachineprocess(event_id).then((res) => {
+          console.log(event_id, res);
+        })
+    );
 };
 
 // 处理单个任务
@@ -110,6 +117,7 @@ const init = async () => {
   let res = await getUdtPpMachineprocess();
   if (res.rows === 0 || R.isNil(res.data[0].from)) {
     res.rows = 0;
+    console.info(`${task_name} 当前无新任务`);
     return res;
   }
   let tasklist = lib.handleData(res);

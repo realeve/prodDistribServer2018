@@ -171,7 +171,7 @@ module.exports.getMultiRows = ({
 };
 
 module.exports.handleData = (res) =>
-  R.map(({ from, to }) => {
+  R.map(({ from, to, event_id }) => {
     let gz = from.slice(0, -6);
     let gz2 = to.slice(0, -6);
     from = from.replace(/[A-Z]/g, "");
@@ -180,5 +180,6 @@ module.exports.handleData = (res) =>
       str: { gz, gz2 },
       from: from.slice(-6),
       to: to.slice(-6),
+      event_id,
     };
   }, res.data);
