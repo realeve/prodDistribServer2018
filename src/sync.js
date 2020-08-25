@@ -24,7 +24,13 @@ const tubuManualCheck = require("./sync/tubuManualCheck");
 // 3T自动锁实废
 const autoLock3T = require("./sync/autoLock");
 
+// NRB10装箱逻辑处理
+const nepal = require('./sync/nepal');
+
 const mainThread = async () => {
+  
+  await nepal.init().catch((e) => console.log(e));
+  
   await autoLock3T.init().catch((e) => {
     console.log(e);
   });
@@ -103,7 +109,7 @@ const mainThread = async () => {
 };
 
 const init = async () => {
-  // 间隔时间 10 分钟。
+  // 间隔时间 20 分钟。
   let timeInterval = 20 * 60 * 1000;
   let times = 1;
 
