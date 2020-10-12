@@ -75,4 +75,4 @@ pm2 logs 0
 
 
 3xia5chu2
-代码在/root/mesapi/src目录里面
+代码在/root/docker-dist/src目录里面

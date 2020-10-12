@@ -103,9 +103,9 @@ const mainThread = async () => {
   });
 
   // 严重废锁图同步
-  await syncSeriousImg.init().catch((e) => {
-    console.log(e);
-  });
+  // await syncSeriousImg.init().catch((e) => {
+  //   console.log(e);
+  // });
 };
 
 const init = async () => {
