@@ -90,19 +90,20 @@ module.exports.setManualverifydata = (params) =>
 //   res2 = await getVCbpcCartlistAllCheck(carts);
 //   return lib.concatMesAndJtzy(res1, res2);
 // };
-module.exports.getViewCartfinder = getVCbpcCartlistAllCheck
+
 /**
  *   @database: { MES_MAIN }
  *   @desc:     { 指定车号列表中全检品 }
  */
 const getVCbpcCartlistAllCheck = (carts) =>
-  axios({
-    url: '/343/16231d052e.json',
-    params: {
-      carts
-    }
-  });
+axios({
+  url: '/343/16231d052e.json',
+  params: {
+    carts
+  }
+});
 
+module.exports.getViewCartfinder = getVCbpcCartlistAllCheck
 /** NodeJS服务端调用：
  *
  *   @database: { 质量信息系统 }
