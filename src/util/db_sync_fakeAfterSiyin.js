@@ -78,18 +78,19 @@ module.exports.setManualverifydata = (params) =>
  *   @database: { 机台作业 }
  *   @desc:     { 指定车号列表中全检品 }
  */
-module.exports.getViewCartfinder = async (carts) => {
-  let res1 = await axios({
-    method: 'post',
-    data: {
-      carts,
-      id: 210,
-      nonce: 'bb0c2704f1'
-    }
-  });
-  res2 = await getVCbpcCartlistAllCheck(carts);
-  return lib.concatMesAndJtzy(res1, res2);
-};
+// module.exports.getViewCartfinder = async (carts) => {
+//   let res1 = await axios({
+//     method: 'post',
+//     data: {
+//       carts,
+//       id: 210,
+//       nonce: 'bb0c2704f1'
+//     }
+//   });
+//   res2 = await getVCbpcCartlistAllCheck(carts);
+//   return lib.concatMesAndJtzy(res1, res2);
+// };
+module.exports.getViewCartfinder = getVCbpcCartlistAllCheck
 /**
  *   @database: { MES_MAIN }
  *   @desc:     { 指定车号列表中全检品 }
