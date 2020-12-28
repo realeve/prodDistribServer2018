@@ -1,5 +1,5 @@
 const lib = require("./util/lib");
-
+const syncGZProduct = require('./sync/gzProduct');
 const syncSeriousImg = require("./sync/syncSeriousImg");
 const manualCheck = require("./sync/manualCheck");
 const cartInfo = require("./sync/cartInfo");
@@ -29,6 +29,8 @@ const nepal = require('./sync/nepal');
 
 const mainThread = async () => {
   
+  await syncGZProduct.init().catch(e=>console.log(e)); 
+
   await nepal.init().catch((e) => console.log(e));
   
   await autoLock3T.init().catch((e) => {
