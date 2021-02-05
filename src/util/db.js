@@ -1,11 +1,11 @@
-let { axios } = require('./axios');
-let http = require('axios');
+let { axios } = require("./axios");
+let http = require("axios");
 
 // const {title,msg,receiver} = params
 const pushRTXInfo = (params) =>
   http({
-    url: 'http://10.8.2.133/datainterface/rtxpush',
-    params
+    url: "http://10.8.2.133/datainterface/rtxpush",
+    params,
   }).then(({ data }) => data);
 /**
 *   @database: { 质量信息系统 }
@@ -16,7 +16,7 @@ const pushRTXInfo = (params) =>
 */
 const getPrintNewprocPlan = () =>
   axios({
-    url: '/78/b36aab89f7.json'
+    url: "/78/b36aab89f7.json",
   });
 
 /**
@@ -27,8 +27,8 @@ const getPrintNewprocPlan = () =>
 const getCartList = (params) =>
   axios({
     // url: '/106/934af4f8b4/array.json', // 机台作业
-    url: '/380/a84b055e1d/array.json',
-    params
+    url: "/380/a84b055e1d/array.json",
+    params,
   });
 
 /**
@@ -39,8 +39,8 @@ const getCartList = (params) =>
 const getCartListWithDate = (params) =>
   axios({
     // url: '/107/bf34cf0c07/array.json', // 机台作业
-    url: '/378/d87d44951c/array',
-    params
+    url: "/378/d87d44951c/array",
+    params,
   });
 
 /**
@@ -51,8 +51,8 @@ const getCartListWithDate = (params) =>
 const getCartListWithGZ = (params) =>
   axios({
     // url: '/108/ee7ddb80c4/array.json',
-    url: '/379/f2de4b5faf/array',
-    params
+    url: "/379/f2de4b5faf/array",
+    params,
   });
 
 /**
@@ -65,8 +65,8 @@ const getCartListWithGZ = (params) =>
 */
 const setPrintNewprocPlan = (params) =>
   axios({
-    url: '/90/a6c66f8d72.json',
-    params
+    url: "/90/a6c66f8d72.json",
+    params,
   });
 
 /**
@@ -76,12 +76,12 @@ const setPrintNewprocPlan = (params) =>
 	@desc:批量插入数据时，约定使用二维数组values参数，格式为[{remark,rec_time }]，数组的每一项表示一条数据*/
 const addPrintWmsLog = (values) =>
   axios({
-    method: 'post',
+    method: "post",
     data: {
       values,
       id: 91,
-      nonce: 'f0500427cb'
-    }
+      nonce: "f0500427cb",
+    },
   });
 
 /**
@@ -89,11 +89,15 @@ const addPrintWmsLog = (values) =>
 *   @desc:     { 更新wms日志信息 } 
     const { return_info, _id } = params;
 */
-const setPrintWmsLog = (params) =>
-  axios({
-    url: '/120/e7d88969ca.json',
-    params
+const setPrintWmsLog = (params) => {
+  if (params.return_info.includes(`{\"result\":{\"handledList\":[]}`)) {
+    return 1;
+  }
+  return axios({
+    url: "/120/e7d88969ca.json",
+    params,
   });
+};
 
 /**
 *   @database: { 质量信息系统 }
@@ -102,12 +106,12 @@ const setPrintWmsLog = (params) =>
 	@desc:批量插入数据时，约定使用二维数组values参数，格式为[{cart_number,gz_num,proc_plan,proc_real,rec_time }]，数组的每一项表示一条数据*/
 const addPrintWmsProclist = (values) =>
   axios({
-    method: 'post',
+    method: "post",
     data: {
       values,
       id: 92,
-      nonce: 'db02022755'
-    }
+      nonce: "db02022755",
+    },
   });
 
 /**
@@ -116,7 +120,7 @@ const addPrintWmsProclist = (values) =>
  */
 const getPrintAbnormalProd = () =>
   axios({
-    url: '/93/ba126b61bf.json'
+    url: "/93/ba126b61bf.json",
   });
 
 /**
@@ -125,10 +129,10 @@ const getPrintAbnormalProd = () =>
  */
 const setPrintAbnormalProd = (cart_number) =>
   axios({
-    url: '/94/ae030c585f.json',
+    url: "/94/ae030c585f.json",
     params: {
-      cart_number
-    }
+      cart_number,
+    },
   });
 /**
 *   @database: { 质量信息系统 }
@@ -137,8 +141,8 @@ const setPrintAbnormalProd = (cart_number) =>
 */
 const setPrintWmsProclist = (params) =>
   axios({
-    url: '/381/1bde8d8f88.json',
-    params
+    url: "/381/1bde8d8f88.json",
+    params,
   });
 
 /**
@@ -148,8 +152,8 @@ const setPrintWmsProclist = (params) =>
 */
 const addPrintWmsHeartbeat = (params) =>
   axios({
-    url: '/95/e04e4b3593.json',
-    params
+    url: "/95/e04e4b3593.json",
+    params,
   });
 
 /**
@@ -158,7 +162,7 @@ const addPrintWmsHeartbeat = (params) =>
  */
 const getPrintWmsHeartbeat = () =>
   axios({
-    url: '/96/8d7c52c835.json'
+    url: "/96/8d7c52c835.json",
   });
 /**
 *   @database: { 质量信息系统 }
@@ -167,8 +171,8 @@ const getPrintWmsHeartbeat = () =>
 */
 const setPrintWmsHeartbeat = (params) =>
   axios({
-    url: '/97/c7677a2271.json',
-    params
+    url: "/97/c7677a2271.json",
+    params,
   });
 
 /**
@@ -177,7 +181,7 @@ const setPrintWmsHeartbeat = (params) =>
  */
 const getPrintSampleCartlist = () =>
   axios({
-    url: '/98/6fc36fa52a.json'
+    url: "/98/6fc36fa52a.json",
   });
 
 /**
@@ -186,7 +190,7 @@ const getPrintSampleCartlist = () =>
  */
 const getPrintMachinecheckMultiweak = () =>
   axios({
-    url: '/99/4c9141bdd3.json'
+    url: "/99/4c9141bdd3.json",
   });
 
 /**
@@ -197,8 +201,8 @@ const getPrintMachinecheckMultiweak = () =>
 */
 const getViewCartfinder = (params) =>
   axios({
-    url: '/100/60d5ad27ec.json',
-    params
+    url: "/100/60d5ad27ec.json",
+    params,
   });
 
 /**
@@ -208,8 +212,8 @@ const getViewCartfinder = (params) =>
 */
 const getVCbpcCartlist = (params) =>
   axios({
-    url: '/346/d46d77fb86.json',
-    params
+    url: "/346/d46d77fb86.json",
+    params,
   });
 
 /**
@@ -221,8 +225,8 @@ const getVCbpcCartlist = (params) =>
 */
 const setPrintMachinecheckMultiweak = (params) =>
   axios({
-    url: '/101/f4f2a8ef0f.json',
-    params
+    url: "/101/f4f2a8ef0f.json",
+    params,
   });
 
 /**
@@ -233,10 +237,10 @@ const setPrintMachinecheckMultiweak = (params) =>
       */
 const getPrintMachinecheckMultiweakById = (_id) =>
   axios({
-    url: '/102/fe64360a81.json',
+    url: "/102/fe64360a81.json",
     params: {
-      _id
-    }
+      _id,
+    },
   });
 
 /**
@@ -247,10 +251,10 @@ const getPrintMachinecheckMultiweakById = (_id) =>
       */
 const setPrintMachinecheckMultiweakStatus = (_id) =>
   axios({
-    url: '/103/1db66c49a0.json',
+    url: "/103/1db66c49a0.json",
     params: {
-      _id
-    }
+      _id,
+    },
   });
 
 /**
@@ -259,10 +263,10 @@ const setPrintMachinecheckMultiweakStatus = (_id) =>
  */
 const getViewCartfinderGZ = (carnos) =>
   axios({
-    url: '/105/153ec8ad02.json',
+    url: "/105/153ec8ad02.json",
     params: {
-      carnos
-    }
+      carnos,
+    },
   });
 
 /**
@@ -271,10 +275,10 @@ const getViewCartfinderGZ = (carnos) =>
  */
 const getVCbpcCartlistGZ = (carnos) =>
   axios({
-    url: '/347/d0fdd5b3d1.json',
+    url: "/347/d0fdd5b3d1.json",
     params: {
-      carnos
-    }
+      carnos,
+    },
   });
 
 /**
@@ -284,8 +288,8 @@ const getVCbpcCartlistGZ = (carnos) =>
 */
 const getPrintWmsProclist = (params) =>
   axios({
-    url: '/109/95aa0001e8.json',
-    params
+    url: "/109/95aa0001e8.json",
+    params,
   });
 
 /**
@@ -294,10 +298,10 @@ const getPrintWmsProclist = (params) =>
  */
 const getPrintMachinecheckMultiweakByCart = (cart) =>
   axios({
-    url: '/116/c96d2b8975.json',
+    url: "/116/c96d2b8975.json",
     params: {
-      cart
-    }
+      cart,
+    },
   });
 
 /**
@@ -306,7 +310,7 @@ const getPrintMachinecheckMultiweakByCart = (cart) =>
  */
 const getCartsNeedPush = () =>
   axios({
-    url: '/165/3c1ac0c5ad.json'
+    url: "/165/3c1ac0c5ad.json",
   });
 
 // {
@@ -330,12 +334,12 @@ const getCartsNeedPush = () =>
 */
 const getTbbaseCarTechnologyHistory = (carnos1) =>
   axios({
-    url: '/132/6ac1e30d85.json',
+    url: "/132/6ac1e30d85.json",
     params: {
       carnos1,
       carnos2: carnos1,
-      carnos3: carnos1
-    }
+      carnos3: carnos1,
+    },
   });
 
 // data 返回为空时，表示已完工，应更新当前状态为已解锁
@@ -357,8 +361,8 @@ const getTbbaseCarTechnologyHistory = (carnos1) =>
 */
 const unlockCartsBySys = (params) =>
   axios({
-    url: '/139/00cbb681ae.json',
-    params
+    url: "/139/00cbb681ae.json",
+    params,
   });
 
 /**
@@ -367,10 +371,10 @@ const unlockCartsBySys = (params) =>
  */
 const updatePushTime = (carts) =>
   axios({
-    url: '/166/8b4c3a7d44.json',
+    url: "/166/8b4c3a7d44.json",
     params: {
-      carts
-    }
+      carts,
+    },
   });
 
 module.exports = {
@@ -402,5 +406,5 @@ module.exports = {
   getPrintWmsProclist,
   pushRTXInfo,
   getPrintMachinecheckMultiweakByCart,
-  setPrintWmsProclist
+  setPrintWmsProclist,
 };
