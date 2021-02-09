@@ -1,6 +1,6 @@
-let { axios } = require('./axios');
-const lib = require('./lib');
-const R = require('ramda');
+let { axios } = require("./axios");
+const lib = require("./lib");
+const R = require("ramda");
 /** NodeJS服务端调用：
  *
  *   @database: { 质量信息系统 }
@@ -8,7 +8,7 @@ const R = require('ramda');
  */
 module.exports.getManualverifydata = () =>
   axios({
-    url: '/238/835a5d56f2.json'
+    url: "/238/835a5d56f2.json",
   });
 
 /** NodeJS服务端调用：
@@ -17,10 +17,10 @@ module.exports.getManualverifydata = () =>
 *   @desc:     { 指定车号丝印作废信息 } 
     const { cart1, cart2 } = params;
 */
-module.exports.getQaRectifyMaster = (params) =>
+module.exports.getQaRectifyMasterSiyin = (params) =>
   axios({
-    url: '/237/69aa98cd35.json',
-    params
+    url: "/237/69aa98cd35.json",
+    params,
   });
 
 /** NodeJS服务端调用：
@@ -31,8 +31,8 @@ module.exports.getQaRectifyMaster = (params) =>
 */
 module.exports.isVerifyComplete = (params) =>
   axios({
-    url: '/239/f9b459beb8.json',
-    params
+    url: "/239/f9b459beb8.json",
+    params,
   });
 
 /** NodeJS服务端调用：
@@ -43,8 +43,8 @@ module.exports.isVerifyComplete = (params) =>
 */
 module.exports.getQaRectifyMaster = (params) =>
   axios({
-    url: '/240/4ce83034b7.json',
-    params
+    url: "/240/4ce83034b7.json",
+    params,
   });
 
 /** NodeJS服务端调用：
@@ -54,10 +54,10 @@ module.exports.getQaRectifyMaster = (params) =>
  */
 module.exports.getWipJobs = (cart) =>
   axios({
-    url: '/241/773bffb950.json',
+    url: "/241/773bffb950.json",
     params: {
-      cart
-    }
+      cart,
+    },
   });
 
 /**
@@ -69,8 +69,8 @@ module.exports.getWipJobs = (cart) =>
 */
 module.exports.setManualverifydata = (params) =>
   axios({
-    url: '/242/d4c0e74a28.json',
-    params
+    url: "/242/d4c0e74a28.json",
+    params,
   });
 
 /** NodeJS服务端调用：
@@ -96,14 +96,14 @@ module.exports.setManualverifydata = (params) =>
  *   @desc:     { 指定车号列表中全检品 }
  */
 const getVCbpcCartlistAllCheck = (carts) =>
-axios({
-  url: '/343/16231d052e.json',
-  params: {
-    carts
-  }
-});
+  axios({
+    url: "/343/16231d052e.json",
+    params: {
+      carts,
+    },
+  });
 
-module.exports.getViewCartfinder = getVCbpcCartlistAllCheck
+module.exports.getViewCartfinder = getVCbpcCartlistAllCheck;
 /** NodeJS服务端调用：
  *
  *   @database: { 质量信息系统 }
@@ -112,12 +112,12 @@ module.exports.getViewCartfinder = getVCbpcCartlistAllCheck
 module.exports.setManualverifydataAllcheck = (carts) =>
   carts.length > 0 && !R.isNil(carts[0])
     ? axios({
-        method: 'post',
+        method: "post",
         data: {
           carts,
           id: 244,
-          nonce: 'd68e782730'
-        }
+          nonce: "d68e782730",
+        },
       })
     : false;
 
@@ -128,10 +128,10 @@ module.exports.setManualverifydataAllcheck = (carts) =>
  */
 module.exports.getViewCartfinderFinshed = async (carts) => {
   let res1 = await axios({
-    url: '/247/0e7fc2bfec.json',
+    url: "/247/0e7fc2bfec.json",
     params: {
-      carts
-    }
+      carts,
+    },
   });
   let res2 = await getVCbpcCartlist(carts);
   return lib.concatMesAndJtzy(res1, res2);
@@ -143,8 +143,8 @@ module.exports.getViewCartfinderFinshed = async (carts) => {
  */
 const getVCbpcCartlist = (carts) =>
   axios({
-    url: '/342/8aa04d0a03.json',
+    url: "/342/8aa04d0a03.json",
     params: {
-      carts
-    }
+      carts,
+    },
   });
