@@ -1,7 +1,7 @@
-let db = require('../util/db_sync_fakeAfterSiyin');
-let R = require('ramda');
+let db = require("../util/db_sync_fakeAfterSiyin");
+let R = require("ramda");
 
-let task_name = '同步丝印实废';
+let task_name = "同步丝印实废";
 
 /**
  * 任务说明：同步丝印后工序产生的丝印实废
@@ -13,13 +13,16 @@ let task_name = '同步丝印实废';
 
 const init = async () => {
   let { data: taskList } = await db.getManualverifydata();
+  if (taskList.length === 0) {
+    return;
+  }
   let allCheckData = await filterAllCheck(taskList);
   taskList = R.reject((item) => allCheckData.includes(item.cart))(taskList);
   let unCompleteCarts = [];
   for (let i = 0; i < taskList.length; i++) {
     console.log(`${task_name}:${i + 1}/${taskList.length}`);
     let prod_id = taskList[i].cart.substr(2, 1);
-    let finish = prod_id != '8' ? true : await isFinished(taskList[i]);
+    let finish = prod_id != "8" ? true : await isFinished(taskList[i]);
     if (finish) {
       await handleMahouTask(taskList[i]);
       console.log(`码后：${i + 1}/${taskList.length} 同步完成`);
@@ -37,25 +40,16 @@ const handleUnCompleteCart = async (carts) => {
     return;
   }
   let { data } = await db.getViewCartfinderFinshed(carts);
-  let allCheckData = R.compose(
-    R.flatten,
-    R.map(R.prop('carts'))
-  )(data);
+  let allCheckData = R.compose(R.flatten, R.map(R.prop("carts")))(data);
   console.log(allCheckData);
   // 更新状态
   await db.setManualverifydataAllcheck(allCheckData);
 };
 
 const filterAllCheck = async (tasks) => {
-  let carts = R.compose(
-    R.flatten,
-    R.map(R.prop('cart'))
-  )(tasks);
+  let carts = R.compose(R.flatten, R.map(R.prop("cart")))(tasks);
   let { data } = await db.getViewCartfinder(carts);
-  let allCheckData = R.compose(
-    R.flatten,
-    R.map(R.prop('cart'))
-  )(data);
+  let allCheckData = R.compose(R.flatten, R.map(R.prop("cart")))(data);
   console.log(allCheckData);
   // 更新状态
   await db.setManualverifydataAllcheck(allCheckData);
@@ -82,39 +76,36 @@ const calcFakeInfo = (data) => {
   // 此时的数据已经去除了前后的黑图
   // 将开位和号码信息组合为键值
   data = data.map((item) => {
-    let format_pos = item.format_pos.padStart(2, '0');
-    let key = 'k' + format_pos + item.code_num;
+    let format_pos = item.format_pos.padStart(2, "0");
+    let key = "k" + format_pos + item.code_num;
     return {
       format_pos: key,
-      type: parseInt(item.type, 10)
+      type: parseInt(item.type, 10),
     };
   });
 
   // 对键值分组
-  data = R.groupBy(R.prop('format_pos'))(data);
+  data = R.groupBy(R.prop("format_pos"))(data);
 
   // 哪些键值只有一项数据（只有码后或只有丝印有）
   let singleData = R.compose(
     R.filter((key) => data[key].length < 2),
     R.keys
   )(data);
-  singleData = R.compose(
-    R.flatten,
-    R.props(singleData)
-  )(data);
+  singleData = R.compose(R.flatten, R.props(singleData))(data);
   let fake_not_in_mahou = R.compose(
       R.length,
-      R.filter(R.propEq('type', 1))
+      R.filter(R.propEq("type", 1))
     )(singleData),
     // 0表示码后有数据，即丝印无数据，丝印后产生的
     fake_after_siyin = R.compose(
       R.length,
-      R.filter(R.propEq('type', 0))
+      R.filter(R.propEq("type", 0))
     )(singleData);
 
   return {
     fake_after_siyin,
-    fake_not_in_mahou
+    fake_not_in_mahou,
   };
 };
 
@@ -122,12 +113,12 @@ const handleOpenNum = async (cart1) => {
   let { data: hecha } = await db.getQaRectifyMaster({ cart1, cart2: cart1 });
   let { data: code } = await db.getWipJobs(cart1);
   hecha = hecha.map(({ format_pos, kilo_num, type }) => ({
-    format_pos: format_pos + '_' + kilo_num,
-    type: parseInt(type)
+    format_pos: format_pos + "_" + kilo_num,
+    type: parseInt(type),
   }));
   code = code.map(({ format_pos, kilo_num, type }) => ({
-    format_pos: format_pos + '_' + kilo_num,
-    type: parseInt(type)
+    format_pos: format_pos + "_" + kilo_num,
+    type: parseInt(type),
   }));
   R.reject((item) => hecha.includes((h) => h.format_pos === item.format_pos))(
     code
@@ -142,7 +133,7 @@ const handleOpenNum = async (cart1) => {
   return {
     ex_opennum,
     ex_siyin_opennum,
-    ex_code_opennum
+    ex_code_opennum,
   };
 };
 
@@ -154,18 +145,18 @@ const handleMahouTask = async ({ id, cart }) => {
   let params = {
     ...updateData1,
     ...updateData2,
-    _id: id
+    _id: id,
   };
   // 待更新的信息
 
   let {
-    data: [{ affected_rows }]
+    data: [{ affected_rows }],
   } = await db.setManualverifydata(params);
   if (affected_rows == 0) {
-    console.log(cart + '判废结果回写失败.');
+    console.log(cart + "判废结果回写失败.");
     return;
   }
-  console.log(id, '更新完成');
+  console.log(id, "更新完成");
 };
 
 module.exports = { init, handleOpenNum };
