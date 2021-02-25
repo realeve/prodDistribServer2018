@@ -72,7 +72,7 @@ const getTaskList = async (id) => {
 // 35925,此前的数据
 const init = async () => {
   let isComplete = false;
-  let lastId = 35925;
+  let lastId = 0;
   // 不断循环
   while (!isComplete) {
     let res = await getTaskList(lastId);

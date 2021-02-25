@@ -1,5 +1,5 @@
 const lib = require("./util/lib");
-const syncGZProduct = require('./sync/gzProduct');
+const syncGZProduct = require("./sync/gzProduct");
 const syncSeriousImg = require("./sync/syncSeriousImg");
 const manualCheck = require("./sync/manualCheck");
 const cartInfo = require("./sync/cartInfo");
@@ -25,14 +25,22 @@ const tubuManualCheck = require("./sync/tubuManualCheck");
 const autoLock3T = require("./sync/autoLock");
 
 // NRB10装箱逻辑处理
-const nepal = require('./sync/nepal');
+const nepal = require("./sync/nepal");
+
+const boxpackage_upload = require("./sync/boxpackage_uploadjtzy");
 
 const mainThread = async () => {
-  
-  await syncGZProduct.init().catch(e=>console.log(e)); 
+  // boxpackage_upload.init().catch((e) => console.log(e));
+  // boxpackage_upload.init2().catch((e) => console.log(e));
+  // boxpackage_upload.init3().catch((e) => console.log(e));
+  // boxpackage_upload.init4().catch((e) => console.log(e));
+  // boxpackage_upload.init5().catch((e) => console.log(e));
+  // return;
+
+  await syncGZProduct.init().catch((e) => console.log(e));
 
   await nepal.init().catch((e) => console.log(e));
-  
+
   await autoLock3T.init().catch((e) => {
     console.log(e);
   });
@@ -112,7 +120,7 @@ const mainThread = async () => {
 
 const init = async () => {
   // 间隔时间 20 分钟。
-  let timeInterval = 20 * 60 * 1000;
+  let timeInterval = 5 * 60 * 1000;
   let times = 1;
 
   console.info("启动数据同步服务");

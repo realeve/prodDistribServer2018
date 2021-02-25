@@ -93,7 +93,7 @@ const init = async () => {
   let isComplete = false;
   //   let lastId = 16983;
 
-  let lastId = 25000;
+  let lastId = 1;
   // 不断循环
   while (!isComplete) {
     let res = await getTaskList(lastId);
@@ -110,7 +110,7 @@ const init = async () => {
 // 35925,此前的数据
 const init2 = async () => {
   let isComplete = false;
-  let lastId = 27000;
+  let lastId = 7000;
   // 不断循环
   while (!isComplete) {
     let res = await getTaskList(lastId);
@@ -127,7 +127,7 @@ const init2 = async () => {
 // 35925,此前的数据
 const init3 = async () => {
   let isComplete = false;
-  let lastId = 28000;
+  let lastId = 14000;
   // 不断循环
   while (!isComplete) {
     let res = await getTaskList(lastId);
@@ -144,7 +144,7 @@ const init3 = async () => {
 // 35925,此前的数据
 const init4 = async () => {
   let isComplete = false;
-  let lastId = 29000;
+  let lastId = 21000;
   // 不断循环
   while (!isComplete) {
     let res = await getTaskList(lastId);
@@ -160,7 +160,7 @@ const init4 = async () => {
 
 const init5 = async () => {
   let isComplete = false;
-  let lastId = 30000;
+  let lastId = 28000;
   // 不断循环
   while (!isComplete) {
     let res = await getTaskList(lastId);
