@@ -120,7 +120,7 @@ const mainThread = async () => {
 
 const init = async () => {
   // 间隔时间 20 分钟。
-  let timeInterval = 5 * 60 * 1000;
+  let timeInterval = 20 * 60 * 1000;
   let times = 1;
 
   console.info("启动数据同步服务");

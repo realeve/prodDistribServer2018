@@ -1,10 +1,10 @@
-let http = require('axios');
-let qs = require('qs');
-let fs = require('fs');
+let http = require("axios");
+let qs = require("qs");
+let fs = require("fs");
 
 let dev = false;
 
-let host = dev ? 'http://127.0.0.1:90/api/' : 'http://10.8.1.25:100/api/';
+let host = dev ? "http://127.0.0.1:90/api/" : "http://10.8.1.25:100/";
 
 const mock = (data, time = Math.random() * 2000) =>
   new Promise((resolve) => {
@@ -13,14 +13,14 @@ const mock = (data, time = Math.random() * 2000) =>
 
 // 程序主目录
 let getMainContent = () => {
-  let PROGRAM_NAME = 'prodDistribServer2018';
+  let PROGRAM_NAME = "prodDistribServer2018";
   // let str = process.cwd().split(PROGRAM_NAME)[0] + PROGRAM_NAME;
   let str = process.cwd();
-  return str.replace(/\\/g, '/');
+  return str.replace(/\\/g, "/");
 };
 
 let getTokenFromUrl = async () => {
-  let url = host + 'authorize.json?user=develop&psw=111111';
+  let url = host + "authorize.json?user=develop&psw=111111";
   let token = await http.get(url).then((res) => res.data.token);
   saveToken(token);
   return { token };
@@ -29,7 +29,7 @@ let getTokenFromUrl = async () => {
 let getToken = async (shopId) => {
   let fileName = `${getMainContent()}/src/util/token.json`;
   try {
-    let token = fs.readFileSync(fileName, 'utf-8');
+    let token = fs.readFileSync(fileName, "utf-8");
     if (token.length == 0) {
       return getTokenFromUrl();
     }
@@ -44,7 +44,7 @@ let getType = (data) =>
   Object.prototype.toString
     .call(data)
     .match(/\S+/g)[1]
-    .replace(']', '')
+    .replace("]", "")
     .toLowerCase();
 
 const saveToken = (token) => {
@@ -59,9 +59,9 @@ let axios = async (option) => {
 
   option = Object.assign(option, {
     headers: {
-      Authorization: token
+      Authorization: token,
     },
-    method: option.method || 'get'
+    method: option.method || "get",
   });
 
   return await http
@@ -69,23 +69,23 @@ let axios = async (option) => {
       baseURL: host,
       timeout: 10000,
       transformRequest: [
-        function(data) {
+        function (data) {
           let dataType = getType(data);
           switch (dataType) {
-            case 'object':
-            case 'array':
+            case "object":
+            case "array":
               data = qs.stringify(data);
               break;
             default:
               break;
           }
           return data;
-        }
-      ]
+        },
+      ],
     })(option)
     .then(({ data }) => {
       // 刷新token
-      if (typeof data.token !== 'undefined') {
+      if (typeof data.token !== "undefined") {
         token = data.token;
         saveToken(token);
       }
@@ -107,7 +107,7 @@ module.exports = {
     rows: 1,
     data: [{ affected_rows: 1, id: Math.ceil(Math.random() * 100) }],
     time: 20,
-    ip: '127.0.0.1',
-    title: '数据更新/插入/删除返回值'
-  }
+    ip: "127.0.0.1",
+    title: "数据更新/插入/删除返回值",
+  },
 };

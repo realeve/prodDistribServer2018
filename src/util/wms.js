@@ -1,48 +1,48 @@
-const axios = require('axios');
+const axios = require("axios");
 
 // 测试环境
-const { dev } = require('./axios');
+const { dev } = require("./axios");
 
 // 品种列表
-// 10.8.1.25:100/api/254/8b9c382d56/5.html，建议随在库产品列表接口一起走
+// 10.8.1.25:100/254/8b9c382d56/5.html，建议随在库产品列表接口一起走
 const ProdList = [
   {
-    prod_id: '20',
-    prod_name: '9606T'
+    prod_id: "20",
+    prod_name: "9606T",
   },
   {
-    prod_id: '14',
-    prod_name: '9606A'
+    prod_id: "14",
+    prod_name: "9606A",
   },
   {
-    prod_id: '1',
-    prod_name: '9602A'
+    prod_id: "1",
+    prod_name: "9602A",
   },
   {
-    prod_id: '13',
-    prod_name: '9605A'
+    prod_id: "13",
+    prod_name: "9605A",
   },
   {
-    prod_id: '2',
-    prod_name: '9603A'
+    prod_id: "2",
+    prod_name: "9603A",
   },
   {
-    prod_id: '4',
-    prod_name: '9607A'
+    prod_id: "4",
+    prod_name: "9607A",
   },
   {
-    prod_id: '15',
-    prod_name: '9607T'
+    prod_id: "15",
+    prod_name: "9607T",
   },
   {
-    prod_id: '3',
-    prod_name: '9604A'
-  }
+    prod_id: "3",
+    prod_name: "9604A",
+  },
 ];
 
 let host = dev
-  ? 'http://mactest.cdyc.cbpm:8080/wms/if'
-  : 'http://cognosdb.cdyc.cbpm:8080/wms/if';
+  ? "http://mactest.cdyc.cbpm:8080/wms/if"
+  : "http://cognosdb.cdyc.cbpm:8080/wms/if";
 
 // host = "http://10.8.60.202:8080/wms/if";
 // host = "http://mactest.cdyc.cbpm:8080/wms/if";
@@ -51,40 +51,40 @@ let host = dev
 // 根据库房id获取库房名
 let getStoreRoom = (org) =>
   [
-    { orgid: 1445, orgname: '数管2号库房' },
-    { orgid: 1446, orgname: '数管3号库房' },
-    { orgid: 1447, orgname: '数管4号库房' },
-    { orgid: 1448, orgname: '数管5号库房' },
-    { orgid: 1449, orgname: '数管6号库房' },
-    { orgid: 1450, orgname: '数管7号库房' },
-    { orgid: 1451, orgname: '数管8号库房' },
-    { orgid: 1452, orgname: '数管9号库房' },
-    { orgid: 1453, orgname: '数管10号库房' },
-    { orgid: 1455, orgname: '数管11号库房' },
-    { orgid: 1460, orgname: '立体库' },
-    { orgid: 250, orgname: '检封库房大张号票库区' },
-    { orgid: 251, orgname: '检封库房小张号票库区' },
-    { orgid: 252, orgname: '检封库房补票库区' }
+    { orgid: 1445, orgname: "数管2号库房" },
+    { orgid: 1446, orgname: "数管3号库房" },
+    { orgid: 1447, orgname: "数管4号库房" },
+    { orgid: 1448, orgname: "数管5号库房" },
+    { orgid: 1449, orgname: "数管6号库房" },
+    { orgid: 1450, orgname: "数管7号库房" },
+    { orgid: 1451, orgname: "数管8号库房" },
+    { orgid: 1452, orgname: "数管9号库房" },
+    { orgid: 1453, orgname: "数管10号库房" },
+    { orgid: 1455, orgname: "数管11号库房" },
+    { orgid: 1460, orgname: "立体库" },
+    { orgid: 250, orgname: "检封库房大张号票库区" },
+    { orgid: 251, orgname: "检封库房小张号票库区" },
+    { orgid: 252, orgname: "检封库房补票库区" },
   ].find(({ orgid }) => orgid === org);
 
 // 工序列表
 let getProcStatus = (psc) =>
   [
-    { pscode: 'wzbz', psname: '物资白纸' },
-    { pscode: 'czbz', psname: '钞纸白纸' },
-    { pscode: 'bz', psname: '白纸' },
-    { pscode: 'jydg', psname: '胶一印待干品' },
-    { pscode: 'jyyp', psname: '胶一印品' },
-    { pscode: 'jedg', psname: '胶二印待干品' },
-    { pscode: 'jeyp', psname: '胶二印品' },
-    { pscode: 'sydg', psname: '丝印待干品' },
-    { pscode: 'syyp', psname: '丝印品' },
-    { pscode: 'wydg', psname: '凹一印待干品' },
-    { pscode: 'wyyp', psname: '凹一印品' },
-    { pscode: 'wedg', psname: '凹二印待干品' },
-    { pscode: 'weyp', psname: '凹二印品' },
-    { pscode: 'dhdg', psname: '大张号票待干品' },
-    { pscode: 'dzhp', psname: '大张号票' }
+    { pscode: "wzbz", psname: "物资白纸" },
+    { pscode: "czbz", psname: "钞纸白纸" },
+    { pscode: "bz", psname: "白纸" },
+    { pscode: "jydg", psname: "胶一印待干品" },
+    { pscode: "jyyp", psname: "胶一印品" },
+    { pscode: "jedg", psname: "胶二印待干品" },
+    { pscode: "jeyp", psname: "胶二印品" },
+    { pscode: "sydg", psname: "丝印待干品" },
+    { pscode: "syyp", psname: "丝印品" },
+    { pscode: "wydg", psname: "凹一印待干品" },
+    { pscode: "wyyp", psname: "凹一印品" },
+    { pscode: "wedg", psname: "凹二印待干品" },
+    { pscode: "weyp", psname: "凹二印品" },
+    { pscode: "dhdg", psname: "大张号票待干品" },
+    { pscode: "dzhp", psname: "大张号票" },
   ].find(({ pscode }) => pscode === psc);
 
 // let reasonCode = [
@@ -104,11 +104,11 @@ let getProcStatus = (psc) =>
 // let [carno1,carno2,carno3] = carnos
 let getStockStatus = async (carnos) => {
   let data = await axios({
-    method: 'post',
-    url: host + '/carnoQ',
+    method: "post",
+    url: host + "/carnoQ",
     data: {
-      carnos
-    }
+      carnos,
+    },
   }).then((res) => res.data);
 
   // 返回值：车号，库房ID，批次数量，工序code
@@ -142,13 +142,13 @@ let getStockStatus = async (carnos) => {
 */
 let setBlackList = async ({ carnos, reason_code, log_id }) => {
   let data = await axios({
-    method: 'post',
-    url: host + '/lockH',
+    method: "post",
+    url: host + "/lockH",
     data: {
       carnos,
       reason_code,
-      log_id
-    }
+      log_id,
+    },
   }).then((res) => res.data);
 
   // 返回值：未处理车号列表，已处理车号列表
@@ -163,10 +163,10 @@ let setBlackList = async ({ carnos, reason_code, log_id }) => {
 // 批量取消人工拉号状态
 const unlockCart = (carno) =>
   axios({
-    url: 'http://10.8.1.27:4000/api/manual_status',
+    url: "http://10.8.1.27:4000/api/manual_status",
     params: {
-      carno
-    }
+      carno,
+    },
   });
 
 // 2.批量车号设定质检工艺
@@ -181,13 +181,13 @@ carnos:[carno1,carno2,carno3]*/
 let setProcs = async ({ checkType, carnos, log_id }) => {
   console.log({ checkType, carnos, log_id });
   let data = await axios({
-    method: 'post',
-    url: host + '/carnoH',
+    method: "post",
+    url: host + "/carnoH",
     data: {
       checkType,
       carnos,
-      log_id
-    }
+      log_id,
+    },
   }).then((res) => {
     let data = res.data;
     if (data.status) {
@@ -216,8 +216,8 @@ let setProcs = async ({ checkType, carnos, log_id }) => {
 // 3 锁车原因列表
 let getBlackReason = async () => {
   let data = await axios({
-    method: 'post',
-    url: host + '/lockQ'
+    method: "post",
+    url: host + "/lockQ",
   }).then((res) => res.data);
 
   // 返回值：未处理车号列表，已处理车号列表
@@ -233,12 +233,12 @@ let getBlackReason = async () => {
 // 状态码，锁车描述
 let addBlackReason = async ({ reason_code, reason_desc }) => {
   let data = await axios({
-    method: 'post',
-    url: host + '/lockR',
+    method: "post",
+    url: host + "/lockR",
     data: {
       reason_code,
-      reason_desc
-    }
+      reason_desc,
+    },
   }).then((res) => res.data);
 
   // 返回值：
@@ -261,11 +261,11 @@ let addBlackReason = async ({ reason_code, reason_desc }) => {
 // let [carno1,carno2,carno3] = carnos
 let setWhiteList = async (carnos) => {
   let data = await axios({
-    method: 'post',
-    url: host + '/unlockH',
+    method: "post",
+    url: host + "/unlockH",
     data: {
-      carnos
-    }
+      carnos,
+    },
   }).then((res) => res.data);
 
   // 返回值：未处理车号列表，已处理车号列表
@@ -280,23 +280,23 @@ let setWhiteList = async (carnos) => {
 // 码后验证。review:1设置验证,0取消验证
 let setReviewList = async ({ carnos, review, log_id }) => {
   let data = await axios({
-    method: 'post',
-    url: host + '/reviewH',
+    method: "post",
+    url: host + "/reviewH",
     data: {
       carnos,
       review,
-      log_id
-    }
+      log_id,
+    },
   }).then((res) => res.data);
   return data;
 };
 
 const updateWmsOpenNum = (carts) => {
-  let data = typeof carts == 'object' ? [carts] : carts;
+  let data = typeof carts == "object" ? [carts] : carts;
   return axios({
-    method: 'post',
-    url: host + '/addOpennum',
-    data
+    method: "post",
+    url: host + "/addOpennum",
+    data,
   }).then((res) => res.data.result);
 };
 
@@ -310,5 +310,5 @@ module.exports = {
   setBlackList,
   setWhiteList,
   setReviewList,
-  updateWmsOpenNum
+  updateWmsOpenNum,
 };
