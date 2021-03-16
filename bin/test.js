@@ -4,6 +4,7 @@ const boxpackage_upload = require("../src/sync/boxpackage_uploadjtzy");
 
 const handleErr = ({ response }) =>
   console.log({ status: response.status, statusText: response.statusText });
+
 boxpackage_upload.init().catch(handleErr);
 boxpackage_upload.init2().catch(handleErr);
 boxpackage_upload.init3().catch(handleErr);

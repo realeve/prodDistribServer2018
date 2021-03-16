@@ -16,25 +16,25 @@ const dbAutoProc = require("./db_auto_proc");
 const manualCheck = require("./manual_check");
 // const dbExcellentProdLine = require('../../task/excellentProdLine');
 
-router.get("/", ctx => {
+router.get("/", (ctx) => {
   ctx.body = {
     status: 200,
-    msg: "hello worlds,this is from get"
+    msg: "hello worlds,this is from get",
   };
 });
-router.post("/", ctx => {
+router.post("/", (ctx) => {
   ctx.body = {
     status: 200,
-    msg: "hello worlds,this is from post"
+    msg: "hello worlds,this is from post",
   };
 });
 
-router.get("/api", ctx => {
+router.get("/api", (ctx) => {
   ctx.body = api_doc;
 });
 
 // 产品指定车号锁车日志
-router.get("/api/remark_info", async ctx => {
+router.get("/api/remark_info", async (ctx) => {
   let validInfo = util.validateParam(ctx, ["cart"]);
   if (!validInfo.status) {
     ctx.body = validInfo;
@@ -45,14 +45,14 @@ router.get("/api/remark_info", async ctx => {
   let data = await db.getPrintWmsProclist({
     cart1: cart,
     cart2: cart,
-    cart3: cart
+    cart3: cart,
   });
   data.status = true;
   ctx.body = data;
 });
 
 // 人工大张拉号，车号已领取后，更新状态。
-router.get("/api/manual_status", async ctx => {
+router.get("/api/manual_status", async (ctx) => {
   let validInfo = util.validateParam(ctx, ["cart"]);
   if (!validInfo.status) {
     ctx.body = validInfo;
@@ -80,7 +80,7 @@ router.get("/api/manual_status", async ctx => {
 });
 
 // 下机产品，通知已生产完成状态以及当前工序。
-router.get("/api/after_print", async ctx => {
+router.get("/api/after_print", async (ctx) => {
   let { process, status, cart, rec, pay } = ctx.query;
   let validParams = "";
   if (R.isNil(rec)) {
@@ -111,7 +111,7 @@ router.get("/api/after_print", async ctx => {
     process,
     status,
     cart,
-    prod_date: lib.now()
+    prod_date: lib.now(),
   });
 
   // step3:机台通知连续作废产品完工状态
@@ -119,7 +119,7 @@ router.get("/api/after_print", async ctx => {
     process,
     status,
     cart,
-    prod_date: lib.now()
+    prod_date: lib.now(),
   });
 
   // step4:精品线当万下机转换状态
@@ -134,7 +134,7 @@ router.get("/api/after_print", async ctx => {
 });
 
 // 连续废通知
-router.get("/api/multiweak", async ctx => {
+router.get("/api/multiweak", async (ctx) => {
   let validInfo = util.validateParam(ctx, ["cart"]);
   if (!validInfo.status) {
     ctx.body = validInfo;
@@ -154,7 +154,7 @@ router.get("/api/multiweak", async ctx => {
 // });
 
 // http://localhost:3000/api/autoproc?cart=1880F945&process=%E5%87%B9%E4%B8%80%E5%8D%B0
-router.get("/api/autoproc", async ctx => {
+router.get("/api/autoproc", async (ctx) => {
   let validInfo = util.validateParam(ctx, "process,cart".split(","));
   if (!validInfo.status) {
     ctx.body = validInfo;
@@ -166,7 +166,7 @@ router.get("/api/autoproc", async ctx => {
   if (data === false) {
     ctx.body = {
       status: 0,
-      msg: "无需转工艺"
+      msg: "无需转工艺",
     };
     return;
   }
@@ -174,7 +174,7 @@ router.get("/api/autoproc", async ctx => {
 });
 
 // 上机前通知接口
-router.get("/api/before_print", async ctx => {
+router.get("/api/before_print", async (ctx) => {
   let { process, machine_name, cart, rec } = ctx.query;
 
   if (R.isNil(rec)) {
@@ -206,7 +206,7 @@ router.get("/api/before_print", async ctx => {
   // 产品为机台连续废通知产品通知工艺员。
   let haveMultiweakNotice = await db2.getPrintMachinecheckMultiweakByCart(cart);
   let data = {
-    status: true
+    status: true,
   };
 
   if (haveMultiweakNotice.rows > 0) {
@@ -227,30 +227,30 @@ router.get("/api/before_print", async ctx => {
 });
 
 // 获取指定用户的rtx信息
-router.get("/api/user/:uid", async ctx => {
+router.get("/api/user/:uid", async (ctx) => {
   let { uid } = ctx.params;
   ctx.body = {
     status: true,
-    data: R.filter(R.propEq("username", uid))(users)
+    data: R.filter(R.propEq("username", uid))(users),
   };
 });
 
 // 根据工序名称获取待推送人员名单rtx信息
-router.get("/api/rtxlist/:proc", async ctx => {
+router.get("/api/rtxlist/:proc", async (ctx) => {
   let { proc } = ctx.params;
   ctx.body = rtx.getRtxList(proc);
 });
 
 // 图像判废排活
-router.get("/api/hecha/task", async ctx => {
+router.get("/api/hecha/task", async (ctx) => {
   const html = `
     // 因用户信息包含较多查询参数，不支持get请求，请按以下方式发起post调用:
     var url = 'http://${
       !db3.dev ? "localhost:3000" : "10.8.1.27:4000"
     }/api/hecha/task';
     var data = {
-        tstart: 20200320,
-        tend: 20200321,
+        tstart: 20210315,
+        tend: 20210315,
         user_list: [{
         //   user_no: '54001793',
         //   user_name: '龚季敏',
@@ -381,7 +381,7 @@ router.get("/api/hecha/task", async ctx => {
   ctx.body = content;
 });
 
-router.post("/api/hecha/task", async ctx => {
+router.post("/api/hecha/task", async (ctx) => {
   // 使用全局参数校验函数
   let validInfo = util.validateParam(ctx, "tstart,tend,user_list".split(","));
   if (!validInfo.status) {
@@ -407,7 +407,7 @@ const hechaTask = async (
     precision,
     prod,
     need_convert,
-    totalnum = 20000
+    totalnum = 20000,
   }
 ) => {
   // 起始日期，用户列表，多少条以内，精度，品种,数据是否需要转换
@@ -427,9 +427,9 @@ const hechaTask = async (
       precision,
       prod,
       need_convert,
-      totalnum
+      totalnum,
     })
-    .catch(e => {
+    .catch((e) => {
       throw e;
     });
   return db3.dev
@@ -438,7 +438,7 @@ const hechaTask = async (
 };
 
 // 检封根据开包量排活
-router.get("/api/package", async ctx => {
+router.get("/api/package", async (ctx) => {
   let data = await dbJianFeng.init(true);
   // ctx.body = data.status
   //   ? data

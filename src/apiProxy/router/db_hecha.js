@@ -3,6 +3,8 @@ const R = require("ramda");
 const { dev } = require("../../util/axios");
 const moment = require("moment");
 
+/** 图像核查排产 */
+
 module.exports.dev = dev;
 
 // 图核判废接口
@@ -359,6 +361,13 @@ module.exports.handleHechaTask = async ({
     codeCarts: carts0,
     data: srcData,
   } = await getTaskList({ tstart, tend, prod });
+
+  // return {
+  //   siyinCarts: carts1,
+  //   codeCarts: carts0,
+  //   data: srcData,
+  // };
+
   if (carts0.length === 0) {
     carts0 = [""];
   }
