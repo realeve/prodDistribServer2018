@@ -27,19 +27,13 @@ const autoLock3T = require("./sync/autoLock");
 // NRB10装箱逻辑处理
 const nepal = require("./sync/nepal");
 
-const boxpackage_upload = require("./sync/boxpackage_uploadjtzy");
+const handleErr = ({ response }) =>
+  console.log({ status: response.status, statusText: response.statusText });
 
 const mainThread = async () => {
-  // boxpackage_upload.init().catch((e) => console.log(e));
-  // boxpackage_upload.init2().catch((e) => console.log(e));
-  // boxpackage_upload.init3().catch((e) => console.log(e));
-  // boxpackage_upload.init4().catch((e) => console.log(e));
-  // boxpackage_upload.init5().catch((e) => console.log(e));
-  // return;
+  await syncGZProduct.init().catch(handleErr);
 
-  await syncGZProduct.init().catch((e) => console.log(e));
-
-  await nepal.init().catch((e) => console.log(e));
+  await nepal.init().catch(handleErr);
 
   await autoLock3T.init().catch((e) => {
     console.log(e);

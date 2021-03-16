@@ -124,7 +124,7 @@ const getLastAlpha = (str) => {
 };
 
 const handleGZInfo = ({ code, prod }) => {
-  if (code.length !== 6) {
+  if (code.length !== 6 && prod != "NRB10") {
     return false;
   }
   code = code.toUpperCase();
@@ -145,7 +145,7 @@ const handleGZInfo = ({ code, prod }) => {
   let start2 = String(start + 1),
     end2 = end;
 
-  let alpha = alphaInfo[0] + starInfo + alphaInfo[1];
+  let alpha = alphaInfo[0] + starInfo + (alphaInfo[1] || "");
   let alpha2 = alpha;
 
   if (needConvert) {
@@ -178,3 +178,5 @@ const handleGZInfo = ({ code, prod }) => {
     alpha2,
   };
 };
+
+// console.log(handleGZInfo({ code: "C4015", prod: "NRB10" }));

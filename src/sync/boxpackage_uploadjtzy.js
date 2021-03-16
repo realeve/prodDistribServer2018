@@ -48,7 +48,7 @@ const setCbpcPackageDataupload = (params) =>
   }).then(({ data: [{ affected_rows }] }) => affected_rows > 0);
 
 const handleTaskItem = async ({ id: _id, ...param }) => {
-  let res = await getQaPacketMaster2(param).catch((e) => {
+  let res = await getQaPacketMaster(param).catch((e) => {
     console.log({ _id });
     return { rows: 0 };
   });
@@ -57,9 +57,10 @@ const handleTaskItem = async ({ id: _id, ...param }) => {
     box_num = res.data[0].num;
   }
 
-  //   if (box_num == 0) {
-  //     return;
-  //   }
+  // 不将有数据的改为0
+  if (box_num == 0) {
+    return;
+  }
 
   await setCbpcPackageDataupload({
     _id,
@@ -110,7 +111,7 @@ const init = async () => {
 // 35925,此前的数据
 const init2 = async () => {
   let isComplete = false;
-  let lastId = 7000;
+  let lastId = 5000;
   // 不断循环
   while (!isComplete) {
     let res = await getTaskList(lastId);
@@ -127,7 +128,7 @@ const init2 = async () => {
 // 35925,此前的数据
 const init3 = async () => {
   let isComplete = false;
-  let lastId = 14000;
+  let lastId = 10000;
   // 不断循环
   while (!isComplete) {
     let res = await getTaskList(lastId);
@@ -144,7 +145,7 @@ const init3 = async () => {
 // 35925,此前的数据
 const init4 = async () => {
   let isComplete = false;
-  let lastId = 21000;
+  let lastId = 15000;
   // 不断循环
   while (!isComplete) {
     let res = await getTaskList(lastId);
@@ -160,7 +161,7 @@ const init4 = async () => {
 
 const init5 = async () => {
   let isComplete = false;
-  let lastId = 28000;
+  let lastId = 20000;
   // 不断循环
   while (!isComplete) {
     let res = await getTaskList(lastId);
