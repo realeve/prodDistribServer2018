@@ -342,66 +342,6 @@ let convertResult = (tasks) => {
   return res;
 };
 
-// {
-//   tstart: '20210320',
-//   tend: '20210320',
-//   user_list: [
-//     { user_name: '邓丽', user_no: '54001804', work_long_time: '1' },
-//     { user_name: '彭瑶', user_no: '54002625', work_long_time: 0.9375 },
-//     { user_name: '蒙娅', user_no: '54001692', work_long_time: '1' },
-//     { user_name: '蒋静', user_no: '54001703', work_long_time: 1 },
-//     { user_name: '夏志英', user_no: '54001656', work_long_time: 1 },
-//     { user_name: '何媛方', user_no: '54002159', work_long_time: 1 },
-//     { user_name: '赵川', user_no: '54002710', work_long_time: 1 }
-//   ],
-//   limit: 20000,
-//   precision: 100,
-//   carts: {
-//     siyin: [
-//       '2075H906', '2075J063', '2075J066',
-//       '2075J068', '2075J070', '2075J109',
-//       '2075J110', '2075J113', '2075J114',
-//       '2075J115', '2075J125', '2075J191',
-//       '2075H898', '2075H900', '2075J064',
-//       '2075J069', '2075J071', '2075J073',
-//       '2075J079', '2075J087', '2075J102',
-//       '2075J106', '2075J108', '2075J127',
-//       '2075J145', '2075H929', '2075J065',
-//       '2075J078', '2075J080', '2075J082',
-//       '2075J105', '2075J107', '2075J111',
-//       '2075J116', '2075J118', '2075J121',
-//       '2075J138'
-//     ],
-//     mahou: [
-//       '2025C104', '2025C362', '2025C380',
-//       '2025C382', '2025C389', '2025C396',
-//       '2025C404', '2025C405', '2025C409',
-//       '2025C423', '2025C431', '2025C432',
-//       '2025C433', '2075G807', '2075G815',
-//       '2075G824', '2075G832', '2075G958',
-//       '2075H000', '2075H047', '2075H053',
-//       '2075H067', '2075H079', '2075H090',
-//       '2075H338', '2075G800', '2075G806',
-//       '2075G808', '2075G810', '2075G819',
-//       '2075G822', '2075G825', '2075H016',
-//       '2075H045', '2075H080', '2075H101',
-//       '2075H119'
-//     ],
-//     tubu: [
-//       '2025C283', '2025C284', '2025C286',
-//       '2025C288', '2025C290', '2025C300',
-//       '2025C301', '2025C304', '2025C306',
-//       '2025C309', '2025C316', '2025C344',
-//       '2045C524', '2045C525', '2045C531',
-//       '2045C540', '2045C542', '2045C550',
-//       '2045C554', '2045C559', '2045C560',
-//       '2045C563', '2045C565', '2045C566'
-//     ]
-//   },
-//   need_convert: false,
-//   totalnum: 20000
-// }
-
 // 核查排活核心流程
 module.exports.handleHechaTask = async ({
   tstart,
@@ -409,19 +349,24 @@ module.exports.handleHechaTask = async ({
   user_list,
   limit,
   precision,
-  carts,
+  prod,
   need_convert,
   totalnum,
 }) => {
   endNum = precision;
 
-  // 获取丝印、印码车号列表以及当天生产的所有车号，用于判断未上传车号；
-  // 在此处截断，用前台传入的数据
+  // 获取车号列表
   let {
     siyinCarts: carts1,
     codeCarts: carts0,
     data: srcData,
   } = await getTaskList({ tstart, tend, prod });
+
+  // return {
+  //   siyinCarts: carts1,
+  //   codeCarts: carts0,
+  //   data: srcData,
+  // };
 
   if (carts0.length === 0) {
     carts0 = [""];
@@ -430,10 +375,10 @@ module.exports.handleHechaTask = async ({
     carts1 = [""];
   }
 
-  // 获取判废条数，调整该接口，支持对丝印，码后，涂布的条数获取条数数据；
+  // 获取判废条数
   let uploadData = await db.getWipJobs({ carts0, carts1 });
 
-  // 未上传车号列表：// 根据已上传车号和已生产车号来计算未上传车号
+  // 未上传车号列表：
   let unupload_carts = getUnUploadCarts({ srcData, uploadData });
 
   // 移除已判废车号
@@ -476,11 +421,11 @@ module.exports.handleHechaTask = async ({
   // });
 
   /** 20190301:确保7T品排产数一致 */
+
   let specialCarts = uploadData.filter(
     (item) => item.type == 0 && item.product_name == "9607T"
   );
 
-  // 其它品种任意排列
   let otherCarts = uploadData.filter(
     (item) => !(item.type == 0 && item.product_name == "9607T")
   );

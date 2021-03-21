@@ -405,7 +405,7 @@ const hechaTask = async (
     user_list,
     limit,
     precision,
-    prod,
+    carts,
     need_convert,
     totalnum = 20000,
   }
@@ -415,9 +415,6 @@ const hechaTask = async (
   precision = precision || 100;
   need_convert = need_convert == "0" ? false : true;
 
-  // 默认全品种
-  prod = prod || false;
-
   let data = await db3
     .handleHechaTask({
       tstart,
@@ -425,7 +422,7 @@ const hechaTask = async (
       user_list,
       limit,
       precision,
-      prod,
+      carts,
       need_convert,
       totalnum,
     })
