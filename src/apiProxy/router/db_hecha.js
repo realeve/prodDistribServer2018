@@ -43,7 +43,7 @@ const getTaskBaseInfo = async ({
   tend,
 }) => {
   let validTotal = calcTotalData("pf_num", validUploadData);
-  let needUsers = Math.floor(validTotal / totalnum);
+  let needUsers = Math.ceil(validTotal / totalnum);
 
   // 汇总缺陷总数
   let totalFakes = calcTotalData("pf_num", uploadData);
