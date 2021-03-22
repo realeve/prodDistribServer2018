@@ -118,7 +118,7 @@ module.exports.getQfmWipProdLogs = async (
 *
 *   @database: { 全幅面 }
 *   @desc:     { 指定车号列表判废条数查询 } 
-    const { carts0, carts1 } = params;
+    const { carts0, carts1,carts2 } = params;
 */
 module.exports.getWipJobs = async (params) =>
   dev

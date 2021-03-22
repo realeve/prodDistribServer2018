@@ -67,7 +67,7 @@ let axios = async (option) => {
   return await http
     .create({
       baseURL: host,
-      timeout: 20000,
+      timeout: 25000,
       transformRequest: [
         function (data) {
           let dataType = getType(data);

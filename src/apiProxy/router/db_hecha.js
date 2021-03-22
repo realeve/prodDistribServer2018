@@ -16,52 +16,16 @@ const totalTryTimes = 50;
 // 数组随机排序，如果某次排产结果不佳，通过随机乱序可生成更佳结果
 const randomArr = (arr) => arr.sort(() => Math.random() - 0.5);
 
-// 过滤为全检及核查品
-const getTaskList = async ({ tstart, tend, prod }) => {
-  // 印码印完后判废
-  // let method = prod ? 'getViewCartfinderByProd' : 'getViewCartfinder';
-
-  // 丝印印完后判废
-  let method = prod ? "getVCbpcCartlistByProd" : "getVCbpcCartlist";
-
-  let params = prod ? { tstart, tend, prod } : { tstart, tend };
-  let { data } = await db[method](params);
-
-  // 产品列表
-  // console.log(method, params, data.length);
-
-  let siyinCarts = [],
-    codeCarts = [];
-
-  // 2019，从MES查询出的丝印还没有工艺信息，需要统计的丝印品
-  // 0 为不分工艺，丝印品此时不分工艺
-  siyinCarts = R.compose(
-    R.uniq,
-    R.pluck("cart_number"),
-    R.filter((item) => ["0"].includes(item.proc_name)) //R.propEq('proc_name', '不分工艺')
-  )(data);
-  // 不分工艺: 全检品
-
-  // 1,2 为分工艺，印码品
-  codeCarts = R.compose(
-    R.uniq,
-    R.pluck("cart_number"),
-    R.filter((item) => ["2", "1"].includes(item.proc_name)) //R.propEq('proc_name', '码后核查'))
-  )(data);
-  // console.log(data);
-  // m97全检品，需要判丝印
-  // console.log("siyinCarts", siyinCarts.slice(0, 20));
-  // 码后品，只判票面
-  // console.log("codeCarts", codeCarts.slice(0, 20));
-  return { siyinCarts, codeCarts, data };
-};
+// 获取当月已判废量
+const getHistoryWorks = false;
 
 // 过滤未上传车号
 const getUnUploadCarts = ({ srcData, uploadData }) => {
-  let uploadCarts = R.map(R.prop("cart_number"))(uploadData);
-  let unUploadCarts = R.reject(({ cart_number }) =>
+  let uploadCarts = R.pluck("cart_number")(uploadData);
+  let unUploadCarts = R.reject((cart_number) =>
     uploadCarts.includes(cart_number)
   )(srcData);
+
   return unUploadCarts;
 };
 
@@ -70,7 +34,17 @@ const calcTotalData = (key, data) =>
   R.compose(R.reduce(R.add, 0), R.map(R.prop(key)))(data);
 
 // 汇总任务数汇总
-const getTaskBaseInfo = async ({ user_list, uploadData, tstart, tend }) => {
+const getTaskBaseInfo = async ({
+  user_list,
+  uploadData,
+  validUploadData,
+  totalnum,
+  tstart,
+  tend,
+}) => {
+  let validTotal = calcTotalData("pf_num", validUploadData);
+  let needUsers = Math.floor(validTotal / totalnum);
+
   // 汇总缺陷总数
   let totalFakes = calcTotalData("pf_num", uploadData);
 
@@ -78,20 +52,22 @@ const getTaskBaseInfo = async ({ user_list, uploadData, tstart, tend }) => {
   tend = moment(tend).endOf("month").format("YYYYMMDD");
 
   // 月度判废量
-  let pfNumByMonth = await db
-    .getQfmWipProdLogs({
-      tstart,
-      tend,
-      tstart2: tstart,
-      tend2: tend,
-      tstart3: tstart,
-      tend3: tend,
-      tstart4: tstart,
-      tend4: tend,
-    })
-    .catch((e) => {
-      console.log(e);
-    });
+  let pfNumByMonth = !getHistoryWorks
+    ? []
+    : await db
+        .getQfmWipProdLogs({
+          tstart,
+          tend,
+          tstart2: tstart,
+          tend2: tend,
+          tstart3: tstart,
+          tend3: tend,
+          tstart4: tstart,
+          tend4: tend,
+        })
+        .catch((e) => {
+          console.log(e);
+        });
 
   // 汇总工时总数
   let totalWorkLongTime = calcTotalData("work_long_time", user_list);
@@ -108,9 +84,9 @@ const getTaskBaseInfo = async ({ user_list, uploadData, tstart, tend }) => {
   users = randomArr(users);
 
   return users.map((item) => {
-    let userPfNum = R.filter(R.propEq("operator_name", item.user_name))(
-      pfNumByMonth
-    );
+    let userPfNum = !getHistoryWorks
+      ? []
+      : R.filter(R.propEq("operator_name", item.user_name))(pfNumByMonth);
     let cart_nums = 0,
       pf_num = 0;
     if (userPfNum.length) {
@@ -122,6 +98,10 @@ const getTaskBaseInfo = async ({ user_list, uploadData, tstart, tend }) => {
       expect_carts: parseFloat(
         (item.work_long_time * cartsPerWorker).toFixed(2)
       ),
+      // 总任务条数
+      validTotal,
+      // 最少需要多少人
+      needUsers,
       real_num: 0,
       carts_num: 0,
       delta_num: 0, // 当前条数与期望条数的差值
@@ -407,37 +387,34 @@ module.exports.handleHechaTask = async ({
   tstart,
   tend,
   user_list,
+  /* 低于该值时判废 */
   limit,
+  /* 停止精度 */
   precision,
   carts,
   need_convert,
+  /* 每人最多判多少 */
   totalnum,
 }) => {
   endNum = precision;
 
-  // 获取丝印、印码车号列表以及当天生产的所有车号，用于判断未上传车号；
-  // 在此处截断，用前台传入的数据
-  let {
-    siyinCarts: carts1,
-    codeCarts: carts0,
-    data: srcData,
-  } = await getTaskList({ tstart, tend, prod });
-
-  if (carts0.length === 0) {
-    carts0 = [""];
-  }
-  if (carts1.length === 0) {
-    carts1 = [""];
-  }
-
   // 获取判废条数，调整该接口，支持对丝印，码后，涂布的条数获取条数数据；
-  let uploadData = await db.getWipJobs({ carts0, carts1 });
+  let uploadData = await db.getWipJobs({
+    carts0: carts.mahou,
+    carts1: carts.siyin,
+    carts2: carts.tubu,
+  });
 
   // 未上传车号列表：// 根据已上传车号和已生产车号来计算未上传车号
-  let unupload_carts = getUnUploadCarts({ srcData, uploadData });
+  let unupload_carts = getUnUploadCarts({
+    srcData: [...carts.siyin, ...carts.mahou, ...carts.tubu],
+    uploadData,
+  });
 
-  // 移除已判废车号
-  uploadData = R.filter(R.propEq("finished_flag", 0))(uploadData);
+  // 移除已判废车号,移除已领取车号
+  uploadData = R.filter(
+    (item) => item.finished_flag == 0 || item.item_flag > 0
+  )(uploadData);
 
   // 超过一定条数不处理
   let unhandle_carts = R.filter((item) => item.pf_num > limit)(uploadData);
@@ -462,11 +439,22 @@ module.exports.handleHechaTask = async ({
   let workHour = user_list.reduce((a, b) => a + Number(b.work_long_time), 0);
   let maxNum = totalnum * workHour;
 
+  let validUploadData = R.clone(uploadData);
+
   // console.log("maxNum", maxNum, uploadData.length);
+
+  // 本次任务指定的人员按不超过2W条排产
   uploadData = handleLimitTask(R.clone(uploadData), maxNum);
   // console.log(uploadData.length);
   // 计算任务基础信息
-  let users = await getTaskBaseInfo({ user_list, uploadData, tstart, tend });
+  let users = await getTaskBaseInfo({
+    user_list,
+    uploadData,
+    validUploadData,
+    totalnum,
+    tstart,
+    tend,
+  });
 
   // 排活
   // let { users: task_list } = distribTasks({

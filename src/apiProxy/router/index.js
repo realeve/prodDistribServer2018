@@ -414,7 +414,7 @@ const hechaTask = async (
   limit = limit || 20000;
   precision = precision || 100;
   need_convert = need_convert == "0" ? false : true;
-
+  console.log("开始处理");
   let data = await db3
     .handleHechaTask({
       tstart,
