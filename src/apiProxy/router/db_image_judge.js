@@ -60,6 +60,20 @@ module.exports.getViewCartfinderByProd = (params) =>
 //   });
 
 /**
+ *   @database: { MES系统_生产环境 }
+ *   @desc:     { 未完工车号信息查询 }
+ */
+module.exports.getVCbpcCartlist = (params) =>
+  axios({
+    method: "post",
+    data: {
+      ...params,
+      id: 1261,
+      nonce: "0d6f9b737b",
+    },
+  }).then((res) => res.data);
+
+/**
 *   @database: { 全幅面 }
 *   @desc:     { 图像判废月度产量汇总 } 
     const { tstart, tend } = params;

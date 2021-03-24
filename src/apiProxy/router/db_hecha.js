@@ -22,6 +22,7 @@ const getHistoryWorks = false;
 // 过滤未上传车号
 const getUnUploadCarts = ({ srcData, uploadData }) => {
   let uploadCarts = R.pluck("cart_number")(uploadData);
+
   let unUploadCarts = R.reject((cart_number) =>
     uploadCarts.includes(cart_number)
   )(srcData);
@@ -411,10 +412,19 @@ module.exports.handleHechaTask = async ({
     uploadData,
   });
 
+  if (unupload_carts.length > 0) {
+    // 获取未上传车号的生产记录
+    unupload_carts = await db.getVCbpcCartlist({
+      tstart,
+      tend,
+      carts: unupload_carts,
+    });
+  }
+
+  let uncomplete = R.filter((item) => item.item_flag > 1)(uploadData);
+
   // 移除已判废车号,移除已领取车号
-  uploadData = R.filter(
-    (item) => item.finished_flag == 0 || item.item_flag > 0
-  )(uploadData);
+  uploadData = R.filter((item) => item.item_flag <= 1)(uploadData);
 
   // 超过一定条数不处理
   let unhandle_carts = R.filter((item) => item.pf_num > limit)(uploadData);
@@ -506,6 +516,7 @@ module.exports.handleHechaTask = async ({
     task_list: tasks,
     unupload_carts,
     unhandle_carts,
+    uncomplete,
   };
 };
 
