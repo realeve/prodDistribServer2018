@@ -395,6 +395,20 @@ router.post("/api/hecha/task", async (ctx) => {
     ctx.body = { msg: `服务端异常`, status: 500 };
   }
 });
+router.post("/api/hecha/code", async (ctx) => {
+  // 使用全局参数校验函数
+  let validInfo = util.validateParam(ctx, "tstart,tend,user_list".split(","));
+  if (!validInfo.status) {
+    ctx.body = validInfo;
+    return;
+  }
+
+  try {
+    ctx.body = await codeTask(ctx, ctx.request.body);
+  } catch (err) {
+    ctx.body = { msg: `服务端异常`, status: 500 };
+  }
+});
 
 // totalNum 人均缺陷条数，默认2W
 const hechaTask = async (
@@ -427,10 +441,44 @@ const hechaTask = async (
       totalnum,
     })
     .catch((e) => {
+      console.log(e);
       throw e;
     });
   return db3.dev
     ? { tstart, tend, user_list, limit, precision, prod, need_convert, ...data }
+    : data;
+};
+
+// totalNum 人均缺陷条数，默认2W
+const codeTask = async (
+  _,
+  {
+    tstart,
+    tend,
+    user_list,
+
+    carts,
+    need_convert,
+  }
+) => {
+  // 起始日期，用户列表，多少条以内，精度，品种,数据是否需要转换
+
+  need_convert = need_convert == "0" ? false : true;
+  console.log("开始处理");
+  let data = await db3
+    .handleCodeTask({
+      tstart,
+      tend,
+      user_list,
+      carts,
+      need_convert,
+    })
+    .catch((e) => {
+      console.log(e);
+      throw e;
+    });
+  return db3.dev
+    ? { tstart, tend, user_list, prod, need_convert, ...data }
     : data;
 };
 

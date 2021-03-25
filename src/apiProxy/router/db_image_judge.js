@@ -157,3 +157,24 @@ module.exports.getWipJobs = async (params) =>
 // .catch((e) => {
 //   console.log(e);
 // });
+
+/** NodeJS服务端调用：
+ *
+ *   @database: { 号码三合一 }
+ *   @desc:     { 号码判废量 } "@/mock/1266_91fba966b7.json"
+ */
+module.exports.getCodeWipProdLogs = (carts) =>
+  axios({
+    method: "post",
+    data: {
+      carts,
+      id: 1266,
+      nonce: "91fba966b7",
+    },
+  }).then(({ data }) => {
+    return data.map((item) => {
+      item.pf_num = parseInt(item.pf_num, 10);
+      item.item_flag = parseInt(item.item_flag, 10);
+      return item;
+    });
+  });

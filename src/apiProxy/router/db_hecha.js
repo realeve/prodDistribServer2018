@@ -19,6 +19,12 @@ const randomArr = (arr) => arr.sort(() => Math.random() - 0.5);
 // 获取当月已判废量
 const getHistoryWorks = false;
 
+// 需要锁定大万数的品种
+
+const needLock = (item) =>
+  ("9607T" == item.product_name && item.type == 0) ||
+  ("9602T" == item.product_name && item.type == 2);
+
 // 过滤未上传车号
 const getUnUploadCarts = ({ srcData, uploadData }) => {
   let uploadCarts = R.pluck("cart_number")(uploadData);
@@ -184,9 +190,7 @@ const updateStatData = (user) => {
   // 汇总缺陷总数
   user.real_num = calcTotalData("pf_num", user.data);
   user.delta_num = user.real_num - user.expect_num;
-  user.prod7 = user.data.filter(
-    (item) => item.product_name == "9607T" && item.type == 0
-  ).length;
+  user.prod7 = user.data.filter((item) => needLock(item)).length;
   return user;
 };
 
@@ -273,10 +277,7 @@ const exchangeCarts = (task_list, try_times = 0) => {
           }
 
           // 7T码后不交换(20190301)，确保用户7T数量一致,此处的判断需要确保前后两个任务中都不对7T运算
-          if (
-            (item.product_name == "9607T" && item.type == 0) ||
-            (nUser.product_name == "9607T" && nUser.type == 0)
-          ) {
+          if (needLock(item) || needLock(nUser)) {
             nextIdx = -1;
           }
         }
@@ -438,6 +439,12 @@ module.exports.handleHechaTask = async ({
     user_list = require("../mock/userList");
   }
 
+  // 对人员随机排序，防止条数多的产品给到指定用户列表
+  user_list = randomArr(user_list);
+
+  // 对已上传的数据随机排序，让丝印涂布随机排列
+  uploadData = randomArr(uploadData);
+
   user_list = user_list.map((item) => {
     if (typeof item.work_long_time == "undefined") {
       item.work_long_time = 1;
@@ -474,30 +481,38 @@ module.exports.handleHechaTask = async ({
   // });
 
   /** 20190301:确保7T品排产数一致 */
-  let specialCarts = uploadData.filter(
-    (item) => item.type == 0 && item.product_name == "9607T"
-  );
-
   // 其它品种任意排列
-  let otherCarts = uploadData.filter(
-    (item) => !(item.type == 0 && item.product_name == "9607T")
-  );
+  let otherCarts = uploadData.filter((item) => !needLock(item));
 
   // console.log(specialCarts, otherCarts);
 
-  // 先排7T
+  // 先排2T
   let res = distribTasks({
     users,
-    uploadData: specialCarts,
+    uploadData: uploadData.filter(
+      (item) => item.product_name === "9602T" && item.type == 2
+    ),
+    ascend: false,
+  });
+
+  // 更新2T条数
+  res.users = res.users.map(updateStatData);
+
+  // 再排7T(此时需将用户顺序乱序，防止7T多的用户2T品重新变多)
+  let res2 = distribTasks({
+    users: res.users.reverse(),
+    uploadData: uploadData.filter(
+      (item) => item.product_name === "9607T" && item.type == 0
+    ),
     ascend: false,
   });
 
   // 更新7T条数
-  res.users = res.users.map(updateStatData);
+  res2.users = res2.users.map(updateStatData);
 
   // 再排普通产品
   let { users: task_list } = distribTasks({
-    users: res.users,
+    users: res2.users,
     uploadData: otherCarts,
     ascend: false,
   });
@@ -512,6 +527,12 @@ module.exports.handleHechaTask = async ({
   if (need_convert) {
     tasks = convertResult(tasks);
   }
+
+  tasks = tasks.map((item) => {
+    item.data = item.data.sort((a, b) => Number(a.type) - Number(b.type));
+    return item;
+  });
+
   return {
     task_list: tasks,
     unupload_carts,
@@ -559,4 +580,106 @@ const handleLimitTask = (data, maxNum) => {
     }
   }
   return distArr;
+};
+
+// 号码判废排活核心流程
+module.exports.handleCodeTask = async ({
+  tstart,
+  tend,
+  user_list,
+  carts,
+  need_convert,
+}) => {
+  let totalnum = 50000;
+
+  // 获取判废条数，调整该接口，支持对丝印，码后，涂布的条数获取条数数据；
+  let uploadData = await db.getCodeWipProdLogs(carts.code);
+
+  // console.log(uploadData);
+  // console.log(carts.code);
+  // 未上传车号列表：// 根据已上传车号和已生产车号来计算未上传车号
+  let unupload_carts = getUnUploadCarts({
+    srcData: carts.code,
+    uploadData,
+  });
+
+  if (unupload_carts.length > 0) {
+    // 获取未上传车号的生产记录
+    unupload_carts = await db.getVCbpcCartlist({
+      tstart,
+      tend,
+      carts: unupload_carts,
+    });
+  }
+
+  // 14表示复核
+  let uncomplete = R.filter((item) => item.item_flag == 14)(uploadData);
+
+  // 获取车号列表
+  let uncompleteCarts = R.pluck("cart_number")(uncomplete);
+
+  // 移除已判废车号,移除已领取车号
+  uploadData = R.reject((item) => uncompleteCarts.includes(item.cart_number))(
+    uploadData
+  );
+
+  if (dev) {
+    user_list = require("../mock/userList");
+  }
+
+  // 对人员随机排序，防止条数多的产品给到指定用户列表
+  user_list = randomArr(user_list);
+
+  // 对已上传的数据随机排序，让丝印涂布随机排列
+  uploadData = randomArr(uploadData);
+
+  user_list = user_list.map((item) => {
+    if (typeof item.work_long_time == "undefined") {
+      item.work_long_time = 1;
+    }
+    return item;
+  });
+
+  // 处理当天的判废总量
+  let workHour = user_list.reduce((a, b) => a + Number(b.work_long_time), 0);
+  let maxNum = totalnum * workHour;
+
+  let validUploadData = R.clone(uploadData);
+
+  uploadData = handleLimitTask(R.clone(uploadData), maxNum);
+  // console.log(uploadData.length);
+  // 计算任务基础信息
+  let users = await getTaskBaseInfo({
+    user_list,
+    uploadData,
+    validUploadData,
+    totalnum,
+    tstart,
+    tend,
+  });
+
+  // 排产品
+  let { users: task_list } = distribTasks({
+    users,
+    uploadData,
+    ascend: false,
+  });
+
+  let tasks = exchangeCarts(task_list);
+
+  if (need_convert) {
+    tasks = convertResult(tasks);
+  }
+
+  tasks = tasks.map((item) => {
+    item.data = item.data.sort((a, b) => Number(a.type) - Number(b.type));
+    return item;
+  });
+
+  return {
+    task_list: tasks,
+    unupload_carts,
+    uncomplete,
+    unhandle_carts: [],
+  };
 };
