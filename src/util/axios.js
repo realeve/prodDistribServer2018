@@ -92,8 +92,9 @@ let axios = async (option) => {
       return data;
     })
     .catch((e) => {
-      console.log(e);
-      return Promise.reject(e);
+      console.log("数据请求出错：");
+      console.log(JSON.stringify(option));
+      // return Promise.reject(e);
     });
 };
 

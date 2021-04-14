@@ -185,9 +185,14 @@ let handleProcStream = async ({
     proc_stream_name,
     proc_stream,
     reason_code,
+  }).catch((e) => {
+    console.log("调整工艺失败：", e.message);
+    return {
+      status: false,
+    };
   });
 
-  console.log(res);
+  // console.log(res);
   if (!res.status) {
     return res;
   }
