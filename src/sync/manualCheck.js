@@ -13,7 +13,9 @@ const mahou = async () => {
   start = 184;
   for (let i = start; i < taskList.length; i++) {
     console.log(`${task_name}:${i + 1}/${taskList.length}`);
-    await handleMahouTask(taskList[i]);
+    await handleMahouTask(taskList[i]).catch((e) => {
+      console.log("判废数据同步出错:", e);
+    });
     console.log(`码后：${i + 1}/${taskList.length} 同步完成`);
   }
 };

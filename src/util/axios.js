@@ -92,9 +92,15 @@ let axios = async (option) => {
       return data;
     })
     .catch((e) => {
+      let { headers, ..._opt } = option;
       console.log("数据请求出错：");
-      console.log(JSON.stringify(option));
-      // return Promise.reject(e);
+      console.log(JSON.stringify(_opt));
+      return {
+        response: e.response || {
+          status: 404,
+          statusText: "无返回结果",
+        },
+      };
     });
 };
 
