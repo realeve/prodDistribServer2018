@@ -27,10 +27,15 @@ const autoLock3T = require("./sync/autoLock");
 // NRB10装箱逻辑处理
 const nepal = require("./sync/nepal");
 
+// OCR同步
+const ocr = require('./sync/ocrsync')
+
 const handleErr = ({ response }) =>
   console.log({ status: response.status, statusText: response.statusText });
 
 const mainThread = async () => {
+  await ocr.init().catch(handleErr)
+
   await syncGZProduct.init().catch(handleErr);
 
   await nepal.init().catch(handleErr);
