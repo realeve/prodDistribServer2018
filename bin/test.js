@@ -14,6 +14,6 @@
 
 
 // 后台同步服务
-const sync = require("../src/sync");
+const sync = require("../src/sync/ocrsync");
 
-sync.init();
+sync.syncTechtype('20210101');

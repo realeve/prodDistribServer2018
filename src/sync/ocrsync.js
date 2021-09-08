@@ -4,7 +4,6 @@ let R = require("ramda");
 let moment = require("moment");
 
 let task_name = "同步OCR开包量信息";
- 
 
 /** NodeJS服务端调用：
  *
@@ -56,7 +55,6 @@ const addOcrdataOnlinelog = (params) =>
 
 // 是否需要记录
 const needRecord = async (tstart) => {
-
   let curHour = parseInt(moment().format("HHMM"), 10);
 
   if (curHour > 0959 || curHour < 200) {
@@ -130,9 +128,60 @@ const handleHisData = async (tstart, tend) => {
       tend: i,
     });
 
-    handleCarts(taskList, i);
+    await handleCarts(taskList, i);
     console.log("处理完成：" + i);
+  }
+
+  syncTechtype(tstart)
+};
+
+// ------------------
+/**
+ *   @database: { 质量信息系统 }
+ *   @desc:     { 待同步工艺信息 }
+ */
+const getOcrdataOnline = (tstart) =>
+  axios({
+    url: "/1373/602556f910.json",
+    params: {
+      tstart,
+    },
+  }).then((res) => res.data);
+
+const getUdtTbWipinventory = (carno) =>
+  axios({
+    method: "post",
+    data: {
+      carno,
+      id: 898,
+      nonce: "8cd5e99472",
+    },
+  }).then((res) => res.data && res.data[0]);
+
+const setOcrdataOnline = (params) =>
+  axios({
+    url: "/1374/1fcecd4160.json",
+    params,
+  }).then(({ data: [{ affected_rows }] }) => affected_rows > 0);
+
+const handleCartTech = async (item) => {
+  let res = await getUdtTbWipinventory(item.cartnumber);
+  if (!res) {
+    return;
+  }
+  let tech_type_name = res.工艺;
+  await setOcrdataOnline({
+    _id: item.id,
+    tech_type_name,
+  });
+};
+
+const syncTechtype = async (datename) => {
+  let taskList = await getOcrdataOnline(datename);
+  for (let i = 0; i < taskList.length; i++) {
+    await handleCartTech(taskList[i]);
+    console.log(`${i}/${taskList.length} complete `);
   }
 };
 
-module.exports = { init };
+module.exports = { init,syncTechtype };

@@ -402,9 +402,9 @@ module.exports.handleHechaTask = async ({
 
   // 获取判废条数，调整该接口，支持对丝印，码后，涂布的条数获取条数数据；
   let uploadData = await db.getWipJobs({
-    carts0: carts.mahou,
-    carts1: carts.siyin,
-    carts2: carts.tubu,
+    carts0: carts.mahou.length == 0 ? [""] : carts.mahou,
+    carts1: carts.siyin.length == 0 ? [""] : carts.siyin,
+    carts2: carts.tubu.length == 0 ? [""] : carts.tubu,
   });
 
   // 未上传车号列表：// 根据已上传车号和已生产车号来计算未上传车号

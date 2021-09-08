@@ -147,7 +147,7 @@ module.exports.getWipJobs = async (params) =>
       }).then(({ data }) => {
         // console.log(params.carts0.concat("','"));
         // console.log(params.carts1.concat("','"));
-        return data.map((item) => {
+        return (data||[]).map((item) => {
           item.pf_num = parseInt(item.pf_num, 10);
           item.type = parseInt(item.type, 10);
           item.finished_flag = parseInt(item.finished_flag, 10);
