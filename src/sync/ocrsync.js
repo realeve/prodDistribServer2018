@@ -184,4 +184,43 @@ const syncTechtype = async (datename) => {
   }
 };
 
-module.exports = { init,syncTechtype };
+/**
+ *   @database: { 全幅面 }
+ *   @desc:     { 开包量数据更新 }  
+ */
+const setOcrdataOnlineDetail = params => axios({
+  url: '/1401/7f4db2c115.json',
+  params,
+}).then(({
+  data: [{
+    affected_rows
+  }]
+}) => affected_rows > 0);
+
+const fs = require('fs')
+
+const updateData = async () => {
+  let txt = fs.readFileSync('./task.txt', 'utf-8')
+  let arr = txt.split('\r\n')
+
+  let len = arr.length
+
+  
+  for (let i = 18869; i < len; i++) {
+    let cart = arr[i]
+    let { data } = await db.getOcrContrastResult(cart).catch(e=>{})
+
+    if (data.length === 0 || data[0].ex_opennum == 0) {
+      continue;
+    }
+    let res = data[0];
+    res = {
+      cartnumber: cart,
+      ...res,
+    };
+    await setOcrdataOnlineDetail(res)
+    console.log(`${i + 1}/${len},${cart}`)
+  }
+}
+
+module.exports = { init, syncTechtype, updateData };

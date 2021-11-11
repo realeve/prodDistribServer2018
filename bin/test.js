@@ -16,4 +16,4 @@
 // 后台同步服务
 const sync = require("../src/sync/ocrsync");
 
-sync.syncTechtype('20210101');
+sync.updateData();
