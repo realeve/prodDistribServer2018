@@ -27,8 +27,8 @@ const getQaPacketMaster = (params) =>
 /**
 *   @database: { MES系统_生产环境 }
 *   @desc:     { 更新数据上传情况 } 
-	以下参数在建立过程中与系统保留字段冲突，已自动替换:
-	@id:_id. 参数说明：api 索引序号 
+  以下参数在建立过程中与系统保留字段冲突，已自动替换:
+  @id:_id. 参数说明：api 索引序号 
 */
 const setCbpcPackageDataupload = (params) =>
   axios({
@@ -72,7 +72,7 @@ const getTaskList = async (id) => {
 // 35925,此前的数据
 const init = async () => {
   let isComplete = false;
-  let lastId = 0;
+  let lastId = 50000;
   // 不断循环
   while (!isComplete) {
     let res = await getTaskList(lastId);
@@ -86,4 +86,56 @@ const init = async () => {
   console.info(`${task_name} 数据处理完成`);
 };
 
+/**
+ * 获取任务列表
+ with src as( SELECT
+  a.CarNumber cart,
+  dbo.fnCBPC_cart_prod ( a.carnumber ) AS prod,
+  (
+  CASE
+    	
+      WHEN len( a.crownword ) = 5 THEN
+      a.crownword 
+      WHEN SUBSTRING ( a.crownword, 4, 1 ) = '*' THEN
+      (
+      CASE
+        	
+          WHEN SUBSTRING ( a.crownword, 3, 1 ) = '*' THEN
+          LEFT ( a.crownword, 2 ) ELSE LEFT ( a.crownword, 3 ) 
+        END 
+        ) ELSE a.crownword 
+      END 
+      ) AS gz,
+      dbo.fnCBPC_GetLeddingNum ( CrownWordStartNum ) gz_num  ,starttime end_time
+    	
+    FROM
+      dbo.udt_pp_MachineProcess a 
+    WHERE
+      a.targetprocess= 24 
+      AND LEFT ( starttime, 4 ) = '2021' 
+      AND crownwordstartnum IS NOT NULL 
+      AND SUBSTRING ( CarNumber, 3, 2 ) <> '10' 
+ ) insert into tbl_cbpc_package_dataupload(cart,prod,gz,gz_num,end_time) select * from src
+
+ */
+
+/** check
+ SELECT
+ id,
+ a.cart 车号,
+ a.prod 品种,
+ a.gz+ a.gz_num 冠字,
+ a.box_num 数据量,
+ a.end_time 装箱日期
+ ,
+ ( CASE WHEN a.box_num IS NULL THEN '缺失' ELSE '数据不完整' END ) 
+ FROM
+   dbo.tbl_cbpc_package_dataupload AS a 
+ WHERE
+   a.box_num IS NULL 
+   OR ( a.box_num <340 ) 
+   -- AND prod not IN ( '9602T', '9603T' )  
+ORDER BY
+ a.end_time ASC
+ */
 module.exports = { init };
