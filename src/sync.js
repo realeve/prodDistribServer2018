@@ -30,10 +30,18 @@ const nepal = require("./sync/nepal");
 // OCR同步
 const ocr = require('./sync/ocrsync')
 
-const handleErr = ({ response }) =>
+const first3 = require('./sync/first3page')
+
+const handleErr = (e) => {
+  console.log(e)
+  let { response } = e
   console.log({ status: response.status, statusText: response.statusText });
+}
 
 const mainThread = async () => {
+
+  await first3.init().catch(handleErr)
+
   await ocr.init().catch(handleErr)
 
   await syncGZProduct.init().catch(handleErr);

@@ -93,8 +93,8 @@ let axios = async (option) => {
     })
     .catch((e) => {
       let { headers, ..._opt } = option;
-      console.log("数据请求出错：");
-      console.log(JSON.stringify(_opt));
+      // console.log("数据请求出错：");
+      // console.log(JSON.stringify(_opt));
       return {
         response: e.response || {
           status: 404,
