@@ -32,6 +32,11 @@ const ocr = require('./sync/ocrsync')
 
 const first3 = require('./sync/first3page')
 
+
+// const aiJudge = require('./sync/ai_imagejudge')
+
+const aiFakeType = require('./sync/ai_faketype')
+
 const handleErr = (e) => {
   console.log(e)
   let { response } = e
@@ -39,6 +44,7 @@ const handleErr = (e) => {
 }
 
 const mainThread = async () => {
+  // aiJudge.init()
 
   await first3.init().catch(handleErr)
 
@@ -125,6 +131,12 @@ const mainThread = async () => {
   // });
 };
 
+const AIFakeThread = async (prodname) => {
+  await aiFakeType(prodname).init().catch((e) => {
+    console.log(e);
+  });
+}
+
 const init = async () => {
   // 间隔时间 20 分钟。
   let timeInterval = 20 * 60 * 1000;
@@ -139,6 +151,17 @@ const init = async () => {
     // 清除次数
     times = times % 1000;
   }, timeInterval);
+
+  // ---------------------------------
+  AIFakeThread('9604T');
+  setInterval(() => {
+    AIFakeThread('9607T');
+  }, 5 * 60 * 1000);
+
+  setInterval(() => {
+    AIFakeThread('9604T');
+  }, 9 * 60 * 1000);
+
 };
 
 module.exports = { init };
