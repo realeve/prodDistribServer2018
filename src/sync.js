@@ -1,6 +1,6 @@
 const lib = require("./util/lib");
 const syncGZProduct = require("./sync/gzProduct");
-const syncSeriousImg = require("./sync/syncSeriousImg");
+// const syncSeriousImg = require("./sync/syncSeriousImg");
 const manualCheck = require("./sync/manualCheck");
 const cartInfo = require("./sync/cartInfo");
 const imgVerify = require("./sync/imgVerify");
@@ -132,7 +132,7 @@ const mainThread = async () => {
 };
 
 const AIFakeThread = async (prodname) => {
-  await aiFakeType(prodname).init().catch((e) => {
+  await aiFakeType.init(prodname).catch((e) => {
     console.log(e);
   });
 }
@@ -141,6 +141,19 @@ const init = async () => {
   // 间隔时间 20 分钟。
   let timeInterval = 20 * 60 * 1000;
   let times = 1;
+
+  // ---------------------------------
+  AIFakeThread('9607T');
+  setInterval(() => {
+    AIFakeThread('9607T');
+  }, 5 * 60 * 1000);
+
+  setInterval(() => {
+    AIFakeThread('9604T');
+  }, 9 * 60 * 1000);
+
+  // -----------
+
 
   console.info("启动数据同步服务");
   mainThread();
@@ -152,15 +165,6 @@ const init = async () => {
     times = times % 1000;
   }, timeInterval);
 
-  // ---------------------------------
-  AIFakeThread('9604T');
-  setInterval(() => {
-    AIFakeThread('9607T');
-  }, 5 * 60 * 1000);
-
-  setInterval(() => {
-    AIFakeThread('9604T');
-  }, 9 * 60 * 1000);
 
 };
 
