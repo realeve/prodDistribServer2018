@@ -137,16 +137,28 @@ const AIFakeThread = async (prodname) => {
   });
 }
 
+const AIInfer = async () => {
+  aiFakeType.autoinfo().catch((e) => {
+    console.log(e);
+  });
+}
+
 const init = async () => {
   // 间隔时间 20 分钟。
   let timeInterval = 20 * 60 * 1000;
   let times = 1;
 
+  AIInfer();
   // ---------------------------------
   AIFakeThread('9607T');
   setInterval(() => {
     AIFakeThread('9607T');
+  }, 7 * 60 * 1000);
+
+  setInterval(() => {
+    AIInfer();
   }, 5 * 60 * 1000);
+
 
   setInterval(() => {
     AIFakeThread('9604T');
