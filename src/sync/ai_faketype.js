@@ -16,7 +16,7 @@ const autoinfo = async () => {
     console.log(`开始 AI自动判废`);
     // 上月作为开始月份时间
     monthName = moment().subtract(1, 'month').format('YYYYMM');
-    url = `http://10.8.60.241:8000/api/autoinfo?tstart=${monthName}`
+    url = `http://10.8.60.241:8000/api/autoinfer?tstart=${monthName}`
     console.log(url)
     axios(url)
 }
