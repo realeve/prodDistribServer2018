@@ -48,7 +48,7 @@ $ docker build -t prod-distrib:1.0 .
 # 独立运行
 $ docker run --rm -dit -p 4000:3000 -p 9615:9615 prod-distrib:1.0
 # 容器随docker服务加载
-docker run -dit --restart always -p 4000:3000 -p 9615:9615 prod-distrib:1.0
+docker run --name [custome-name] -dit --restart always -p 4000:3000 -p 9615:9615 prod-distrib:1.0
 $ docker ps
 $ docker logs [containerID|containerName]
 $ docker logs -f [containerID|containerName]
